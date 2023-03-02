@@ -1,0 +1,28 @@
+[package]
+name = "kyushu"
+version = "0.1.0"
+edition = "2021"
+authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
+description = "kyushu is a journaling application which let you deliberate on events and your journey through them"
+homepage = "https://github.com/amirography/soapberry/tree/main/crates/kyushu"
+repository = "https://github.com/amirography/soapberry/tree/main/crates/kyushu"
+license = "Apache-2.0"
+readme = "README.md"
+categories = ["command-line-utilities"]
+keywords = ["journaling", "events"]
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "kyushu"
+
+
+[dependencies]
+tokio = { version = "1.26.0", features = ["rt", "macros", "rt-multi-thread"] }
+tonic = "0.8.3"
+
+
+[build-dependencies]
+tonic-build = "0.8.4"

@@ -1,0 +1,13 @@
+name: rust-clippy analyze
+
+on:
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: ["main"]
+  schedule:
+    - cron: "44 16 * * 4"
+
+jobs:
+  check-rust:
+    name: check rust
+    uses: amirography/whirlybird/.github/workflows/reusable.yml@main
