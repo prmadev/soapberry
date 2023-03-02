@@ -12,5 +12,5 @@ keywords = ["data_model", "event-sourcing", "events"]
 readme = "README.md"
 
 [dependencies]
-redmaple = "0.8.0"
+redmaple = { version = "0.8.0", path = "../redmaple" }
 thiserror = "1.0.38"
