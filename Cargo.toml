@@ -1,0 +1,7 @@
+[profile.release]
+strip = true      # Automatically strip symbols from the binary.
+lto = true
+codegen-units = 1
+
+[workspace]
+members = ["crates/*"]
