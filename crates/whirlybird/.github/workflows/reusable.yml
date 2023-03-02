@@ -1,0 +1,66 @@
+on:
+  workflow_call:
+    inputs:
+      rust-version:
+        type: string
+        required: false
+        default: nightly
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af #@v1
+        with:
+          profile: minimal
+          toolchain: ${{  inputs.rust-version }}
+          components: rustfmt, clippy
+          override: true
+
+      - name: Install cargo check tools
+        run: |
+          cargo install --locked cargo-deny || true
+          cargo install --locked cargo-outdated || true
+          cargo install --locked cargo-udeps || true
+          cargo install --locked cargo-audit || true
+          cargo install --locked cargo-pants || true
+          cargo install --locked cargo-rdme || true
+
+      - name: set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock')}}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Lint
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy -- -D warnings
+
+      - name: Check
+        run: |
+          cargo deny check
+          cargo outdated --exit-code 1
+          rustup run nightly cargo udeps
+          rm -rf ~/.cargo/advisory-db
+          rustup run nightly cargo audit
+          rustup run nightly cargo pants
+      - name: build
+        run: cargo build --verbose
+
+      - name: test
+        run: cargo test --verbose
+
+      - name: check if the readme is up to date.
+        run: |
+          cargo rdme --check
