@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1](https://github.com/amirography/soapberry/compare/redmaple-v0.8.0...redmaple-v0.8.1) - 2023-03-04
+
+### Other
+- updated subcrates
+
 ## [0.5.1](https://github.com/amirography/redmaple/compare/v0.5.0...v0.5.1) - 2023-02-13
 
 ### Other
