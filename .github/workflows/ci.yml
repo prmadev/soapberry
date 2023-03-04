@@ -86,6 +86,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - run: |
+          rustup set auto-self-update disable
+          rustup toolchain install stable --profile minimal --component llvm-tools-preview
+      - uses: Swatinem/rust-cache@v2
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
@@ -93,6 +97,5 @@ jobs:
       - name: "Install cargo-udeps"
         run: |
           cargo install --locked cargo-udeps || true
-      - uses: Swatinem/rust-cache@v2
       - run: |
           rustup run nightly cargo udeps
