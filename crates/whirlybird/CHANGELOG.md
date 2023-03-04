@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1](https://github.com/amirography/soapberry/compare/whirlybird-v0.3.0...whirlybird-v0.3.1) - 2023-03-04
+
+### Added
+- add some compatibility changes
+
+### Other
+- add releaser
+- updated subcrates
+- try new caching strategy, p2
+- add some checks
+
 ## [0.1.5](https://github.com/amirography/whirlybird/compare/v0.1.4...v0.1.5) - 2023-02-16
 
 ### Added
