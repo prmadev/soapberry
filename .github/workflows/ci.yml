@@ -64,3 +64,35 @@ jobs:
       - uses: Swatinem/rust-cache@v1
       - run: |
           cargo deny check
+
+  cargo-outdated:
+    name: "cargo outdated"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Install cargo-outdated"
+        run: |
+          cargo install --locked cargo-outdated || true
+      - uses: Swatinem/rust-cache@v1
+      - run: |
+          cargo outdated --exit-code 1
+
+  cargo-udeps:
+    name: "cargo udeps"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Install cargo-udeps"
+        run: |
+          cargo install --locked cargo-udeps || true
+      - uses: Swatinem/rust-cache@v2
+      - run: |
+          rustup run nightly cargo udeps
