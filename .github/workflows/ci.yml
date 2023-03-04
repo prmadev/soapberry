@@ -55,6 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
@@ -62,7 +63,6 @@ jobs:
       - name: "Install cargo-deny"
         run: |
           cargo install --locked cargo-deny || true
-      - uses: Swatinem/rust-cache@v2
       - run: |
           cargo deny check
 
