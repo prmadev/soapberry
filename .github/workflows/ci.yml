@@ -204,7 +204,6 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: "Install cargo-udeps"
         run: |
-          cargo install --locked pants || true
+          cargo install --locked cargo-pants || true
       - run: |
-          rm -rf ~/.cargo/advisory-db
           rustup run nightly cargo pants
