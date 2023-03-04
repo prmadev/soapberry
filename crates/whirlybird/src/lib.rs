@@ -107,6 +107,7 @@ mod tests {
 
     #[test]
     fn it_works() {
+        //
         let mut es = ES::new(vec![]);
 
         let created_event = Argument::new_create_event();
@@ -127,7 +128,7 @@ mod tests {
         };
 
         match es.get_redmaples() {
-            Some(f) => println!("{:#?}", f),
+            Some(f) => println!("{f:#?}"),
             None => panic!("list is empty"),
         }
     }
