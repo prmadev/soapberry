@@ -107,6 +107,7 @@ mod tests {
 
     #[test]
     fn it_works() {
+        //
         let mut es = ES::new(vec![]);
 
         let created_event = Argument::new_create_event();
