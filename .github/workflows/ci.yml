@@ -23,7 +23,10 @@ jobs:
       - name: "Install Rust toolchain"
         run: rustup show
       - uses: Swatinem/rust-cache@v1
-      - run: cargo build --all
+      - name: build
+        run: cargo build --all
+      - name: test
+        run: cargo test --verbose
 
   cargo-fmt:
     name: "cargo fmt"
