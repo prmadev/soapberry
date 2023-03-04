@@ -148,6 +148,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
       - uses: Swatinem/rust-cache@v2
       - name: set up cargo cache
         uses: actions/cache@v3
