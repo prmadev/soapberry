@@ -127,7 +127,7 @@ mod tests {
         };
 
         match es.get_redmaples() {
-            Some(f) => println!("{:#?}", f),
+            Some(f) => println!("{f:#?}"),
             None => panic!("list is empty"),
         }
     }
