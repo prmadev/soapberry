@@ -6,3 +6,6 @@ redmaple:
 
 whirlybird:
   - crates/whirlybird/**/*
+
+CI:
+  - .github/**/*
