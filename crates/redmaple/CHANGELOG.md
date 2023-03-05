@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - _(redmaple)_ fix picture
 
-## [0.8.1](https://github.com/amirography/soapberry/compare/redmaple-v0.8.0...redmaple-v0.8.1) - 2023-03-04
+## [0.8.1](https://github.com/amirography/soapberry/compare/redmaple%400.8.0...redmaple-v0.8.1) - 2023-03-04
 
 ### Other
 
