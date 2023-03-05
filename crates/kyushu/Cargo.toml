@@ -16,12 +16,18 @@ keywords = ["journaling", "events"]
 path = "src/lib.rs"
 
 [[bin]]
-path = "src/main.rs"
-name = "kyushu"
+path = "src/server.rs"
+name = "kyushu-server"
+
+[[bin]]
+path = "src/client.rs"
+name = "kyushu-client"
 
 
 [dependencies]
+prost = "0.11.8"
 tokio = { version = "1.26.0", features = ["rt", "macros", "rt-multi-thread"] }
+tonic = "0.8.3"
 
 
 [build-dependencies]

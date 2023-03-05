@@ -1,11 +1,9 @@
-//! `kyushu` is an opinionated way of journalling and contemplating about your life.
+//! `kyushu` is an opinionated way of journaling and contemplating about your life.
 //!
-//! For now `kyushu` is still in its infancy. I suggest that you do not use it for now.
-//! But it should be awesome when it reaches a  stable core.
+//! this is a client library made to act as way to communicate with the daemon and be used by the
+//! users
 //!
 //! `kyushu` is proudly standing on the shoulders of [`RedMaple`](https://crates.io/crates/redmaple) library.
-//!
-
 #![deny(missing_docs)]
 #![deny(clippy::expect_used)]
 #![deny(clippy::unwrap_used)]
@@ -35,5 +33,17 @@
 )]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-pub mod api;
-pub mod health_check;
+use kyushu::api::{health_check_service_client::HealthCheckServiceClient, Marco, MarcoPoloRequest};
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut client = HealthCheckServiceClient::connect("http://[::1]:8002").await?;
+    let request = tonic::Request::new(MarcoPoloRequest {
+        marco: Some(Marco {
+            content: String::from("marco"),
+        }),
+    });
+    let response = client.marco_polo(request).await?;
+    println!("RESPONSE={response:?}");
+
+    Ok(())
+}

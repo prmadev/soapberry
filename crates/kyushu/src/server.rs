@@ -1,10 +1,7 @@
 //! `kyushu` is an opinionated way of journaling and contemplating about your life.
-//!
-//! For now `kyushu` is still in its infancy. I suggest that you do not use it for now.
-//! But it should be awesome when it reaches a  stable core.
+//! this is a server binary made to act as daemon for the client
 //!
 //! `kyushu` is proudly standing on the shoulders of [`RedMaple`](https://crates.io/crates/redmaple) library.
-
 #![deny(missing_docs)]
 #![deny(clippy::expect_used)]
 #![deny(clippy::unwrap_used)]
@@ -34,7 +31,15 @@
 )]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+use kyushu::{api::health_check_service_server::HealthCheckServiceServer, health_check};
+use tonic::transport::Server;
 #[tokio::main]
-async fn main() {
-    println!("Hello, world!");
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let addr = "[::1]:8002".parse()?;
+    let health_srv = health_check::HealthSevice::default();
+    Server::builder()
+        .add_service(HealthCheckServiceServer::new(health_srv))
+        .serve(addr)
+        .await?;
+    Ok(())
 }
