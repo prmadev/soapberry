@@ -1,6 +1,6 @@
 [package]
 name = "whirlybird"
-version = "0.3.2"
+version = "0.3.3"
 edition = "2021"
 authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
 description = "whirlybird is a library of generic type implementations for RedMaple library, that offers workflows for different events compatible with common contents like todos, blogs and etc."
@@ -18,5 +18,5 @@ split_commits = true
 filter_unconventional = true
 
 [dependencies]
-redmaple = { version = "0.8.2", path = "../redmaple" }
+redmaple = { version = "0.8.3", path = "../redmaple" }
 thiserror = "1.0.38"
