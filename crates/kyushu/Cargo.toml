@@ -23,6 +23,10 @@ name = "kyushu-server"
 path = "src/client.rs"
 name = "kyushu-client"
 
+[package.metadata.git-cliff.git]
+conventional_commits = true
+split_commits = true
+filter_unconventional = true
 
 [dependencies]
 prost = "0.11.8"
