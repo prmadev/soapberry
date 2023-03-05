@@ -1,7 +1,7 @@
 [package]
 name = "kyushu"
 description = "kyushu is a journaling application which let you deliberate on events and your journey through them"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
 
