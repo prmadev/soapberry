@@ -3,7 +3,7 @@ Whirlybird
 </h1>
 
 <p align="center">
-<img width="200" src="./assets/whirlybird.gif" alt="a picture of a whirlybird falling  in the style of a pixel art">
+<img width="200" src="https://raw.githubusercontent.com/amirography/soapberry/main/crates/whirlybird/assets/whirlybird.gif" alt="a picture of a whirlybird falling  in the style of a pixel art">
 </p>
 
 <!-- cargo-rdme start -->
