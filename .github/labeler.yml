@@ -1,8 +1,8 @@
 kyushu:
-  - src/crates/kyushu/**/*
+  - crates/kyushu/**/*
 
 redmaple:
-  - src/crates/redmaple/**/*
+  - crates/redmaple/**/*
 
 whirlybird:
-  - src/crates/whirlybird/**/*
+  - crates/whirlybird/**/*
