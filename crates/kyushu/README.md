@@ -3,7 +3,7 @@ Kyushu
 </h1>
 
 <p align="center">
-<img width="200" src="github.com/amirography/soapberry/tree/crates/kyushu/assets/kyushu.png" alt="a picture of a Kyushu Maple in the style of a pixel art">
+<img width="200" src="https://raw.githubusercontent.com/amirography/soapberry/main/crates/kyushu/assets/kyushu.png" alt="a picture of a Kyushu Maple in the style of a pixel art">
 </p>
 
 <!-- cargo-rdme start -->

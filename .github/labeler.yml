@@ -1,0 +1,8 @@
+kyushu:
+  - src/crates/kyushu/**/*
+
+redmaple:
+  - src/crates/redmaple/**/*
+
+whirlybird:
+  - src/crates/whirlybird/**/*
