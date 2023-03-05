@@ -1,7 +1,6 @@
 name: Links Per PR
 
 on:
-  push:
   pull_request:
 
 jobs:
