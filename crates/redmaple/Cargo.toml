@@ -11,6 +11,10 @@ categories = ["data-structures"]
 keywords = ["data_model", "event-sourcing", "events"]
 readme = "README.md"
 
+[package.metadata.git-cliff.git]
+conventional_commits = true
+split_commits = true
+filter_unconventional = true
 
 [dependencies]
 thiserror = "1.0.38"
