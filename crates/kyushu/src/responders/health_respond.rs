@@ -13,7 +13,7 @@ pub struct HealthSevice;
 
 #[async_trait]
 impl HealthCheckService for HealthSevice {
-    #[instrument]
+    #[instrument(level = "debug" , fields(request_id = %uuid::Uuid::new_v4()), skip(request))]
     async fn marco_polo(
         &self,
         request: Request<MarcoPoloRequest>,
@@ -27,6 +27,7 @@ impl HealthCheckService for HealthSevice {
                         content: String::from("Polo"),
                     }),
                 };
+
                 let response = Response::new(reply);
 
                 Ok(response)
