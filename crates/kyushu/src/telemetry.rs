@@ -8,6 +8,10 @@ use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_subscriber::{fmt::MakeWriter, layer::SubscriberExt, EnvFilter, Registry};
 
 /// this will initialize the subscriber created
+///
+/// # Errors
+///
+/// it may return errors from upstream library
 pub fn init_subscriber(
     subscriber: impl Subscriber + Send + Sync,
 ) -> Result<(), SetGlobalDefaultError> {
