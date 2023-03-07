@@ -32,13 +32,29 @@
 #![allow(clippy::multiple_crate_versions)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+use std::net::SocketAddr;
+
 use kyushu::api::health_check_service_server::HealthCheckServiceServer;
 use kyushu::responders::health_respond;
 use kyushu::server_configuration::Config;
+use kyushu::telemetry;
 use tonic::transport::Server;
+use tracing::instrument;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    //
+    // instrumentalizing
+    //
+
+    let subscriber = telemetry::get_subscriber(
+        "kyushu_server".to_owned(),
+        "info".to_owned(),
+        std::io::stdout,
+    );
+
+    telemetry::init_subscriber(subscriber)?;
+
     //
     // configuration
     //
@@ -49,19 +65,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // servers
     //
 
-    let health_service = health_respond::HealthSevice::default();
-
     // main
-    let main_server_address = conf.server_address();
-    let main_server_handler = tokio::task::spawn(async move {
-        Server::builder()
-            .add_service(HealthCheckServiceServer::new(health_service))
-            .serve(main_server_address)
-            .await
-    });
-
-    // handle awaits
-    main_server_handler.await??;
+    let main_server_handler = MainServer::new(conf.server_address()).serve();
+    main_server_handler.await?;
 
     Ok(())
+}
+
+#[derive(Debug)]
+struct MainServer {
+    address: SocketAddr,
+    server: tonic::transport::server::Router,
+}
+
+impl MainServer {
+    fn new(address: SocketAddr) -> Self {
+        let health_service = health_respond::HealthSevice::default();
+
+        let server = Server::builder().add_service(HealthCheckServiceServer::new(health_service));
+
+        Self { address, server }
+    }
+    #[instrument(name = "Main server")]
+    async fn serve(self) -> Result<(), tonic::transport::Error> {
+        self.server.serve(self.address).await?;
+        Ok(())
+    }
 }

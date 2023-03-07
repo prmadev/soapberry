@@ -41,3 +41,4 @@ pub mod callers;
 pub mod client_configuration;
 pub mod responders;
 pub mod server_configuration;
+pub mod telemetry;
