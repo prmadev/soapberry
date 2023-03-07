@@ -33,7 +33,11 @@
     clippy::cognitive_complexity,
     clippy::self_named_constructors
 )]
+#![allow(clippy::multiple_crate_versions)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 pub mod api;
-pub mod health_check;
+pub mod callers;
+pub mod client_configuration;
+pub mod responders;
+pub mod server_configuration;

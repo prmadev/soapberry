@@ -29,17 +29,39 @@
     clippy::cognitive_complexity,
     clippy::self_named_constructors
 )]
+#![allow(clippy::multiple_crate_versions)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-use kyushu::{api::health_check_service_server::HealthCheckServiceServer, health_check};
+use kyushu::api::health_check_service_server::HealthCheckServiceServer;
+use kyushu::responders::health_respond;
+use kyushu::server_configuration::Config;
 use tonic::transport::Server;
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = "[::1]:8002".parse()?;
-    let health_srv = health_check::HealthSevice::default();
-    Server::builder()
-        .add_service(HealthCheckServiceServer::new(health_srv))
-        .serve(addr)
-        .await?;
+    //
+    // configuration
+    //
+
+    let conf = Config::build()?;
+
+    //
+    // servers
+    //
+
+    let health_service = health_respond::HealthSevice::default();
+
+    // main
+    let main_server_address = conf.server_address();
+    let main_server_handler = tokio::task::spawn(async move {
+        Server::builder()
+            .add_service(HealthCheckServiceServer::new(health_service))
+            .serve(main_server_address)
+            .await
+    });
+
+    // handle awaits
+    main_server_handler.await??;
+
     Ok(())
 }

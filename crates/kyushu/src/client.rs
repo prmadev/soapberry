@@ -31,19 +31,46 @@
     clippy::cognitive_complexity,
     clippy::self_named_constructors
 )]
+#![allow(clippy::multiple_crate_versions)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-use kyushu::api::{health_check_service_client::HealthCheckServiceClient, Marco, MarcoPoloRequest};
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = HealthCheckServiceClient::connect("http://[::1]:8002").await?;
-    let request = tonic::Request::new(MarcoPoloRequest {
-        marco: Some(Marco {
-            content: String::from("marco"),
-        }),
-    });
-    let response = client.marco_polo(request).await?;
-    println!("RESPONSE={response:?}");
+use std::net::SocketAddr;
 
+use kyushu::{
+    callers::health_call::{HealthCheckClient, HealthCheckError},
+    client_configuration::{Commands, Config, ConfigurationError},
+};
+
+#[tokio::main]
+async fn main() -> Result<(), CommandLineError> {
+    let conf = Config::build()?;
+    route_command(conf.command(), conf.server_address()).await?;
+    Ok(())
+}
+
+#[derive(thiserror::Error, Debug)]
+enum CommandLineError {
+    #[error("function could not connect to server: {0}")]
+    Connection(#[from] tonic::transport::Error),
+
+    #[error("failure during checking health: {0}")]
+    CheckingHealth(#[from] HealthCheckError),
+
+    #[error("failure building configuration: {0}")]
+    BuildingConfiguration(#[from] ConfigurationError),
+}
+
+async fn route_command(
+    command: &Commands,
+    server_address: SocketAddr,
+) -> Result<(), CommandLineError> {
+    match command {
+        Commands::HealthCheck => {
+            let mut client = HealthCheckClient::build(server_address)
+                .await
+                .map_err(CommandLineError::CheckingHealth)?;
+            client.marco_polo_test().await?;
+        }
+    };
     Ok(())
 }
