@@ -1,4 +1,4 @@
-//! `kyushu` is an opinionated way of journalling and contemplating about your life.
+//! [`kyushu`] is an opinionated way of journalling and contemplating about your life.
 //!
 //! For now `kyushu` is still in its infancy. I suggest that you do not use it for now.
 //! But it should be awesome when it reaches a  stable core.

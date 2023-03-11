@@ -35,6 +35,7 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 pub mod argument;
+pub mod journey;
 
 #[allow(clippy::panic)]
 #[cfg(test)]
