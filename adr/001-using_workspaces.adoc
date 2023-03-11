@@ -1,0 +1,63 @@
+= workspaces
+{author}
+// author of this document
+:author: Amir H. Alesheikh <amirhossein.alesheikh@gmail.com>
+// the person proposing this idea
+:proposer: {author}
+// the date that this proposal was created
+:date: 2023-03-10
+// status of the proposal
+// proposed | accepted | rejected | superseded by <example.adoc> | deprecated
+:status: accepted
+// the person that decides the status of the document
+:decider: {author}
+// people consulted for this proposal
+:consulted: NONE
+// decision summary
+:decision: Using one repo, which hosts a workspace, and many crates containing binary and library crates.
+:description: {decision}
+
+[cols="^0h,<1", stripes=hover,%rotate,.details]
+|====
+|Date | {date}
+|Status| {status}
+|Proposer| {proposer}
+|Decider| {decider}
+|consulted| {consulted}
+|====
+
+
+== Context
+// statement of problem
+How should we structure different crates related to the soapberry project?
+
+
+== Decision drivers
+// items and forces that are considered in this decision
+* Ease of change
+* Reliability of API
+* Complexity of maintenance
+
+
+== Decision
+// what is the change that we're proposing and/or doing?
+{decision}
+
+== Considered Alternatives
+// alternatives routes we could have taken, why we did not
+* one repo for soapberry and submodules for each crate
+** using submodules will create complexity when updating versions
+** also this will not help with immediate feedback
+
+* one repo per crate
+** this item will cause a huge amount of friction when one crate updates.
+** also this will cause a headache for maintenance of CI/CD, considering that each change needs to be replicated on all crates.
+
+
+
+== Consequences
+// What becomes easier or more difficult to do because of this change?
+Pros::
+* Increases the agility.
+Cons::
+* History of repose that I have already created will be lost.
