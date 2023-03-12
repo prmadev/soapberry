@@ -47,8 +47,10 @@ Each redmaple is commanded by ForestElf synchronously, but the ForestElfs contac
 ```
 
 Now, this is just how I imagine an architecture based on RedMaples may look-like.
+This is not prescriptive.
 
-This is not prescriptive, however.
+<figure ><img src="../../assets/2021.jpg"> </img> <figcaption > Randal Munroe, Attribution-NonCommercial 2.5 Generic (CC BY-NC 2.5)</figcaption> </figure>
+
 
 ## WhirlyBird
 

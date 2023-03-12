@@ -30,6 +30,17 @@
    background: #8bd5ca;
  }
 
+ figure {
+   text-align: center
+ }
+
+
+ figcaption {
+   text-align: center;
+   color: #8bd5ca;
+   font-size: 0.8em;
+ }
+
  .content h1,
  .content h2,
  .content h3,
