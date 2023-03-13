@@ -18,6 +18,6 @@
         - [Component](./development/c4/component.md)
         - [Code](./development/c4/code.md)
     - [Architectural Decision Records (ADRs)](./development/adr.md)
-        - [Workspaces](./adr/001_workspaces.md)
-        - [gRPC](./adr/002_grpc.md)
+        - [Workspaces](./development/adr/001_workspaces.md)
+        - [gRPC](./development/adr/002_grpc.md)
 
