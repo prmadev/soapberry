@@ -20,4 +20,5 @@
     - [Architectural Decision Records (ADRs)](./development/adr.md)
         - [Workspaces](./development/adr/001_workspaces.md)
         - [gRPC](./development/adr/002_grpc.md)
+        - [gRPC](./development/adr/003_rust.md)
 
