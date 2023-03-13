@@ -86,6 +86,7 @@ impl MainServer {
 
         Self { address, server }
     }
+
     #[instrument(name = "Main server")]
     async fn serve(self) -> Result<(), tonic::transport::Error> {
         self.server.serve(self.address).await?;
