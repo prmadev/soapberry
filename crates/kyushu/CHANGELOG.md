@@ -6,6 +6,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4](https://github.com/amirography/soapberry/compare/kyushu-v0.2.3...kyushu-v0.2.4) - 2023-03-13
+
+### Added
+- *(whirlybird)* add logic for journey
+- *(kyushu)* add details for linking objects and links them selves
+- *(kyushu)* add command requests to proto files
+- add tracing instrumentalization
+- add tracing instrumentalization
+- *(kyushu)* add a basic client-server grpc connection
+- add kyushu
+
+### Other
+- release
+- release
+- Merge pull request #40 from amirography/outline_commands
+- Merge pull request #39 from amirography/outline_commands
+- Merge pull request #35 from amirography/instrumentalize
+- improve server's organization
+- release
+- release
+- Merge branch 'main' into CI
+- add CI case to labeler
+- release
+- Merge pull request #18 from amirography/readme
+- *(kyushu)* update kyushu's readme
+- add labeler
+- release
+- release
+- *(kyushu)* publish on crates.io
+- fix type
+- fix typo
+- add picture to kyushu docs
+- add some checks
+
 ## [0.2.3](https://github.com/amirography/soapberry/compare/kyushu-v0.2.2...kyushu-v0.2.3) - 2023-03-13
 
 ### Added

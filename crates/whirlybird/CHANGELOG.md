@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.3.4...whirlybird-v0.4.0) - 2023-03-13
+
+### Added
+- *(whirlybird)* add logic for journey
+
 ## [0.3.4](https://github.com/amirography/soapberry/compare/whirlybird-v0.3.3...whirlybird-v0.3.4) - 2023-03-12
 
 ### Added
