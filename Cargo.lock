@@ -338,6 +338,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "getset-scoped"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e84baf0a7ddc2959a70a0d14b0d87ef6ec9c4841e60f7bb72a0f0ba3b664c65d"
+dependencies = [
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "h2"
 version = "0.3.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1595,6 +1607,7 @@ dependencies = [
 name = "whirlybird"
 version = "0.3.4"
 dependencies = [
+ "getset-scoped",
  "redmaple",
  "thiserror",
 ]
