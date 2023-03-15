@@ -89,6 +89,7 @@ impl Title {
         if text.is_empty() {
             return Err(DomainError::TextCannotBeEmpty);
         };
+
         Ok(Self(text))
     }
 
@@ -126,7 +127,7 @@ pub struct Entry {
 
     /// [`Journey`] s that this [`Entry`] is on
     #[getset(get = "pub")]
-    journeys: Vec<ID>,
+    journeys: Vec<ValidJourneyID>,
 }
 
 impl Entry {
@@ -138,7 +139,7 @@ impl Entry {
         title: Option<Title>,
         body: Option<Body>,
         links: Vec<Link>,
-        journeys: Vec<ID>,
+        journeys: Vec<ValidJourneyID>,
     ) -> Self {
         Self {
             id: ValidEntryID(id),
@@ -203,11 +204,11 @@ pub struct Link {
 
     /// The unique [`ID`] of certain the [`Entry`] which the [`Link`] is started from.  
     #[getset(get = "pub")]
-    from_id: ID,
+    from_id: ValidEntryID,
 
     /// The unique [`ID`] of certain the [`Entry`] which the [`Link`] is pointing to.  
     #[getset(get = "pub")]
-    to_id: ID,
+    to_id: ValidEntryID,
 
     /// [`Title`] of the [`Entry`]
     #[getset(get = "pub")]
@@ -224,8 +225,8 @@ impl Link {
     pub const fn new(
         id: ID,
         time_created: SystemTime,
-        from_id: ID,
-        to_id: ID,
+        from_id: ValidEntryID,
+        to_id: ValidEntryID,
         title: Title,
         body: Body,
     ) -> Self {
