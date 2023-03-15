@@ -12,10 +12,10 @@ keywords = ["data_model", "event-sourcing", "events"]
 readme = "README.md"
 
 [features]
-default = []
+default = ["journey", "argument"]
 journey = []
 argument = []
-all = ["default", "argument"]
+all = ["journey", "argument"]
 
 
 [package.metadata.git-cliff.git]
@@ -24,6 +24,6 @@ split_commits = true
 filter_unconventional = true
 
 [dependencies]
-getset-scoped = {version= "0.1.2", optional=true}
-redmaple = { version = "0.8.3", path = "../redmaple", optional=true}
-thiserror = {version="1.0.38", optional=true}
+getset-scoped = {version= "0.1.2"}
+redmaple = { version = "0.8.3", path = "../redmaple"}
+thiserror = {version="1.0.38"}

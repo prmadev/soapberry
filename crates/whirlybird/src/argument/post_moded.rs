@@ -3,7 +3,7 @@ use std::time::SystemTime;
 use redmaple::{id::ID, RedMaple};
 
 use super::{
-    post::{Mode, Post},
+    post::{Mode, ValidPostID},
     views::Views,
     Argument,
 };
@@ -14,22 +14,24 @@ pub struct ContentModed {
     id: ID,
     created: SystemTime,
     redmaple_id: ID,
-    post_id: ID,
+    post_id: ValidPostID,
     new_mod: Mode,
 }
 
 impl ContentModed {
     /// Creates an event that states that some content has changed their mod to a given one.
     pub fn new(
+        id: ID,
+        created: SystemTime,
         red_maple: &RedMaple<Argument, Views>,
-        post: &Post<String, String>,
+        post_id: ValidPostID,
         new_mod: Mode,
     ) -> Self {
         Self {
-            id: ID::new(),
-            created: std::time::SystemTime::now(),
+            id,
+            created,
             redmaple_id: red_maple.id().clone(),
-            post_id: post.id().clone(),
+            post_id,
             new_mod,
         }
     }
@@ -45,7 +47,7 @@ impl ContentModed {
     }
 
     /// Gets the inner content ID that this event is effecting on
-    pub const fn post_id(&self) -> &ID {
+    pub const fn post_id(&self) -> &ValidPostID {
         &self.post_id
     }
 

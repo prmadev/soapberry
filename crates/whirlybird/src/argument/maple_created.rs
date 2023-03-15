@@ -24,10 +24,10 @@ impl<V: ViewMode + Sized + Clone> Created<V> {
     /// * `view_mode`: set the view mode for this `RedMaple` `ViewMode`
     /// * `redmaple_id`: set the id of the the parent redmaple
     #[must_use]
-    pub fn new(view_mode: V, redmaple_id: ID) -> Self {
+    pub const fn new(id: ID, created: SystemTime, view_mode: V, redmaple_id: ID) -> Self {
         Self {
-            id: ID::new(),
-            created: std::time::SystemTime::now(),
+            id,
+            created,
             redmaple_id,
             view_mode,
         }
@@ -78,7 +78,12 @@ mod tests {
     #[test]
     fn could_make_event() {
         let red_maple_id = ID::new();
-        let new_event = Created::new(Views::Blog(BlogMode::Text), red_maple_id.clone());
+        let new_event = Created::new(
+            ID::new(),
+            std::time::SystemTime::now(),
+            Views::Blog(BlogMode::Text),
+            red_maple_id.clone(),
+        );
 
         assert_eq!(new_event.redmaple_id(), &red_maple_id);
         assert_eq!(

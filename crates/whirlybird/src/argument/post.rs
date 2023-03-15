@@ -51,3 +51,13 @@ impl Post<String, String> {
         }
     }
 }
+
+#[repr(transparent)]
+#[derive(Clone, Debug, PartialEq)]
+pub struct ValidPostID(ID);
+
+impl ValidPostID {
+    pub const fn inner(&self) -> &ID {
+        &self.0
+    }
+}

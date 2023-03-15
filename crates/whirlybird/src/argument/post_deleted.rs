@@ -2,7 +2,7 @@ use std::time::SystemTime;
 
 use redmaple::{id::ID, RedMaple};
 
-use super::{post::Post, views::Views, Argument};
+use super::{post::ValidPostID, views::Views, Argument};
 
 /// Sets a Content as published
 #[derive(Debug, Clone)]
@@ -10,17 +10,22 @@ pub struct PostDeleted {
     id: ID,
     created: SystemTime,
     redmaple_id: ID,
-    post_id: ID,
+    post_id: ValidPostID,
 }
 
 impl PostDeleted {
     /// Creates an event that states that some content has been deleted (invisible) to users.
-    pub fn new(red_maple: &RedMaple<Argument, Views>, post: &Post<String, String>) -> Self {
+    pub fn new(
+        id: ID,
+        created: SystemTime,
+        red_maple: &RedMaple<Argument, Views>,
+        post_id: ValidPostID,
+    ) -> Self {
         Self {
-            id: ID::new(),
-            created: std::time::SystemTime::now(),
+            id,
+            created,
             redmaple_id: red_maple.id().clone(),
-            post_id: post.id().clone(),
+            post_id,
         }
     }
 
@@ -35,7 +40,7 @@ impl PostDeleted {
     }
 
     /// Gets the inner content ID that this event is effecting on
-    pub const fn post_id(&self) -> &ID {
+    pub const fn post_id(&self) -> &ValidPostID {
         &self.post_id
     }
 

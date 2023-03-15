@@ -273,6 +273,11 @@ impl Argument {
     /// Creates a new instance of `Argument::Created`
     #[must_use]
     pub fn new_create_event() -> Self {
-        Self::Created(Created::new(views::Views::Blog(BlogMode::Text), ID::new()))
+        Self::Created(Created::new(
+            ID::new(),
+            std::time::SystemTime::now(),
+            views::Views::Blog(BlogMode::Text),
+            ID::new(),
+        ))
     }
 }
