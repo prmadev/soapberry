@@ -51,17 +51,14 @@ impl Created {
 
 #[cfg(test)]
 mod tests {
-    // use redmaple::view_mode::BlogMode;
-
-    use redmaple::id::ID;
-
     use crate::argument::maple_created::Created;
+    use redmaple::id::ID;
 
     #[test]
     fn could_make_event() {
-        let red_maple_id = ID::new();
+        let red_maple_id = ID::new(uuid::Uuid::new_v4());
         let new_event = Created::new(
-            ID::new(),
+            ID::new(uuid::Uuid::new_v4()),
             std::time::SystemTime::now(),
             red_maple_id.clone(),
         );
