@@ -156,11 +156,7 @@ impl EventGroup for Argument {
 impl Argument {
     /// Creates a new instance of `Argument::Created`
     #[must_use]
-    pub fn new_create_event() -> Self {
-        Self::Created(Created::new(
-            ID::new(),
-            std::time::SystemTime::now(),
-            ID::new(),
-        ))
+    pub const fn new_create_event(id: ID, created: SystemTime, redmaple_id: ID) -> Self {
+        Self::Created(Created::new(id, created, redmaple_id))
     }
 }

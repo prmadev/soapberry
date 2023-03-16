@@ -39,6 +39,7 @@ impl Post<String, String> {
             Self::Text { id, .. } | Self::Picture { id, .. } => id,
         }
     }
+
     pub const fn date(&self) -> &SystemTime {
         match self {
             Self::Text { date, .. } | Self::Picture { date, .. } => date,
@@ -52,7 +53,6 @@ impl Post<String, String> {
     }
 }
 
-#[repr(transparent)]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ValidPostID(ID);
 

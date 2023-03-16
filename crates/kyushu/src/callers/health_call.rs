@@ -12,7 +12,6 @@ use crate::api::{health_check_service_client::HealthCheckServiceClient, Marco, M
 ///
 /// * `client`: is the underlying connection
 #[derive(Debug)]
-#[repr(transparent)] // because for now we are only using one object and making a wrapper around it
 pub struct HealthCheckClient {
     client: HealthCheckServiceClient<Channel>,
 }

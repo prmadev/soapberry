@@ -14,7 +14,7 @@ pub struct PostCreated {
 }
 
 impl PostCreated {
-    /// Creates an event that states that some content has been added to an existing `RedMaple`.
+    /// Creates an event that states that some content has been added to an existing [`RedMaple`].
     pub fn new(
         id: ID,
         created: SystemTime,

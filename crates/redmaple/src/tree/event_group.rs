@@ -48,8 +48,8 @@ use super::id::ID;
 ///
 ///    }
 ///
-///    let ev1 = Eg(ID::new(), ID::new(), SystemTime::now(), String::from("first_text"));
-///    let ev2 = Eg(ID::new(), ID::new(), SystemTime::now(), String::from("second_text"));
+///    let ev1 = Eg(ID::new(uuid::Uuid::new_v4()), ID::new(uuid::Uuid::new_v4()), SystemTime::now(), String::from("first_text"));
+///    let ev2 = Eg(ID::new(uuid::Uuid::new_v4()), ID::new(uuid::Uuid::new_v4()), SystemTime::now(), String::from("second_text"));
 ///
 ///
 ///    // the two instances should not have the same [`ID`]
