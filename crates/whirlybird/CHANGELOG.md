@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.4.0...whirlybird-v0.5.0) - 2023-03-16
+
+### Other
+- defer handling of state from redmaple to later and make it more simplified
+- change the name of a method to identity to be more declaritive
+- add validity to id of journey
+- make more of whirlybird pure
+
 ## [0.4.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.3.4...whirlybird-v0.4.0) - 2023-03-13
 
 ### Added

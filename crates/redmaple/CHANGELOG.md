@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0](https://github.com/amirography/soapberry/compare/redmaple-v0.8.3...redmaple-v0.9.0) - 2023-03-16
+
+### Other
+- defer handling of state from redmaple to later and make it more simplified
+- change the name of a method to identity to be more declaritive
+
 ## [0.8.3](https://github.com/amirography/soapberry/compare/redmaple-v0.8.2...redmaple-v0.8.3) - 2023-03-05
 
 ### Other
