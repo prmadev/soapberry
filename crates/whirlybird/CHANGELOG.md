@@ -6,6 +6,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.5.0...whirlybird-v0.6.0) - 2023-03-16
+
+### Added
+- *(whirlybird)* add logic for journey
+- add mdbook for documentation
+- add some compatibility changes
+- add whirlybird
+
+### Other
+- Merge pull request #62 from amirography/make_more_pure
+- change naming and make sure every function in redmaple and whirlybird are pure
+- remove hasty use of repr
+- make ID creation pure
+- defer handling of state from redmaple to later and make it more simplified
+- change the name of a method to identity to be more declaritive
+- add validity to id of journey
+- make more of whirlybird pure
+- release
+- release
+- release
+- add CI case to labeler
+- Merge pull request #24 from amirography/readme
+- *(whirlybird)* fix picture
+- release
+- add releaser
+- updated subcrates
+- try new caching strategy, p2
+- add some checks
+- Release 0.3.0
+
 ## [0.5.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.4.0...whirlybird-v0.5.0) - 2023-03-16
 
 ### Other
