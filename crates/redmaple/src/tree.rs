@@ -19,7 +19,7 @@ pub mod id;
 pub struct RedMaple<T: EventGroup + Sized + Clone> {
     id: ID,
     events: Vec<T>,
-    subscribers: Vec<ID>,
+    subscribers: SubscriberList,
 }
 
 impl<T: EventGroup + Sized + Clone> RedMaple<T> {
@@ -27,11 +27,11 @@ impl<T: EventGroup + Sized + Clone> RedMaple<T> {
     ///
     /// * `view_mode`: sets the view mode of the `RedMaple`
     #[must_use]
-    pub const fn new(id: ID) -> Self {
+    pub const fn new(id: ID, events: Vec<T>, subscribers: SubscriberList) -> Self {
         Self {
             id,
-            events: vec![],
-            subscribers: vec![],
+            events,
+            subscribers,
         }
     }
 
@@ -50,53 +50,8 @@ impl<T: EventGroup + Sized + Clone> RedMaple<T> {
     /// Gets a list of subscribers (the subscribers that are listening to any changes happening to
     /// this item)
     #[must_use]
-    pub fn subscribers(&self) -> &[ID] {
-        self.subscribers.as_ref()
-    }
-
-    /// sets a list of subscribers. You should prefer `add_subscriber` and `remove_subscriber`
-    /// whereever possible
-    pub fn set_subsribers(&mut self, subscribers: Vec<ID>) {
-        self.subscribers = subscribers;
-    }
-
-    /// adds a subscriber to the list of subscribers to this tree.
-    ///
-    /// * `subscriber`: of type `ID`
-    ///
-    /// # Errors
-    ///
-    /// * `SubscriberError::IsAlreadyInTheList` : means that the ID that you are trying to add is
-    /// alread in the list of subscribers. having two subscriptions to the same ID may mean twice
-    /// the change messages which may mean data corruption
-    pub fn add_subscriber(&mut self, subscriber: ID) -> Result<(), SubscriberError> {
-        if self.subscribers.contains(&subscriber) {
-            return Err(SubscriberError::IsAlreadyInTheList(subscriber));
-        };
-
-        self.subscribers.push(subscriber);
-
-        Ok(())
-    }
-
-    /// adds a subscriber to the list of subscribers to this tree.
-    ///
-    /// * `subscriber`: of type `ID`
-    ///
-    /// # Errors
-    ///
-    /// * `SubscriberError::CouldNotFindSubscriber`: means that the id that is requested by you
-    ///  to be removed is not found in the list of subscribers of this item.
-    ///
-    pub fn remove_subscriber(&mut self, subscriber: &ID) -> Result<(), SubscriberError> {
-        match self.subscribers.iter().position(|x| x == subscriber) {
-            Some(position) => {
-                self.subscribers.swap_remove(position);
-                Ok(())
-            }
-
-            None => Err(SubscriberError::CouldNotFindSubscriber(subscriber.clone())),
-        }
+    pub const fn subscribers(&self) -> &SubscriberList {
+        &self.subscribers
     }
 }
 
@@ -106,8 +61,33 @@ pub enum SubscriberError {
     /// when subscriber is in the list
     #[error("Could not find the subscriber you are looking for: {0}")]
     CouldNotFindSubscriber(ID),
+}
 
-    /// when subscriber is already in the list
-    #[error("ID is already in the subscribers list: {0}")]
-    IsAlreadyInTheList(ID),
+/// [`SubscriberList`] is wrapper around  `Vec<ID>` which is there to ensure that the subscriber
+/// list follows some gurantees, like not having duplicates and being ordered.
+#[repr(transparent)]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SubscriberList(Vec<ID>);
+impl SubscriberList {
+    /// Creates [`SubscriberLists`] but first sorts the given [`ID`] list and and then checks for
+    /// duplicated subscribers, if found removes duplicates.
+    #[must_use]
+    pub fn new(mut members: Vec<ID>) -> Self {
+        members.sort();
+        members.dedup();
+        Self(members)
+    }
+
+    /// Creates a reference to see the inner vector.
+    #[must_use]
+    pub const fn inner(&self) -> &Vec<ID> {
+        &self.0
+    }
+
+    /// Returns the inner vector and consumes itself in the process.
+    #[must_use]
+    #[allow(clippy::missing_const_for_fn)] // currently a destructor method cannot be const
+    pub fn into_inner(self) -> Vec<ID> {
+        self.0
+    }
 }

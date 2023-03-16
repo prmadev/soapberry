@@ -43,7 +43,7 @@ use uuid::Uuid;
 /// ```
 
 #[repr(transparent)]
-#[derive(Default, Debug, PartialEq, Eq, Clone)]
+#[derive(Default, Debug, PartialEq, Eq, Clone, PartialOrd, Ord)]
 pub struct ID(Uuid);
 
 impl Display for ID {
