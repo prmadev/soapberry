@@ -16,5 +16,5 @@ pub trait ViewMode {
     ///
     /// I suggest the use of an enum. The enum can be the same as the parent enum (if you are
     /// using an enum as the parent parent ).
-    fn get(&self) -> &Self::Identifier;
+    fn identity(&self) -> &Self::Identifier;
 }

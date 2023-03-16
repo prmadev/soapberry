@@ -46,7 +46,7 @@ impl Display for Views {
 impl ViewMode for Views {
     type Identifier = Self;
 
-    fn get(&self) -> &Self::Identifier {
+    fn identity(&self) -> &Self::Identifier {
         self
     }
 }
@@ -80,7 +80,7 @@ impl Display for BlogMode {
 impl ViewMode for BlogMode {
     type Identifier = Self;
 
-    fn get(&self) -> &Self::Identifier {
+    fn identity(&self) -> &Self::Identifier {
         self
     }
 }
