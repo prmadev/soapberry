@@ -35,6 +35,5 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 // pub mod argument;
-pub mod store;
 pub mod tree;
 pub use tree::*;
