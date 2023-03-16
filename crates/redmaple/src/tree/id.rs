@@ -42,7 +42,6 @@ use uuid::Uuid;
 /// assert_ne!(ID::new(id1), ID::new(id2));
 /// ```
 
-#[repr(transparent)]
 #[derive(Default, Debug, PartialEq, Eq, Clone, PartialOrd, Ord)]
 pub struct ID(Uuid);
 

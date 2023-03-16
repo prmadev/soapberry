@@ -39,7 +39,6 @@ pub enum Journal {
 
 /// `Body` is a wrapper around simple [`String`] to ensure that the text alway follows the domain rules
 #[derive(Clone, Debug)]
-#[repr(transparent)]
 pub struct Body(String);
 
 impl Body {
@@ -75,7 +74,6 @@ pub enum DomainError {
 /// [`Title`] is similar to [`Body`] in that it is a wrapper around simple [`String`] to
 /// ensure that the text alway follows the domain rules.
 #[derive(Clone, Debug)]
-#[repr(transparent)]
 pub struct Title(String);
 
 impl Title {
@@ -105,7 +103,7 @@ impl Title {
 ///
 #[derive(Clone, Debug, Getters)]
 pub struct Entry {
-    /// The unique [`ID`] of certain entry.  
+    /// The unique [`ID`] of certain entry.
     #[getset(get = "pub")]
     id: ValidEntryID,
 
@@ -153,7 +151,6 @@ impl Entry {
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Entry`]
-#[repr(transparent)]
 #[derive(Debug, Clone)]
 pub struct ValidEntryID(ID);
 
@@ -166,7 +163,6 @@ impl ValidEntryID {
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Journey`]
-#[repr(transparent)]
 #[derive(Debug, Clone)]
 pub struct ValidJourneyID(ID);
 
@@ -179,7 +175,6 @@ impl ValidJourneyID {
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Link`]
-#[repr(transparent)]
 #[derive(Debug, Clone)]
 pub struct ValidLinkID(ID);
 
@@ -202,11 +197,11 @@ pub struct Link {
     #[getset(get = "pub")]
     time_created: SystemTime,
 
-    /// The unique [`ID`] of certain the [`Entry`] which the [`Link`] is started from.  
+    /// The unique [`ID`] of certain the [`Entry`] which the [`Link`] is started from.
     #[getset(get = "pub")]
     from_id: ValidEntryID,
 
-    /// The unique [`ID`] of certain the [`Entry`] which the [`Link`] is pointing to.  
+    /// The unique [`ID`] of certain the [`Entry`] which the [`Link`] is pointing to.
     #[getset(get = "pub")]
     to_id: ValidEntryID,
 
@@ -272,9 +267,9 @@ impl Journey {
 /// [`ObjectType`] specifies the type of object
 #[derive(Clone, Debug)]
 pub enum ObjectType {
-    /// an object that is held in this [`Redmaple`]  
+    /// an object that is held in this [`Redmaple`]
     Internal,
-    /// an object that is held in other [`Redmaple`]  
+    /// an object that is held in other [`Redmaple`]
     External,
     ///  n object that points to an specific time
     Time,

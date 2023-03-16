@@ -52,7 +52,6 @@ impl Post<String, String> {
     }
 }
 
-#[repr(transparent)]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ValidPostID(ID);
 

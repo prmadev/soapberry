@@ -65,7 +65,6 @@ pub enum SubscriberError {
 
 /// [`SubscriberList`] is wrapper around  `Vec<ID>` which is there to ensure that the subscriber
 /// list follows some gurantees, like not having duplicates and being ordered.
-#[repr(transparent)]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SubscriberList(Vec<ID>);
 impl SubscriberList {
