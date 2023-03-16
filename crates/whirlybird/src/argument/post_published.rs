@@ -2,7 +2,7 @@ use std::time::SystemTime;
 
 use redmaple::{id::ID, RedMaple};
 
-use super::{post::ValidPostID, views::Views, Argument};
+use super::{post::ValidPostID, Argument};
 
 /// Sets a Content as published
 #[derive(Debug, Clone)]
@@ -17,7 +17,7 @@ impl ContentPublished {
     pub fn new(
         id: ID,
         created: SystemTime,
-        red_maple: &RedMaple<Argument, Views>,
+        red_maple: &RedMaple<Argument>,
         post_id: ValidPostID,
     ) -> Self {
         Self {

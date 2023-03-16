@@ -11,7 +11,7 @@ pub enum Mode {
     /// The main post of the redmaple
     HeadPost,
     /// Answer the redmaple, or optionally, answer to another content of the same redmaple
-    Conversation(Option<ID>),
+    Conversation(Option<ValidPostID>),
     /// A new edition for the headpost
     Edition,
 }
@@ -53,7 +53,7 @@ impl Post<String, String> {
 }
 
 #[repr(transparent)]
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ValidPostID(ID);
 
 impl ValidPostID {

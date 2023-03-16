@@ -4,7 +4,6 @@ use redmaple::{id::ID, RedMaple};
 
 use super::{
     post::{Mode, ValidPostID},
-    views::Views,
     Argument,
 };
 
@@ -23,7 +22,7 @@ impl ContentModed {
     pub fn new(
         id: ID,
         created: SystemTime,
-        red_maple: &RedMaple<Argument, Views>,
+        red_maple: &RedMaple<Argument>,
         post_id: ValidPostID,
         new_mod: Mode,
     ) -> Self {
