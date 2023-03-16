@@ -11,7 +11,7 @@ pub enum Mode {
     /// The main post of the redmaple
     HeadPost,
     /// Answer the redmaple, or optionally, answer to another content of the same redmaple
-    Conversation(Option<ID>),
+    Conversation(Option<ValidPostID>),
     /// A new edition for the headpost
     Edition,
 }
@@ -49,5 +49,15 @@ impl Post<String, String> {
         match self {
             Self::Text { content, .. } | Self::Picture { content, .. } => content,
         }
+    }
+}
+
+#[repr(transparent)]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ValidPostID(ID);
+
+impl ValidPostID {
+    pub const fn inner(&self) -> &ID {
+        &self.0
     }
 }

@@ -19,7 +19,7 @@ pub fn init_subscriber(
 }
 
 /// this function creates a subscriber item
-pub fn get_subscriber<M>(name: String, env_filter: String, sink: M) -> impl Subscriber + Send + Sync
+pub fn subscriber<M>(name: String, env_filter: String, sink: M) -> impl Subscriber + Send + Sync
 where
     M: for<'a> MakeWriter<'a> + Send + Sync + 'static,
 {

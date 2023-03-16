@@ -2,7 +2,7 @@ use std::time::SystemTime;
 
 use redmaple::{id::ID, RedMaple};
 
-use super::{post::Post, views::Views, Argument};
+use super::{post::Post, Argument};
 
 /// Adds Content to that redmaple
 #[derive(Debug, Clone)]
@@ -15,10 +15,15 @@ pub struct PostCreated {
 
 impl PostCreated {
     /// Creates an event that states that some content has been added to an existing `RedMaple`.
-    pub fn new(red_maple: &RedMaple<Argument, Views>, post: Post<String, String>) -> Self {
+    pub fn new(
+        id: ID,
+        created: SystemTime,
+        red_maple: &RedMaple<Argument>,
+        post: Post<String, String>,
+    ) -> Self {
         Self {
-            id: ID::new(),
-            created: std::time::SystemTime::now(),
+            id,
+            created,
             redmaple_id: red_maple.id().clone(),
             post,
         }

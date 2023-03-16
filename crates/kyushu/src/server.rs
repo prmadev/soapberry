@@ -47,7 +47,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // instrumentalizing
     //
 
-    let subscriber = telemetry::get_subscriber(
+    let subscriber = telemetry::subscriber(
         "kyushu_server".to_owned(),
         "info".to_owned(),
         std::io::stdout,

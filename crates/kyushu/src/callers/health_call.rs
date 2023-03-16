@@ -6,9 +6,7 @@ use std::net::SocketAddr;
 use tonic::{codegen::http::uri::InvalidUri, transport::Channel};
 use tracing::{error, instrument};
 
-use crate::api::{
-    health_check_service_client::HealthCheckServiceClient, Marco, MarcoPoloRequest, Polo,
-};
+use crate::api::{health_check_service_client::HealthCheckServiceClient, Marco, MarcoPoloRequest};
 
 /// [`HealthCheckClient`] holds a connection to the [`HealthCheckService`]
 ///
@@ -62,7 +60,24 @@ impl HealthCheckClient {
                 x => HealthCheckError::ServerError(x),
             })?;
 
-        check_if_polo(&response.into_inner().polo)
+        response
+            .into_inner()
+            .polo
+            // matching the empty polo
+            .ok_or(HealthCheckError::MissMatchResponse(
+                String::new(),
+                EXPECT.to_owned(),
+            ))
+            // matching non polo response
+            .map(|p| {
+                if p.content == *EXPECT {
+                    return Ok(());
+                }
+                Err(HealthCheckError::MissMatchResponse(
+                    p.content,
+                    EXPECT.to_owned(),
+                ))
+            })?
     }
 }
 
@@ -91,18 +106,4 @@ pub enum HealthCheckError {
     /// of it.
     #[error("got the wrong message: {0} I expected: {1} ")]
     MissMatchResponse(String, String),
-}
-
-fn check_if_polo(o: &Option<Polo>) -> Result<(), HealthCheckError> {
-    match o {
-        Some(p) if p.content == EXPECT => Ok(()),
-        Some(p) => Err(HealthCheckError::MissMatchResponse(
-            p.content.clone(),
-            EXPECT.to_owned(),
-        )),
-        None => Err(HealthCheckError::MissMatchResponse(
-            String::new(),
-            EXPECT.to_owned(),
-        )),
-    }
 }

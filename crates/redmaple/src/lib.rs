@@ -37,5 +37,4 @@
 // pub mod argument;
 pub mod store;
 pub mod tree;
-pub mod view_mode;
 pub use tree::*;

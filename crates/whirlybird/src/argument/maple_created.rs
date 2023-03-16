@@ -4,38 +4,30 @@
 use std::time::SystemTime;
 
 use redmaple::id::ID;
-use redmaple::view_mode::ViewMode;
 
 /// Creates a new instance of Story
 ///
 /// * `id`: is of type ID.
 /// * `redmaple_id`: is of type ID.
 #[derive(Clone, Debug)]
-pub struct Created<V: ViewMode + Sized + Clone> {
+pub struct Created {
     id: ID,
     created: SystemTime,
     redmaple_id: ID,
-    view_mode: V,
 }
 
-impl<V: ViewMode + Sized + Clone> Created<V> {
+impl Created {
     /// Creates a new [`Created`] event
     ///
     /// * `view_mode`: set the view mode for this `RedMaple` `ViewMode`
     /// * `redmaple_id`: set the id of the the parent redmaple
     #[must_use]
-    pub fn new(view_mode: V, redmaple_id: ID) -> Self {
+    pub const fn new(id: ID, created: SystemTime, redmaple_id: ID) -> Self {
         Self {
-            id: ID::new(),
-            created: std::time::SystemTime::now(),
+            id,
+            created,
             redmaple_id,
-            view_mode,
         }
-    }
-
-    /// returns the view mode of the parent redmaple
-    pub const fn view_mode(&self) -> &V {
-        &self.view_mode
     }
 
     /// returns the id of event
@@ -50,13 +42,6 @@ impl<V: ViewMode + Sized + Clone> Created<V> {
         &self.redmaple_id
     }
 
-    // pub fn apply(
-    //     &self,
-    //     store: &dyn crate::store::StateStorage<>,
-    // ) -> Result<(), crate::store::ApplyError> {
-    //     store.apply(self)
-    // }
-
     /// returns the creation time of event
     #[must_use]
     pub const fn created(&self) -> &SystemTime {
@@ -70,15 +55,16 @@ mod tests {
 
     use redmaple::id::ID;
 
-    use crate::argument::{
-        maple_created::Created,
-        views::{BlogMode, Views},
-    };
+    use crate::argument::maple_created::Created;
 
     #[test]
     fn could_make_event() {
         let red_maple_id = ID::new();
-        let new_event = Created::new(Views::Blog(BlogMode::Text), red_maple_id.clone());
+        let new_event = Created::new(
+            ID::new(),
+            std::time::SystemTime::now(),
+            red_maple_id.clone(),
+        );
 
         assert_eq!(new_event.redmaple_id(), &red_maple_id);
         assert_eq!(

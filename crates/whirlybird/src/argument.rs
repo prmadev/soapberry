@@ -3,13 +3,12 @@
 
 use std::time::SystemTime;
 
-use redmaple::{event_group::EventGroup, id::ID, versioned::Versioned};
+use redmaple::{event_group::EventGroup, id::ID};
 use thiserror::Error;
 
 use self::{
     maple_created::Created,
     post::{Mode, Post},
-    views::{BlogMode, Views},
 };
 
 mod maple_created;
@@ -18,13 +17,12 @@ mod post_added;
 mod post_deleted;
 mod post_moded;
 mod post_published;
-pub mod views;
 
 /// Event hold all the events that could happened to a `RedMaple`
 #[derive(Debug, Clone)]
 pub enum Argument {
     /// States that a RedMaple is created
-    Created(maple_created::Created<views::Views>),
+    Created(maple_created::Created),
     /// When a content is added. It does not neccessarily means that it is published
     PostAdded(post_added::PostCreated),
     /// Happens When a content is visible by all those that can view the RedMaple
@@ -95,88 +93,6 @@ impl From<&Post<String, String>> for Dialog {
     }
 }
 
-/// holds the state of an [`Argument`]
-pub struct State {
-    version: u64,
-    view: Views,
-    dialogs: Vec<Dialog>,
-}
-
-impl State {
-    /// Returns a reference to the view of this [`ArgumentState`].
-    pub const fn view(&self) -> &Views {
-        &self.view
-    }
-
-    /// Sets the view of this [`ArgumentState`].
-    fn set_view(&mut self, view: Views) {
-        self.view = view;
-    }
-
-    /// Returns a reference to the posts of this [`ArgumentState`].
-    #[must_use]
-    pub fn dialogs(&self) -> &[Dialog] {
-        self.dialogs.as_ref()
-    }
-
-    /// Adds a [`Dialog`]
-    fn add_dialog(&mut self, post: Dialog) {
-        self.dialogs.push(post);
-    }
-
-    fn publish_dialog(&mut self, id: &ID, time: SystemTime) -> Result<(), StateChangeError> {
-        match self.dialogs.iter_mut().find(|dialog| dialog.id() == id) {
-            Some(mut dialog) => {
-                if dialog.published().is_some() {
-                    Err(StateChangeError::AlreadyDone)
-                } else {
-                    dialog.published = Some(time);
-                    Ok(())
-                }
-            }
-            None => Err(StateChangeError::NotFound),
-        }
-    }
-
-    fn unpublish_dialog(&mut self, id: &ID) -> Result<(), StateChangeError> {
-        match self.dialogs.iter_mut().find(|dialog| dialog.id() == id) {
-            Some(mut dialog) => {
-                if dialog.published().is_none() {
-                    Err(StateChangeError::AlreadyDone)
-                } else {
-                    dialog.published = None;
-                    Ok(())
-                }
-            }
-            None => Err(StateChangeError::NotFound),
-        }
-    }
-
-    fn mode_dialog(&mut self, id: &ID, mode: Mode) -> Result<(), StateChangeError> {
-        match self.dialogs.iter_mut().find(|dialog| dialog.id() == id) {
-            Some(mut dialog) => {
-                if dialog.mode() == &mode {
-                    Err(StateChangeError::AlreadyDone)
-                } else {
-                    dialog.mode = mode;
-                    Ok(())
-                }
-            }
-            None => Err(StateChangeError::NotFound),
-        }
-    }
-}
-
-impl Versioned for State {
-    fn version(&self) -> u64 {
-        self.version
-    }
-
-    fn increment_version(&mut self) {
-        self.version += 1;
-    }
-}
-
 #[derive(Error, Debug)]
 /// An enum which shows the errors reated to applying the event group
 pub enum StateChangeError {
@@ -191,8 +107,6 @@ pub enum StateChangeError {
 }
 
 impl EventGroup for Argument {
-    type State = State;
-
     type EventGroupError = StateChangeError;
 
     fn id(&self) -> &ID {
@@ -237,42 +151,16 @@ impl EventGroup for Argument {
             (_, _) => false,
         }
     }
-
-    fn apply_to(&self, state: &mut Self::State) -> Result<(), Self::EventGroupError> {
-        match self {
-            Self::Created(c) => {
-                state.set_view(c.view_mode().clone());
-                state.increment_version();
-                Ok(())
-            }
-            Self::PostAdded(c) => {
-                state.add_dialog(Dialog::from(c.post()));
-                state.increment_version();
-                Ok(())
-            }
-            Self::PostPublished(c) => {
-                state.publish_dialog(c.id(), *c.created())?;
-                state.increment_version();
-                Ok(())
-            }
-            Self::PostModed(c) => {
-                state.mode_dialog(c.id(), c.new_mod().clone())?;
-                state.increment_version();
-                Ok(())
-            }
-            Self::PostDeleted(c) => {
-                state.unpublish_dialog(c.id())?;
-                state.increment_version();
-                Ok(())
-            }
-        }
-    }
 }
 
 impl Argument {
     /// Creates a new instance of `Argument::Created`
     #[must_use]
     pub fn new_create_event() -> Self {
-        Self::Created(Created::new(views::Views::Blog(BlogMode::Text), ID::new()))
+        Self::Created(Created::new(
+            ID::new(),
+            std::time::SystemTime::now(),
+            ID::new(),
+        ))
     }
 }

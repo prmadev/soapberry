@@ -1,6 +1,5 @@
 //! redmaple is the central data-structure that is underlying the whole crate
 use self::{event_group::EventGroup, id::ID};
-use crate::view_mode::ViewMode;
 use std::fmt::Debug;
 
 /// event module holds the types and functions that events could take and the operations that they
@@ -10,7 +9,6 @@ pub mod event_group;
 pub mod id;
 
 /// versioned keeps the version of an stateful item
-pub mod versioned;
 
 /// `RedMaple` is essentially a series of related events that form a state
 ///
@@ -18,30 +16,23 @@ pub mod versioned;
 /// * `view_mode`: an enum that holds set view mode of an `RedMaple`
 /// * `events`: a list of entities that happened in time series
 #[derive(Debug, Clone)]
-pub struct RedMaple<T: EventGroup + Sized + Clone, V: ViewMode + Sized + Clone> {
+pub struct RedMaple<T: EventGroup + Sized + Clone> {
     id: ID,
-    view_mode: V,
     events: Vec<T>,
     subscribers: Vec<ID>,
 }
 
-impl<T: EventGroup + Sized + Clone, V: ViewMode + Sized + Clone> RedMaple<T, V> {
+impl<T: EventGroup + Sized + Clone> RedMaple<T> {
     /// creates a new instance of [`RedMaple`]
     ///
     /// * `view_mode`: sets the view mode of the `RedMaple`
     #[must_use]
-    pub const fn new(view_mode: V, id: ID) -> Self {
+    pub const fn new(id: ID) -> Self {
         Self {
             id,
-            view_mode,
             events: vec![],
             subscribers: vec![],
         }
-    }
-
-    /// Gets the view mode of the `RedMaple`
-    pub const fn view_mode(&self) -> &V {
-        &self.view_mode
     }
 
     /// Gets the ID of the `RedMaple`
@@ -58,6 +49,7 @@ impl<T: EventGroup + Sized + Clone, V: ViewMode + Sized + Clone> RedMaple<T, V> 
 
     /// Gets a list of subscribers (the subscribers that are listening to any changes happening to
     /// this item)
+    #[must_use]
     pub fn subscribers(&self) -> &[ID] {
         self.subscribers.as_ref()
     }

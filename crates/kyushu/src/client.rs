@@ -44,7 +44,7 @@ use kyushu::{
 #[tokio::main]
 async fn main() -> Result<(), CommandLineError> {
     let conf = Config::build()?;
-    route_command(conf.command(), conf.server_address()).await?;
+    router(conf.command(), conf.server_address()).await?;
     Ok(())
 }
 
@@ -60,10 +60,7 @@ enum CommandLineError {
     BuildingConfiguration(#[from] ConfigurationError),
 }
 
-async fn route_command(
-    command: &Commands,
-    server_address: SocketAddr,
-) -> Result<(), CommandLineError> {
+async fn router(command: &Commands, server_address: SocketAddr) -> Result<(), CommandLineError> {
     match command {
         Commands::HealthCheck => {
             let mut client = HealthCheckClient::build(server_address)
