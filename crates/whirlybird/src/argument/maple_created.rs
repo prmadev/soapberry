@@ -65,8 +65,8 @@ mod tests {
 
         assert_eq!(new_event.redmaple_id(), &red_maple_id);
         assert_eq!(
-            new_event.id().into_inner().to_string().len(),
-            red_maple_id.into_inner().to_string().len()
+            new_event.id().inner().to_string().len(),
+            red_maple_id.inner().to_string().len()
         );
     }
 }

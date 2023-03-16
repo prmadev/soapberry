@@ -14,9 +14,9 @@ use uuid::Uuid;
 ///
 /// let id = Uuid::new_v4();
 ///
-/// assert_eq!(id, ID::new(id).into_inner());
+/// assert_eq!(id, ID::new(id).inner());
 ///
-/// assert_eq!(4usize, ID::new(id).into_inner().get_version_num());
+/// assert_eq!(4usize, ID::new(id).inner().get_version_num());
 /// ```
 ///
 /// We should make sure to insure that the `ID::new()` never outputs a nil (all zero) id.
@@ -27,7 +27,7 @@ use uuid::Uuid;
 ///
 /// let id = Uuid::new_v4();
 ///
-/// assert!(!ID::new(id).into_inner().is_nil());
+/// assert!(!ID::new(id).inner().is_nil());
 /// ```
 ///
 /// Of course all ID's should be unique.
@@ -52,7 +52,7 @@ impl Display for ID {
 }
 
 impl ID {
-    /// creats a new instance of the ID
+    /// creats a new instance of the [`ID`]
     #[must_use]
     pub const fn new(id: Uuid) -> Self {
         Self(id)
@@ -60,7 +60,7 @@ impl ID {
 
     /// Returns the uuid of this [`ID`].
     #[must_use]
-    pub const fn into_inner(&self) -> Uuid {
+    pub const fn inner(&self) -> Uuid {
         self.0
     }
 }

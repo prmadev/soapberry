@@ -44,6 +44,7 @@ pub struct Body(String);
 impl Body {
     /// `build` checks if the the domain rules are being followed
     ///
+    /// NOTE: This function is, and should remain pure.
     ///
     /// # Errors
     ///
@@ -57,9 +58,20 @@ impl Body {
     }
 
     /// the inner string of [`Body`]
+    ///
+    /// NOTE: This function is, and should remain pure.
     #[must_use]
     pub const fn inner(&self) -> &String {
         &self.0
+    }
+
+    /// Return the inner string of [`Body`] and consumes itself in the process
+    ///
+    /// NOTE: This function is, and should remain pure.
+    #[must_use]
+    #[allow(clippy::missing_const_for_fn)] // currently a destructor method cannot be const
+    pub fn into_inner(self) -> String {
+        self.0
     }
 }
 
@@ -79,6 +91,7 @@ pub struct Title(String);
 impl Title {
     /// `build` checks if the the domain rules are being followed
     ///
+    /// NOTE: This function is, and should remain pure.
     ///
     /// # Errors
     ///
@@ -92,6 +105,8 @@ impl Title {
     }
 
     /// The inner string  of [`Title`]
+    ///
+    /// NOTE: This function is, and should remain pure.
     #[must_use]
     pub const fn inner(&self) -> &String {
         &self.0

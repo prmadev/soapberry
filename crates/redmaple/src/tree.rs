@@ -9,7 +9,6 @@ pub mod event_group;
 pub mod id;
 
 /// versioned keeps the version of an stateful item
-
 /// `RedMaple` is essentially a series of related events that form a state
 ///
 /// * `id`: of type ID
@@ -23,7 +22,7 @@ pub struct RedMaple<T: EventGroup + Sized + Clone> {
 }
 
 impl<T: EventGroup + Sized + Clone> RedMaple<T> {
-    /// creates a new instance of [`RedMaple`]
+    /// Creates a new instance of [`RedMaple`]
     ///
     /// * `view_mode`: sets the view mode of the `RedMaple`
     #[must_use]

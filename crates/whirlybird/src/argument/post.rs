@@ -39,6 +39,7 @@ impl Post<String, String> {
             Self::Text { id, .. } | Self::Picture { id, .. } => id,
         }
     }
+
     pub const fn date(&self) -> &SystemTime {
         match self {
             Self::Text { date, .. } | Self::Picture { date, .. } => date,
