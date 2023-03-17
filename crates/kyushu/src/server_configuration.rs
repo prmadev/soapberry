@@ -45,30 +45,34 @@ pub enum ConfigurationError {
     ProblemParsingTheAddress(#[from] AddrParseError),
 }
 
-impl Config {
-    /// [`build`] parses the runtime arguments and returns a [`Config`] struct
+impl TryFrom<std::env::ArgsOs> for Config {
+    type Error = ConfigurationError;
+
+    /// [`try_from`] parses the runtime arguments and returns a Result<[`Config`], [`ConfigurationError`]> struct
     ///
     /// # Errors
     ///
     /// may return all kinds of errors. all wrapped in [`ConfigurationError`]. for more details see
     /// there.
-    pub fn build() -> Result<Self, ConfigurationError> {
-        let args = Args::parse();
+    fn try_from(value: std::env::ArgsOs) -> Result<Self, Self::Error> {
+        let args = Args::parse_from(value);
+        let serve = match args.address {
+            Some(ad) => ad,
+            None => ask_for_address()?,
+        };
+        let port = match args.port {
+            Some(p) => p,
+            None => ask_for_port(9000)?,
+        };
+
+        let sockadd = SocketAddr::new(IpAddr::from_str(&serve)?, port);
 
         Ok(Self {
-            server_address: SocketAddr::new(
-                IpAddr::from_str(&match &args.address {
-                    Some(a) => a.clone(),
-                    None => ask_for_address()?,
-                })?,
-                match args.port {
-                    Some(p) => p,
-                    None => ask_for_port(9000)?,
-                },
-            ),
+            server_address: sockadd,
         })
     }
-
+}
+impl Config {
     /// returns the address of the server
     #[must_use]
     pub const fn server_address(&self) -> SocketAddr {
