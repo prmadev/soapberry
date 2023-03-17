@@ -59,7 +59,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // configuration
     //
 
-    let conf = Config::build()?;
+    let conf = Config::try_from(std::env::args_os())?;
 
     //
     // servers
