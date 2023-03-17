@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add kyushu
 
 ### Other
+- *(kyushu)* make try-from more pure
 - *(kyushu)* use try_from instead of build for configuration of kyushu
 - release
 - Merge pull request #62 from amirography/make_more_pure
