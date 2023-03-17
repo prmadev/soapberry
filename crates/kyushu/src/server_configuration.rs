@@ -7,8 +7,6 @@ use std::{
 };
 
 use clap::{command, Parser};
-use inquire::{validator::Validation, InquireError, Text};
-use validators::prelude::validators_prelude;
 
 /// [`Config`] holds the configuarion and command logic that the user runs to run [`kyushu_client`]
 ///
@@ -32,17 +30,21 @@ pub struct Args {
 /// these are the errors that happen when trying to form a configuration for client
 #[derive(thiserror::Error, Debug)]
 pub enum ConfigurationError {
-    /// error that happen when trying to get answer interactively from user
-    #[error("could not get response from you: {0}")]
-    InquireError(#[from] InquireError),
-
     /// error that happen when trying to parse an integer out of an string
     #[error("Could not parsee integer: {0}")]
     ProblemParsingInteger(#[from] ParseIntError),
 
     /// error that happen when trying to pars an socket address from an string
-    #[error("Could not parsee address: {0}")]
+    #[error("Could not parse address: {0}")]
     ProblemParsingTheAddress(#[from] AddrParseError),
+
+    /// mising address
+    #[error("you should pass in the server's ip address")]
+    MissingAddressArgument,
+
+    /// mising port
+    #[error("you should pass in the server's port number")]
+    MissingPortArgument,
 }
 
 impl TryFrom<std::env::ArgsOs> for Config {
@@ -56,14 +58,10 @@ impl TryFrom<std::env::ArgsOs> for Config {
     /// there.
     fn try_from(value: std::env::ArgsOs) -> Result<Self, Self::Error> {
         let args = Args::parse_from(value);
-        let serve = match args.address {
-            Some(ad) => ad,
-            None => ask_for_address()?,
-        };
-        let port = match args.port {
-            Some(p) => p,
-            None => ask_for_port(9000)?,
-        };
+        let serve = args
+            .address
+            .ok_or(ConfigurationError::MissingAddressArgument)?;
+        let port = args.port.ok_or(ConfigurationError::MissingPortArgument)?;
 
         let sockadd = SocketAddr::new(IpAddr::from_str(&serve)?, port);
 
@@ -72,58 +70,11 @@ impl TryFrom<std::env::ArgsOs> for Config {
         })
     }
 }
+
 impl Config {
     /// returns the address of the server
     #[must_use]
     pub const fn server_address(&self) -> SocketAddr {
         self.server_address
     }
-}
-
-/// this is a function that asks the user for an IP to the server interactively
-fn ask_for_address() -> Result<String, ConfigurationError> {
-    let address_validator = |input: &str| {
-        if validators_prelude::Ipv4Addr::from_str(input).is_err() && input != "localhost" {
-            Ok(Validation::Invalid(
-                "the address does not seem to be a valid address".into(),
-            ))
-        } else {
-            Ok(Validation::Valid)
-        }
-    };
-
-    Ok(
-        match Text::new("what is the server's address")
-            .with_validator(address_validator)
-            .with_default("127.0.0.1")
-            .with_placeholder("127.0.0.1")
-            .with_help_message(
-                "the address of the server. can be ip address like 0.0.0.0 or it can be localhost.",
-            )
-            .prompt()?
-            .as_str()
-        {
-            "localhost" => "127.0.0.1".to_owned(),
-            x => x.to_owned(),
-        },
-    )
-}
-
-/// this is a function that asks the user for an port number of the server interactively
-fn ask_for_port(default_port: u16) -> Result<u16, ConfigurationError> {
-    let port_validator = |input: &str| match u16::from_str(input) {
-        Ok(_) => Ok(Validation::Valid),
-        Err(_) => Ok(Validation::Invalid(
-            "the port does not seem to be a valid port number".into(),
-        )),
-    };
-
-    Ok(u16::from_str(
-        &Text::new("what is the server's port ")
-            .with_validator(port_validator)
-            .with_default(&format!("{default_port}"))
-            .with_placeholder(&format!("{default_port}"))
-            .with_help_message("the port number of the server, can be any number from 0 to 65536.")
-            .prompt()?,
-    )?)
 }
