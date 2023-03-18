@@ -32,6 +32,7 @@
     clippy::cognitive_complexity,
     clippy::self_named_constructors
 )]
+#![allow(clippy::multiple_crate_versions)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 #[cfg(feature = "argument")]
