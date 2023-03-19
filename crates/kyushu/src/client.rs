@@ -38,7 +38,7 @@ use std::net::SocketAddr;
 
 use kyushu::{
     callers::health_call::{
-        marco_polo_response, marco_polo_response_handler, ConnectedHealthCheckClient,
+        error_handlr, marco_polo_response, marco_polo_response_handler, ConnectedHealthCheckClient,
         HealthCheckError,
     },
     client_configuration::{Commands, Config, ConfigurationError},
@@ -79,9 +79,8 @@ async fn router(command: &Commands, server_address: SocketAddr) -> Result<(), Co
             });
 
             //
-            marco_polo_response_handler(
-                marco_polo_response(client.inner_mut(), request).await?,
-                String::from("Polo"),
+            marco_polo_response_handler(String::from("Polo"))(
+                marco_polo_response(client.inner_mut(), request, error_handlr).await?,
             )?;
         }
     };

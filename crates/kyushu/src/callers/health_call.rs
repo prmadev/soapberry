@@ -3,7 +3,7 @@
 
 use std::net::SocketAddr;
 
-use tonic::{codegen::http::uri::InvalidUri, transport::Channel, Request, Response};
+use tonic::{codegen::http::uri::InvalidUri, transport::Channel, Request, Response, Status};
 use tracing::error;
 
 use crate::api::{
@@ -39,21 +39,26 @@ impl ConnectedHealthCheckClient {
 }
 
 /// response getter
+/// TODO make better documentation
 ///
 /// # Errors
 pub async fn marco_polo_response(
     client: &mut HealthCheckServiceClient<Channel>,
     request: Request<MarcoPoloRequest>,
+    error_handlr: impl Fn(Status) -> HealthCheckError,
 ) -> Result<Response<MarcoPoloResponse>, HealthCheckError> {
-    let resp = client
-        .marco_polo(request)
-        .await
-        .map_err(|e| match e.code() {
-            tonic::Code::Ok => HealthCheckError::OkStatus(e.message().to_owned()),
-            x => HealthCheckError::ServerError(x),
-        })?;
+    let resp = client.marco_polo(request).await.map_err(error_handlr)?;
 
     Ok(resp)
+}
+
+#[allow(clippy::needless_pass_by_value)] // this is in order to recieve the status and being acceptable by compiler for map_err
+/// an error handler which checks the status for different errors and returns the appropiate error
+pub fn error_handlr(status: Status) -> HealthCheckError {
+    match status.code() {
+        tonic::Code::Ok => HealthCheckError::OkStatus(status.message().to_owned()),
+        x => HealthCheckError::ServerError(x),
+    }
 }
 
 /// an example response handler for Marco Polo
@@ -62,27 +67,28 @@ pub async fn marco_polo_response(
 ///
 /// it may return errors to be used by the test
 pub fn marco_polo_response_handler(
-    response: Response<MarcoPoloResponse>,
     expected_response_content: String,
-) -> Result<(), HealthCheckError> {
-    response
-        .into_inner()
-        .polo
-        // matching the empty polo
-        .ok_or(HealthCheckError::MissMatchResponse(
-            String::new(),
-            expected_response_content.clone(),
-        ))
-        // matching non polo response
-        .map(|p| {
-            if p.content == *expected_response_content {
-                return Ok(());
-            }
-            Err(HealthCheckError::MissMatchResponse(
-                p.content,
-                expected_response_content,
+) -> impl Fn(Response<MarcoPoloResponse>) -> Result<(), HealthCheckError> {
+    move |response: Response<MarcoPoloResponse>| -> Result<(), HealthCheckError> {
+        response
+            .into_inner()
+            .polo
+            // matching the empty polo
+            .ok_or(HealthCheckError::MissMatchResponse(
+                String::new(),
+                expected_response_content.clone(),
             ))
-        })?
+            // matching non polo response
+            .map(|p| {
+                if p.content == expected_response_content {
+                    return Ok(());
+                }
+                Err(HealthCheckError::MissMatchResponse(
+                    p.content,
+                    expected_response_content.clone(),
+                ))
+            })?
+    }
 }
 
 /// [`HealthCheckError`] checks for any error that can be resulted when building and testing
