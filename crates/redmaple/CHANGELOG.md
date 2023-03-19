@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.1](https://github.com/amirography/soapberry/compare/redmaple-v0.10.0...redmaple-v0.10.1) - 2023-03-19
+
+### Added
+- *(redmaple)* implement eq and partialeq for better apis
+
 ## [0.10.0](https://github.com/amirography/soapberry/compare/redmaple-v0.9.0...redmaple-v0.10.0) - 2023-03-16
 
 ### Added

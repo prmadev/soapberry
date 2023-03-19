@@ -1,6 +1,6 @@
 [package]
 name = "redmaple"
-version = "0.10.0"
+version = "0.10.1"
 edition = "2021"
 authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
 description = "RedMaple offers an oppinionated yet extremely flexible data modeling system based on events for backend applications"
