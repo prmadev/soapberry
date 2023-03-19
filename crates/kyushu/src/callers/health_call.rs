@@ -14,9 +14,9 @@ use crate::api::{
 ///
 /// * `client`: is the underlying connection
 #[derive(Debug)]
-pub struct HealthCheckClient(HealthCheckServiceClient<Channel>);
+pub struct ConnectedHealthCheckClient(HealthCheckServiceClient<Channel>);
 
-impl HealthCheckClient {
+impl ConnectedHealthCheckClient {
     /// is a builder for the [`HealthCheckClient`]
     ///
     /// * `address`: is a the address of the server
@@ -31,6 +31,7 @@ impl HealthCheckClient {
 
         Ok(Self(client))
     }
+
     /// Exposes the inner client for this type
     pub fn inner_mut(&mut self) -> &mut HealthCheckServiceClient<Channel> {
         &mut self.0

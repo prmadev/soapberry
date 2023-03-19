@@ -38,7 +38,8 @@ use std::net::SocketAddr;
 
 use kyushu::{
     callers::health_call::{
-        marco_polo_response, marco_polo_response_handler, HealthCheckClient, HealthCheckError,
+        marco_polo_response, marco_polo_response_handler, ConnectedHealthCheckClient,
+        HealthCheckError,
     },
     client_configuration::{Commands, Config, ConfigurationError},
 };
@@ -66,7 +67,7 @@ async fn router(command: &Commands, server_address: SocketAddr) -> Result<(), Co
     match command {
         Commands::HealthCheck => {
             // making client
-            let mut client = HealthCheckClient::connected_client(server_address)
+            let mut client = ConnectedHealthCheckClient::connected_client(server_address)
                 .await
                 .map_err(CommandLineError::CheckingHealth)?;
 
