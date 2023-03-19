@@ -10,7 +10,7 @@ use getset_scoped::Getters;
 use redmaple::id::ID;
 
 /// Event hold all the events that could happened to a `RedMaple`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Journal {
     /// Event: An [`Entry`] was created.
     EntryCreated(Entry),
@@ -38,7 +38,7 @@ pub enum Journal {
 }
 
 /// `Body` is a wrapper around simple [`String`] to ensure that the text alway follows the domain rules
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Body(String);
 
 impl Body {
@@ -76,7 +76,7 @@ impl Body {
 }
 
 /// Errors that are resulted from functions  and emthods inside [`journey`]
-#[derive(thiserror::Error, Debug, Clone)]
+#[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum DomainError {
     /// For when a text field should contain 1 or more characters
     #[error("Text Cannot have 0 length")]
@@ -85,7 +85,7 @@ pub enum DomainError {
 
 /// [`Title`] is similar to [`Body`] in that it is a wrapper around simple [`String`] to
 /// ensure that the text alway follows the domain rules.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Title(String);
 
 impl Title {
@@ -116,7 +116,7 @@ impl Title {
 /// [`Entry`] contains information related to an specific user entry
 ///
 ///
-#[derive(Clone, Debug, Getters)]
+#[derive(Clone, Debug, Getters, PartialEq, Eq)]
 pub struct Entry {
     /// The unique [`ID`] of certain entry.
     #[getset(get = "pub")]
@@ -166,7 +166,7 @@ impl Entry {
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Entry`]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ValidEntryID(ID);
 
 impl ValidEntryID {
@@ -178,7 +178,7 @@ impl ValidEntryID {
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Journey`]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ValidJourneyID(ID);
 
 impl ValidJourneyID {
@@ -190,7 +190,7 @@ impl ValidJourneyID {
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Link`]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ValidLinkID(ID);
 
 impl ValidLinkID {
@@ -202,7 +202,7 @@ impl ValidLinkID {
 }
 
 /// [`Link`] is the holder of information between two valid objects
-#[derive(Clone, Debug, Getters)]
+#[derive(Clone, Debug, Getters, PartialEq, Eq)]
 pub struct Link {
     /// The unique [`ID`] of certain [`Link`].
     #[getset(get = "pub")]
@@ -252,7 +252,7 @@ impl Link {
 }
 
 /// [`Journey`] is the holder of meta information for journeys
-#[derive(Clone, Debug, Getters)]
+#[derive(Clone, Debug, Getters, PartialEq, Eq)]
 pub struct Journey {
     /// The unique [`ID`] of certain [`Journey`].
     #[getset(get = "pub")]
@@ -280,7 +280,7 @@ impl Journey {
 }
 
 /// [`ObjectType`] specifies the type of object
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ObjectType {
     /// an object that is held in this [`Redmaple`]
     Internal,
