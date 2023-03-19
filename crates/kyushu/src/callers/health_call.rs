@@ -14,9 +14,7 @@ use crate::api::{
 ///
 /// * `client`: is the underlying connection
 #[derive(Debug)]
-pub struct HealthCheckClient {
-    client: HealthCheckServiceClient<Channel>,
-}
+pub struct HealthCheckClient(HealthCheckServiceClient<Channel>);
 
 impl HealthCheckClient {
     /// is a builder for the [`HealthCheckClient`]
@@ -31,11 +29,11 @@ impl HealthCheckClient {
             .await
             .map_err(|x| HealthCheckError::ProblemConnecting(Box::new(x)))?;
 
-        Ok(Self { client })
+        Ok(Self(client))
     }
-    /// some documentatiom
+    /// Exposes the inner client for this type
     pub fn inner_mut(&mut self) -> &mut HealthCheckServiceClient<Channel> {
-        &mut self.client
+        &mut self.0
     }
 }
 
@@ -56,6 +54,7 @@ pub async fn marco_polo_response(
 
     Ok(resp)
 }
+
 /// an example response handler for Marco Polo
 ///
 /// # Errors
