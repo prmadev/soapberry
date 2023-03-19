@@ -4,7 +4,7 @@
 use std::net::SocketAddr;
 
 use tonic::{codegen::http::uri::InvalidUri, transport::Channel, Request, Response};
-use tracing::{error, instrument};
+use tracing::error;
 
 use crate::api::{
     health_check_service_client::HealthCheckServiceClient, MarcoPoloRequest, MarcoPoloResponse,
@@ -33,33 +33,28 @@ impl HealthCheckClient {
 
         Ok(Self { client })
     }
-
-    /// checks the server, and essentailly pings it.
-    /// this will only test a unary grpc connection.
-    ///
-    /// # Errors
-    ///
-    /// * [`HealthCheckError::OkStatus`]: may happen, though highly unlikely
-    ///
-    /// * [`HealthCheckError::ServerError`]: contains all other types of errors
-    #[instrument]
-    pub async fn marco_polo_test(
-        &mut self,
-        request: Request<MarcoPoloRequest>,
-        expected_response_content: String,
-        response_handler: fn(Response<MarcoPoloResponse>, String) -> Result<(), HealthCheckError>,
-    ) -> Result<(), HealthCheckError> {
-        let response = self
-            .client
-            .marco_polo(request)
-            .await
-            .map_err(|e| match e.code() {
-                tonic::Code::Ok => HealthCheckError::OkStatus(e.message().to_owned()),
-                x => HealthCheckError::ServerError(x),
-            })?;
-
-        response_handler(response, expected_response_content)
+    /// some documentatiom
+    pub fn inner_mut(&mut self) -> &mut HealthCheckServiceClient<Channel> {
+        &mut self.client
     }
+}
+
+/// response getter
+///
+/// # Errors
+pub async fn marco_polo_response(
+    client: &mut HealthCheckServiceClient<Channel>,
+    request: Request<MarcoPoloRequest>,
+) -> Result<Response<MarcoPoloResponse>, HealthCheckError> {
+    let resp = client
+        .marco_polo(request)
+        .await
+        .map_err(|e| match e.code() {
+            tonic::Code::Ok => HealthCheckError::OkStatus(e.message().to_owned()),
+            x => HealthCheckError::ServerError(x),
+        })?;
+
+    Ok(resp)
 }
 /// an example response handler for Marco Polo
 ///

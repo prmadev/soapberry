@@ -37,7 +37,9 @@
 use std::net::SocketAddr;
 
 use kyushu::{
-    callers::health_call::{marco_polo_response_handler, HealthCheckClient, HealthCheckError},
+    callers::health_call::{
+        marco_polo_response, marco_polo_response_handler, HealthCheckClient, HealthCheckError,
+    },
     client_configuration::{Commands, Config, ConfigurationError},
 };
 
@@ -63,20 +65,23 @@ enum CommandLineError {
 async fn router(command: &Commands, server_address: SocketAddr) -> Result<(), CommandLineError> {
     match command {
         Commands::HealthCheck => {
+            // making client
             let mut client = HealthCheckClient::connected_client(server_address)
                 .await
                 .map_err(CommandLineError::CheckingHealth)?;
-            client
-                .marco_polo_test(
-                    tonic::Request::new(kyushu::api::MarcoPoloRequest {
-                        marco: Some(kyushu::api::Marco {
-                            content: String::from("Marco"),
-                        }),
-                    }),
-                    String::from("Polo"),
-                    marco_polo_response_handler,
-                )
-                .await?;
+
+            // forming the request
+            let request = tonic::Request::new(kyushu::api::MarcoPoloRequest {
+                marco: Some(kyushu::api::Marco {
+                    content: String::from("Marco"),
+                }),
+            });
+
+            //
+            marco_polo_response_handler(
+                marco_polo_response(client.inner_mut(), request).await?,
+                String::from("Polo"),
+            )?;
         }
     };
     Ok(())
