@@ -18,9 +18,7 @@ impl HealthCheckService for HealthSevice {
         &self,
         request: Request<MarcoPoloRequest>,
     ) -> Result<Response<MarcoPoloResponse>, Status> {
-        let req = request.into_inner();
-
-        match req.marco {
+        match request.into_inner().marco {
             Some(x) if x.content == "Marco" => {
                 let reply = MarcoPoloResponse {
                     polo: Some(Polo {

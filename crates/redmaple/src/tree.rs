@@ -14,7 +14,7 @@ pub mod id;
 /// * `id`: of type ID
 /// * `view_mode`: an enum that holds set view mode of an `RedMaple`
 /// * `events`: a list of entities that happened in time series
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RedMaple<T: EventGroup + Sized + Clone> {
     id: ID,
     events: Vec<T>,
@@ -55,7 +55,7 @@ impl<T: EventGroup + Sized + Clone> RedMaple<T> {
 }
 
 /// Error type when a dealing with a subscriber
-#[derive(thiserror::Error, Debug)]
+#[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum SubscriberError {
     /// when subscriber is in the list
     #[error("Could not find the subscriber you are looking for: {0}")]

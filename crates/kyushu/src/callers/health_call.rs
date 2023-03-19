@@ -3,19 +3,18 @@
 
 use std::net::SocketAddr;
 
-use tonic::{codegen::http::uri::InvalidUri, transport::Channel};
-use tracing::{error, instrument};
+use tonic::{codegen::http::uri::InvalidUri, transport::Channel, Request, Response};
+use tracing::error;
 
-use crate::api::{health_check_service_client::HealthCheckServiceClient, Marco, MarcoPoloRequest};
+use crate::api::{
+    health_check_service_client::HealthCheckServiceClient, MarcoPoloRequest, MarcoPoloResponse,
+};
 
 /// [`HealthCheckClient`] holds a connection to the [`HealthCheckService`]
 ///
 /// * `client`: is the underlying connection
 #[derive(Debug)]
-pub struct HealthCheckClient {
-    client: HealthCheckServiceClient<Channel>,
-}
-const EXPECT: &str = "Polo";
+pub struct HealthCheckClient(HealthCheckServiceClient<Channel>);
 
 impl HealthCheckClient {
     /// is a builder for the [`HealthCheckClient`]
@@ -25,59 +24,64 @@ impl HealthCheckClient {
     /// # Errors
     ///
     /// * [`HealthCheckError::ProblemConnecting`]: happens when client cannot connect
-    pub async fn build(address: SocketAddr) -> Result<Self, HealthCheckError> {
-        let s = format!("http://{address}");
-        let client = HealthCheckServiceClient::connect(s)
+    pub async fn connected_client(address: SocketAddr) -> Result<Self, HealthCheckError> {
+        let client = HealthCheckServiceClient::connect(format!("http://{address}"))
             .await
             .map_err(|x| HealthCheckError::ProblemConnecting(Box::new(x)))?;
 
-        Ok(Self { client })
+        Ok(Self(client))
     }
+    /// Exposes the inner client for this type
+    pub fn inner_mut(&mut self) -> &mut HealthCheckServiceClient<Channel> {
+        &mut self.0
+    }
+}
 
-    /// checks the server, and essentailly pings it.
-    /// this will only test a unary grpc connection.
-    ///
-    /// # Errors
-    ///
-    /// * [`HealthCheckError::OkStatus`]: may happen, though highly unlikely
-    ///
-    /// * [`HealthCheckError::ServerError`]: contains all other types of errors
-    #[instrument]
-    pub async fn marco_polo_test(&mut self) -> Result<(), HealthCheckError> {
-        let request = tonic::Request::new(MarcoPoloRequest {
-            marco: Some(Marco {
-                content: "Marco".to_owned(),
-            }),
-        });
+/// response getter
+///
+/// # Errors
+pub async fn marco_polo_response(
+    client: &mut HealthCheckServiceClient<Channel>,
+    request: Request<MarcoPoloRequest>,
+) -> Result<Response<MarcoPoloResponse>, HealthCheckError> {
+    let resp = client
+        .marco_polo(request)
+        .await
+        .map_err(|e| match e.code() {
+            tonic::Code::Ok => HealthCheckError::OkStatus(e.message().to_owned()),
+            x => HealthCheckError::ServerError(x),
+        })?;
 
-        let response = self
-            .client
-            .marco_polo(request)
-            .await
-            .map_err(|e| match e.code() {
-                tonic::Code::Ok => HealthCheckError::OkStatus(e.message().to_owned()),
-                x => HealthCheckError::ServerError(x),
-            })?;
+    Ok(resp)
+}
 
-        response
-            .into_inner()
-            .polo
-            // matching the empty polo
-            .ok_or(HealthCheckError::MissMatchResponse(
-                String::new(),
-                EXPECT.to_owned(),
+/// an example response handler for Marco Polo
+///
+/// # Errors
+///
+/// it may return errors to be used by the test
+pub fn marco_polo_response_handler(
+    response: Response<MarcoPoloResponse>,
+    expected_response_content: String,
+) -> Result<(), HealthCheckError> {
+    response
+        .into_inner()
+        .polo
+        // matching the empty polo
+        .ok_or(HealthCheckError::MissMatchResponse(
+            String::new(),
+            expected_response_content.clone(),
+        ))
+        // matching non polo response
+        .map(|p| {
+            if p.content == *expected_response_content {
+                return Ok(());
+            }
+            Err(HealthCheckError::MissMatchResponse(
+                p.content,
+                expected_response_content,
             ))
-            // matching non polo response
-            .map(|p| {
-                if p.content == *EXPECT {
-                    return Ok(());
-                }
-                Err(HealthCheckError::MissMatchResponse(
-                    p.content,
-                    EXPECT.to_owned(),
-                ))
-            })?
-    }
+        })?
 }
 
 /// [`HealthCheckError`] checks for any error that can be resulted when building and testing
