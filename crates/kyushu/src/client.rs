@@ -45,7 +45,7 @@ use kyushu::{
 
 #[tokio::main]
 async fn main() -> Result<(), CommandLineError> {
-    let conf = Config::build()?;
+    let conf = Config::try_from(std::env::args_os())?;
     router(conf.command(), conf.server_address()).await?;
     Ok(())
 }

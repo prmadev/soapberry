@@ -57,15 +57,16 @@ pub enum ConfigurationError {
     ProblemParsingTheAddress(#[from] AddrParseError),
 }
 
-impl Config {
+impl TryFrom<std::env::ArgsOs> for Config {
+    type Error = ConfigurationError;
     /// [`build`] parses the runtime arguments and returns a [`Config`] struct
     ///
     /// # Errors
     ///
     /// may return all kinds of errors. all wrapped in [`ConfigurationError`]. for more details see
     /// there.
-    pub fn build() -> Result<Self, ConfigurationError> {
-        let args = Args::parse();
+    fn try_from(args: std::env::ArgsOs) -> Result<Self, ConfigurationError> {
+        let args = Args::parse_from(args);
 
         Ok(Self {
             server_address: SocketAddr::new(
@@ -82,7 +83,9 @@ impl Config {
             command: args.command,
         })
     }
+}
 
+impl Config {
     /// returns the address of the server
     #[must_use]
     pub const fn server_address(&self) -> SocketAddr {
