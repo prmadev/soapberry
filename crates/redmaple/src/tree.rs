@@ -1,6 +1,8 @@
 //! redmaple is the central data-structure that is underlying the whole crate
+use itertools::Itertools;
+
 use self::{event_group::EventGroup, id::ID};
-use std::fmt::Debug;
+use std::{cmp::Ordering, fmt::Debug};
 
 /// event module holds the types and functions that events could take and the operations that they
 /// can do.
@@ -69,11 +71,72 @@ pub struct SubscriberList(Vec<ID>);
 impl SubscriberList {
     /// Creates [`SubscriberLists`] but first sorts the given [`ID`] list and and then checks for
     /// duplicated subscribers, if found removes duplicates.
+    ///
+    /// # Parameters
+    ///
+    /// ## `D` or `deduplicator`
+    /// this function will be used inside a fold function after the list was sorted.
+    /// so for a case of a sorted list you can just use:
+    ///
+    ///```
+    /// use redmaple::id::ID;
+    /// |mut list:Vec<ID> , item: &ID| {
+    ///   if list.last() != Some(item) {
+    ///     list.push(item.to_owned());
+    ///   };
+    ///   list
+    /// };
+    ///```
+    /// note however that `list.last()` is the only item it will check. So if the list is not
+    /// sorted it will fail to detect duplicates.
+    /// In case you don't want a sorted list you can instead use this:
+    ///
+    ///```
+    /// use  redmaple::id::ID;
+    /// let a = |mut list: Vec<ID>, item: &ID| {
+    ///   if !list.contains(item)  {
+    ///     list.push(item.to_owned());
+    ///   };
+    ///   list
+    /// };
+    ///
+    ///```
+    /// this is less performant because all of the new list will be checked before a new item is
+    /// added. While for the sorted list you only need to check if the last item is equal to the
+    /// current one.
+    ///
+    /// you might also not want to deduplicate in which case you should just add items to the list,
+    /// regardless:
+    ///
+    ///```
+    /// use redmaple::id::ID;
+    /// |mut list: Vec<ID>, item: &ID| {
+    ///   list.push(item.to_owned());
+    ///   list
+    /// };
+    ///```
+    ///
+    ///
+    /// ## `S` or `sorter`
+    ///
+    /// This function will be used to sort the list before it gets deduplicated.
+    ///
+    /// An example would be:
+    ///
+    /// ```
+    /// use redmaple::id::ID;
+    /// |a: &ID , b: &ID| {
+    ///   Ord::cmp(a, b)
+    /// };
+    /// ```
+    ///
     #[must_use]
-    pub fn new(mut members: Vec<ID>) -> Self {
-        members.sort();
-        members.dedup();
-        Self(members)
+    pub fn new<S, D>(members: &[ID], sorter: S, deduplicator: D) -> Self
+    where
+        S: FnMut(&&ID, &&ID) -> Ordering,
+        D: FnMut(Vec<ID>, &ID) -> Vec<ID>,
+    {
+        Self(members.iter().sorted_by(sorter).fold(vec![], deduplicator))
     }
 
     /// Creates a reference to see the inner vector.
