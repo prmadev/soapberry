@@ -154,6 +154,8 @@ impl SubscriberList {
 }
 #[cfg(test)]
 mod tests {
+    use uuid::Uuid;
+
     use super::*;
 
     fn deduplicator(mut list: Vec<ID>, item: &ID) -> Vec<ID> {
@@ -173,5 +175,43 @@ mod tests {
         let empty_subscribers_list = SubscriberList::new(&empty_list, sorter, deduplicator);
 
         assert_eq!(empty_subscribers_list.into_inner(), vec![]);
+    }
+    #[test]
+    fn make_a_sorted_list() {
+        let (item1, item2, item3, item4) = (
+            ID::new(Uuid::new_v4()),
+            ID::new(Uuid::new_v4()),
+            ID::new(Uuid::new_v4()),
+            ID::new(Uuid::new_v4()),
+        );
+        let mut sorted_list = vec![item1.clone(), item2.clone(), item3.clone(), item4.clone()];
+        sorted_list.sort();
+
+        let full_list: Vec<ID> = vec![item1, item2, item3, item4];
+        let new_subscribers_list = SubscriberList::new(&full_list, sorter, deduplicator);
+        assert_eq!(new_subscribers_list.into_inner(), sorted_list);
+    }
+
+    #[test]
+    fn make_a_sorted_deduplicated_list() {
+        let (item1, item2, item3, item4) = (
+            ID::new(Uuid::new_v4()),
+            ID::new(Uuid::new_v4()),
+            ID::new(Uuid::new_v4()),
+            ID::new(Uuid::new_v4()),
+        );
+        let mut sorted_list = vec![
+            item1.clone(),
+            item2.clone(),
+            item3.clone(),
+            item4.clone(),
+            item2.clone(),
+        ];
+        sorted_list.sort();
+        sorted_list.dedup();
+
+        let full_list: Vec<ID> = vec![item1, item2, item3, item4];
+        let new_subscribers_list = SubscriberList::new(&full_list, sorter, deduplicator);
+        assert_eq!(new_subscribers_list.into_inner(), sorted_list);
     }
 }
