@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1](https://github.com/amirography/soapberry/compare/whirlybird-v0.6.0...whirlybird-v0.6.1) - 2023-03-19
+
+### Added
+- *(redmaple)* implement eq and partialeq for better apis on journey types
+- *(redmaple)* implement eq and partialeq for better apis
+
 ## [0.6.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.5.0...whirlybird-v0.6.0) - 2023-03-16
 
 ### Added

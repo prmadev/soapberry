@@ -555,7 +555,7 @@ checksum = "453ad9f582a441959e5f0d088b02ce04cfe8d51a8eaf077f12ac6d3e94164ca6"
 
 [[package]]
 name = "kyushu"
-version = "0.4.1"
+version = "0.5.0"
 dependencies = [
  "clap",
  "inquire",
@@ -946,7 +946,7 @@ dependencies = [
 
 [[package]]
 name = "redmaple"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "thiserror",
  "uuid",
@@ -1597,7 +1597,7 @@ dependencies = [
 
 [[package]]
 name = "whirlybird"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "getset-scoped",
  "redmaple",
