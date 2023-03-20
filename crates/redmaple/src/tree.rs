@@ -152,3 +152,26 @@ impl SubscriberList {
         self.0
     }
 }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn deduplicator(mut list: Vec<ID>, item: &ID) -> Vec<ID> {
+        if list.last() != Some(item) {
+            list.push(item.clone());
+        }
+        list
+    }
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    fn sorter(a: &&ID, b: &&ID) -> Ordering {
+        Ord::cmp(a, b)
+    }
+
+    #[test]
+    fn make_empty_subscribers_list() {
+        let empty_list: Vec<ID> = vec![];
+        let empty_subscribers_list = SubscriberList::new(&empty_list, sorter, deduplicator);
+
+        assert_eq!(empty_subscribers_list.into_inner(), vec![]);
+    }
+}
