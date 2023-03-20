@@ -948,6 +948,7 @@ dependencies = [
 name = "redmaple"
 version = "0.10.1"
 dependencies = [
+ "itertools",
  "thiserror",
  "uuid",
 ]
