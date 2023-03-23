@@ -139,6 +139,29 @@ impl SubscriberList {
         Self(members.iter().sorted_by(sorter).fold(vec![], deduplicator))
     }
 
+    /// a very simple sorted which compares the first ID with the second ID
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    #[must_use]
+    pub fn simple_sorter(a: &&ID, b: &&ID) -> Ordering {
+        Ord::cmp(a, b)
+    }
+
+    /// a very simple deduplicator that sees if the last id in the list is the same as the one
+    /// that is given, if so, it will add the item to the list and return the list.
+    ///
+    /// You should note that this function does not "seem" to be purely functional as it takes a
+    /// mutable list. However, you should consider that the variable is now owned by the function.
+    /// as such it is not a shared mutable reference between different functions.
+    /// This will not comprimise the state of the application, While at the sametime improves
+    /// performance considerably by not cloning every single element time and times again.
+    #[must_use]
+    pub fn simple_deduplicator(mut list: Vec<ID>, item: &ID) -> Vec<ID> {
+        if list.last() != Some(item) {
+            list.push(item.clone());
+        }
+        list
+    }
+
     /// Creates a reference to see the inner vector.
     #[must_use]
     pub const fn inner(&self) -> &Vec<ID> {
@@ -164,6 +187,7 @@ mod tests {
         }
         list
     }
+
     #[allow(clippy::trivially_copy_pass_by_ref)]
     fn sorter(a: &&ID, b: &&ID) -> Ordering {
         Ord::cmp(a, b)
@@ -176,6 +200,7 @@ mod tests {
 
         assert_eq!(empty_subscribers_list.into_inner(), vec![]);
     }
+
     #[test]
     fn make_a_sorted_list() {
         let (item1, item2, item3, item4) = (
