@@ -181,22 +181,14 @@ mod tests {
 
     use super::*;
 
-    fn deduplicator(mut list: Vec<ID>, item: &ID) -> Vec<ID> {
-        if list.last() != Some(item) {
-            list.push(item.clone());
-        }
-        list
-    }
-
-    #[allow(clippy::trivially_copy_pass_by_ref)]
-    fn sorter(a: &&ID, b: &&ID) -> Ordering {
-        Ord::cmp(a, b)
-    }
-
     #[test]
     fn make_empty_subscribers_list() {
         let empty_list: Vec<ID> = vec![];
-        let empty_subscribers_list = SubscriberList::new(&empty_list, sorter, deduplicator);
+        let empty_subscribers_list = SubscriberList::new(
+            &empty_list,
+            SubscriberList::simple_sorter,
+            SubscriberList::simple_deduplicator,
+        );
 
         assert_eq!(empty_subscribers_list.into_inner(), vec![]);
     }
@@ -213,7 +205,11 @@ mod tests {
         sorted_list.sort();
 
         let full_list: Vec<ID> = vec![item1, item2, item3, item4];
-        let new_subscribers_list = SubscriberList::new(&full_list, sorter, deduplicator);
+        let new_subscribers_list = SubscriberList::new(
+            &full_list,
+            SubscriberList::simple_sorter,
+            SubscriberList::simple_deduplicator,
+        );
         assert_eq!(new_subscribers_list.into_inner(), sorted_list);
     }
 
@@ -236,7 +232,11 @@ mod tests {
         sorted_list.dedup();
 
         let full_list: Vec<ID> = vec![item1, item2, item3, item4];
-        let new_subscribers_list = SubscriberList::new(&full_list, sorter, deduplicator);
+        let new_subscribers_list = SubscriberList::new(
+            &full_list,
+            SubscriberList::simple_sorter,
+            SubscriberList::simple_deduplicator,
+        );
         assert_eq!(new_subscribers_list.into_inner(), sorted_list);
     }
 }
