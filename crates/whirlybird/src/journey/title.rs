@@ -1,12 +1,13 @@
-//! [`body`] module contains information about the text body of an entry
+//! [`title`] contains the logic for a valid title for an [`Entry`]
 
 use super::DomainError;
 
-/// `Body` is a wrapper around simple [`String`] to ensure that the text alway follows the domain rules
+/// [`Title`] is similar to [`Body`] in that it is a wrapper around simple [`String`] to
+/// ensure that the text alway follows the domain rules.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Body(String);
+pub struct Title(String);
 
-impl Body {
+impl Title {
     /// `build` checks if the the domain rules are being followed
     ///
     /// # Errors
@@ -20,16 +21,9 @@ impl Body {
         Ok(Self(text))
     }
 
-    /// the inner string of [`Body`]
+    /// The inner string  of [`Title`]
     #[must_use]
     pub const fn inner(&self) -> &String {
         &self.0
-    }
-
-    /// Return the inner string of [`Body`] and consumes itself in the process
-    #[must_use]
-    #[allow(clippy::missing_const_for_fn)] // currently a destructor method cannot be const
-    pub fn into_inner(self) -> String {
-        self.0
     }
 }

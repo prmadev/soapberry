@@ -5,6 +5,8 @@
 //! these relationships form journeys
 pub mod body;
 pub mod entry;
+pub mod link;
+pub mod title;
 
 use std::time::SystemTime;
 
@@ -12,8 +14,10 @@ use getset_scoped::Getters;
 use redmaple::id::ID;
 
 use self::{
-    body::{Body, DomainError},
+    body::Body,
     entry::{Entry, ValidEntryID},
+    link::Link,
+    title::Title,
 };
 
 /// Event hold all the events that could happened to a `RedMaple`
@@ -44,32 +48,6 @@ pub enum Journal {
     JourneyDeleted(ValidJourneyID),
 }
 
-/// [`Title`] is similar to [`Body`] in that it is a wrapper around simple [`String`] to
-/// ensure that the text alway follows the domain rules.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Title(String);
-
-impl Title {
-    /// `build` checks if the the domain rules are being followed
-    ///
-    /// # Errors
-    ///
-    /// * [`JourneyError::TextCannotBeEmpty`] can be returned in-case of empty [`String`].
-    pub fn build(text: String) -> Result<Self, DomainError> {
-        if text.is_empty() {
-            return Err(DomainError::TextCannotBeEmpty);
-        };
-
-        Ok(Self(text))
-    }
-
-    /// The inner string  of [`Title`]
-    #[must_use]
-    pub const fn inner(&self) -> &String {
-        &self.0
-    }
-}
-
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Journey`]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ValidJourneyID(ID);
@@ -79,68 +57,6 @@ impl ValidJourneyID {
     #[must_use]
     pub const fn inner(&self) -> &ID {
         &self.0
-    }
-}
-
-/// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Link`]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ValidLinkID(ID);
-
-impl ValidLinkID {
-    /// exposes the inner [`ID`] of the [`Link`]
-    #[must_use]
-    pub const fn inner(&self) -> &ID {
-        &self.0
-    }
-}
-
-/// [`Link`] is the holder of information between two valid objects
-#[derive(Clone, Debug, Getters, PartialEq, Eq)]
-pub struct Link {
-    /// The unique [`ID`] of certain [`Link`].
-    #[getset(get = "pub")]
-    id: ValidLinkID,
-
-    /// The time it was created.
-    #[getset(get = "pub")]
-    time_created: SystemTime,
-
-    /// The unique [`ID`] of certain the [`Entry`] which the [`Link`] is started from.
-    #[getset(get = "pub")]
-    from_id: ValidEntryID,
-
-    /// The unique [`ID`] of certain the [`Entry`] which the [`Link`] is pointing to.
-    #[getset(get = "pub")]
-    to_id: ValidEntryID,
-
-    /// [`Title`] of the [`Entry`]
-    #[getset(get = "pub")]
-    title: Title,
-
-    /// [`Body`] of the [`Entry`]
-    #[getset(get = "pub")]
-    body: Body,
-}
-
-impl Link {
-    /// creates a new instance of [`Link`]
-    #[must_use]
-    pub const fn new(
-        id: ID,
-        time_created: SystemTime,
-        from_id: ValidEntryID,
-        to_id: ValidEntryID,
-        title: Title,
-        body: Body,
-    ) -> Self {
-        Self {
-            id: ValidLinkID(id),
-            time_created,
-            from_id,
-            to_id,
-            title,
-            body,
-        }
     }
 }
 
@@ -181,4 +97,12 @@ pub enum ObjectType {
     External,
     ///  n object that points to an specific time
     Time,
+}
+
+/// Errors that are resulted from functions  and emthods inside [`journey`]
+#[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
+pub enum DomainError {
+    /// For when a text field should contain 1 or more characters
+    #[error("Text Cannot have 0 length")]
+    TextCannotBeEmpty,
 }
