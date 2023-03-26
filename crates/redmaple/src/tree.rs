@@ -154,6 +154,9 @@ impl SubscriberList {
     /// as such it is not a shared mutable reference between different functions.
     /// This will not comprimise the state of the application, While at the sametime improves
     /// performance considerably by not cloning every single element time and times again.
+    ///
+    /// another approach could be to copy around the list on each item. which is more "pure". but
+    /// misses the point of "pureness" for a worse performance.
     #[must_use]
     pub fn simple_deduplicator(mut list: Vec<ID>, item: &ID) -> Vec<ID> {
         if list.last() != Some(item) {
