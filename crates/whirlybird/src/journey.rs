@@ -3,11 +3,79 @@
 //! in that each node entry has a time associated with it.
 //! and forms named relation ships.
 //! these relationships form journeys
+pub mod body;
+pub mod entry;
+pub mod link;
+pub mod title;
 
 use std::time::SystemTime;
 
 use getset_scoped::Getters;
 use redmaple::id::ID;
+
+use self::{
+    body::Body,
+    entry::{Entry, ValidEntryID},
+    link::Link,
+    title::Title,
+};
+
+/// [`JournelaEvent`] holds the meta data for [`Journal`] event
+pub struct JournalEvent {
+    id: ValidEventID,
+    time: SystemTime,
+    journal_id: ID,
+    data: Journal,
+}
+
+impl JournalEvent {
+    /// this will create a new Journal event
+    #[must_use]
+    pub const fn new(id: ID, time: SystemTime, journal_id: ID, data: Journal) -> Self {
+        Self {
+            id: ValidEventID(id),
+            time,
+            journal_id,
+            data,
+        }
+    }
+
+    /// returns the valid ID of the event
+    #[must_use]
+    pub const fn id(&self) -> &ValidEventID {
+        &self.id
+    }
+
+    /// returns the time the event was created
+    #[must_use]
+    pub const fn time(&self) -> SystemTime {
+        self.time
+    }
+
+    /// returns the ID of the [`RedMapl`] (which in here is the Journal) that the event belongs to
+    #[must_use]
+    pub const fn journal_id(&self) -> &ID {
+        &self.journal_id
+    }
+
+    /// returns the specific data to be acted on
+    #[must_use]
+    pub const fn data(&self) -> &Journal {
+        &self.data
+    }
+}
+
+/// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`JournalEvent`]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ValidEventID(ID);
+
+impl ValidEventID {
+    /// exposes the inner [`ID`] of the [`JournalEvent`]
+    #[must_use]
+    pub const fn inner(&self) -> &ID {
+        &self.0
+    }
+}
 
 /// Event hold all the events that could happened to a `RedMaple`
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -37,146 +105,6 @@ pub enum Journal {
     JourneyDeleted(ValidJourneyID),
 }
 
-/// `Body` is a wrapper around simple [`String`] to ensure that the text alway follows the domain rules
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Body(String);
-
-impl Body {
-    /// `build` checks if the the domain rules are being followed
-    ///
-    /// NOTE: This function is, and should remain pure.
-    ///
-    /// # Errors
-    ///
-    /// * [`JourneyError::TextCannotBeEmpty`] can be returned in-case of empty [`String`].
-    pub fn build(text: String) -> Result<Self, DomainError> {
-        if text.is_empty() {
-            return Err(DomainError::TextCannotBeEmpty);
-        };
-
-        Ok(Self(text))
-    }
-
-    /// the inner string of [`Body`]
-    ///
-    /// NOTE: This function is, and should remain pure.
-    #[must_use]
-    pub const fn inner(&self) -> &String {
-        &self.0
-    }
-
-    /// Return the inner string of [`Body`] and consumes itself in the process
-    ///
-    /// NOTE: This function is, and should remain pure.
-    #[must_use]
-    #[allow(clippy::missing_const_for_fn)] // currently a destructor method cannot be const
-    pub fn into_inner(self) -> String {
-        self.0
-    }
-}
-
-/// Errors that are resulted from functions  and emthods inside [`journey`]
-#[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
-pub enum DomainError {
-    /// For when a text field should contain 1 or more characters
-    #[error("Text Cannot have 0 length")]
-    TextCannotBeEmpty,
-}
-
-/// [`Title`] is similar to [`Body`] in that it is a wrapper around simple [`String`] to
-/// ensure that the text alway follows the domain rules.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Title(String);
-
-impl Title {
-    /// `build` checks if the the domain rules are being followed
-    ///
-    /// NOTE: This function is, and should remain pure.
-    ///
-    /// # Errors
-    ///
-    /// * [`JourneyError::TextCannotBeEmpty`] can be returned in-case of empty [`String`].
-    pub fn build(text: String) -> Result<Self, DomainError> {
-        if text.is_empty() {
-            return Err(DomainError::TextCannotBeEmpty);
-        };
-
-        Ok(Self(text))
-    }
-
-    /// The inner string  of [`Title`]
-    ///
-    /// NOTE: This function is, and should remain pure.
-    #[must_use]
-    pub const fn inner(&self) -> &String {
-        &self.0
-    }
-}
-
-/// [`Entry`] contains information related to an specific user entry
-///
-///
-#[derive(Clone, Debug, Getters, PartialEq, Eq)]
-pub struct Entry {
-    /// The unique [`ID`] of certain entry.
-    #[getset(get = "pub")]
-    id: ValidEntryID,
-
-    /// The time it was created.
-    #[getset(get = "pub")]
-    time_created: SystemTime,
-
-    /// [`Title`] of the [`Entry`]
-    #[getset(get = "pub")]
-    title: Option<Title>,
-
-    /// [`Body`] of the [`Entry`]
-    #[getset(get = "pub")]
-    body: Option<Body>,
-
-    /// list of [`Link`] s from this [`Entry`]
-    #[getset(get = "pub")]
-    links: Vec<Link>,
-
-    /// [`Journey`] s that this [`Entry`] is on
-    #[getset(get = "pub")]
-    journeys: Vec<ValidJourneyID>,
-}
-
-impl Entry {
-    /// `new` creates a new instance of [`Entry`]
-    #[must_use]
-    pub const fn new(
-        id: ID,
-        time_created: SystemTime,
-        title: Option<Title>,
-        body: Option<Body>,
-        links: Vec<Link>,
-        journeys: Vec<ValidJourneyID>,
-    ) -> Self {
-        Self {
-            id: ValidEntryID(id),
-            time_created,
-            title,
-            body,
-            links,
-            journeys,
-        }
-    }
-}
-
-/// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Entry`]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ValidEntryID(ID);
-
-impl ValidEntryID {
-    /// exposes the inner [`ID`] of the [`Entry`]
-    #[must_use]
-    pub const fn inner(&self) -> &ID {
-        &self.0
-    }
-}
-
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Journey`]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ValidJourneyID(ID);
@@ -186,68 +114,6 @@ impl ValidJourneyID {
     #[must_use]
     pub const fn inner(&self) -> &ID {
         &self.0
-    }
-}
-
-/// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Link`]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ValidLinkID(ID);
-
-impl ValidLinkID {
-    /// exposes the inner [`ID`] of the [`Link`]
-    #[must_use]
-    pub const fn inner(&self) -> &ID {
-        &self.0
-    }
-}
-
-/// [`Link`] is the holder of information between two valid objects
-#[derive(Clone, Debug, Getters, PartialEq, Eq)]
-pub struct Link {
-    /// The unique [`ID`] of certain [`Link`].
-    #[getset(get = "pub")]
-    id: ValidLinkID,
-
-    /// The time it was created.
-    #[getset(get = "pub")]
-    time_created: SystemTime,
-
-    /// The unique [`ID`] of certain the [`Entry`] which the [`Link`] is started from.
-    #[getset(get = "pub")]
-    from_id: ValidEntryID,
-
-    /// The unique [`ID`] of certain the [`Entry`] which the [`Link`] is pointing to.
-    #[getset(get = "pub")]
-    to_id: ValidEntryID,
-
-    /// [`Title`] of the [`Entry`]
-    #[getset(get = "pub")]
-    title: Title,
-
-    /// [`Body`] of the [`Entry`]
-    #[getset(get = "pub")]
-    body: Body,
-}
-
-impl Link {
-    /// creates a new instance of [`Link`]
-    #[must_use]
-    pub const fn new(
-        id: ID,
-        time_created: SystemTime,
-        from_id: ValidEntryID,
-        to_id: ValidEntryID,
-        title: Title,
-        body: Body,
-    ) -> Self {
-        Self {
-            id: ValidLinkID(id),
-            time_created,
-            from_id,
-            to_id,
-            title,
-            body,
-        }
     }
 }
 
@@ -279,13 +145,21 @@ impl Journey {
     }
 }
 
-/// [`ObjectType`] specifies the type of object
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub enum ObjectType {
-    /// an object that is held in this [`Redmaple`]
-    Internal,
-    /// an object that is held in other [`Redmaple`]
-    External,
-    ///  n object that points to an specific time
-    Time,
+// /// [`ObjectType`] specifies the type of object
+// #[derive(Clone, Debug, PartialEq, Eq)]
+// pub enum ObjectType {
+//     /// an object that is held in this [`Redmaple`]
+//     Internal,
+//     /// an object that is held in other [`Redmaple`]
+//     External,
+//     ///  n object that points to an specific time
+//     Time,
+// }
+
+/// Errors that are resulted from functions  and emthods inside [`journey`]
+#[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
+pub enum DomainError {
+    /// For when a text field should contain 1 or more characters
+    #[error("Text Cannot have 0 length")]
+    TextCannotBeEmpty,
 }
