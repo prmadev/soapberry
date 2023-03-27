@@ -20,6 +20,63 @@ use self::{
     title::Title,
 };
 
+/// [`JournelaEvent`] holds the meta data for [`Journal`] event
+pub struct JournalEvent {
+    id: ValidEventID,
+    time: SystemTime,
+    journal_id: ID,
+    data: Journal,
+}
+
+impl JournalEvent {
+    /// this will create a new Journal event
+    #[must_use]
+    pub const fn new(id: ID, time: SystemTime, journal_id: ID, data: Journal) -> Self {
+        Self {
+            id: ValidEventID(id),
+            time,
+            journal_id,
+            data,
+        }
+    }
+
+    /// returns the valid ID of the event
+    #[must_use]
+    pub const fn id(&self) -> &ValidEventID {
+        &self.id
+    }
+
+    /// returns the time the event was created
+    #[must_use]
+    pub const fn time(&self) -> SystemTime {
+        self.time
+    }
+
+    /// returns the ID of the [`RedMapl`] (which in here is the Journal) that the event belongs to
+    #[must_use]
+    pub const fn journal_id(&self) -> &ID {
+        &self.journal_id
+    }
+
+    /// returns the specific data to be acted on
+    #[must_use]
+    pub const fn data(&self) -> &Journal {
+        &self.data
+    }
+}
+
+/// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`JournalEvent`]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ValidEventID(ID);
+
+impl ValidEventID {
+    /// exposes the inner [`ID`] of the [`JournalEvent`]
+    #[must_use]
+    pub const fn inner(&self) -> &ID {
+        &self.0
+    }
+}
+
 /// Event hold all the events that could happened to a `RedMaple`
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Journal {
