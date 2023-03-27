@@ -88,16 +88,16 @@ impl Journey {
     }
 }
 
-/// [`ObjectType`] specifies the type of object
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub enum ObjectType {
-    /// an object that is held in this [`Redmaple`]
-    Internal,
-    /// an object that is held in other [`Redmaple`]
-    External,
-    ///  n object that points to an specific time
-    Time,
-}
+// /// [`ObjectType`] specifies the type of object
+// #[derive(Clone, Debug, PartialEq, Eq)]
+// pub enum ObjectType {
+//     /// an object that is held in this [`Redmaple`]
+//     Internal,
+//     /// an object that is held in other [`Redmaple`]
+//     External,
+//     ///  n object that points to an specific time
+//     Time,
+// }
 
 /// Errors that are resulted from functions  and emthods inside [`journey`]
 #[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
