@@ -1,6 +1,6 @@
 [package]
 name = "whirlybird"
-version = "0.6.2"
+version = "0.7.0"
 edition = "2021"
 authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
 description = "whirlybird is a library of generic type implementations for RedMaple library, that offers workflows for different events compatible with common contents like todos, blogs and etc."
@@ -25,7 +25,7 @@ filter_unconventional = true
 
 [dependencies]
 getset-scoped = {version= "0.1.2"}
-redmaple = { version = "0.11.0", path = "../redmaple"}
+redmaple = { version = "0.11.1", path = "../redmaple"}
 thiserror = {version="1.0.38"}
 
 [dev-dependencies]
