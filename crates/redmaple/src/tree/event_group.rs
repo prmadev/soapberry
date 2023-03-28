@@ -41,11 +41,6 @@ use super::id::ID;
 ///        fn time(&self) -> &SystemTime {
 ///            &self.2
 ///        }
-///
-///        fn has_the_same_contents(&self, other: &Self) -> bool{
-///            self.3 == other.3
-///        }
-///
 ///    }
 ///
 ///    let ev1 = Eg(ID::new(uuid::Uuid::new_v4()), ID::new(uuid::Uuid::new_v4()), SystemTime::now(), String::from("first_text"));
@@ -70,8 +65,4 @@ pub trait EventGroup {
     /// returns the time of the time that that event happened at
     #[must_use]
     fn time(&self) -> &SystemTime;
-
-    /// checks if the event have the same content of another event, but does not check for date
-    /// and id which are probably unique to each event
-    fn has_the_same_contents(&self, other: &Self) -> bool;
 }
