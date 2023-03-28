@@ -321,43 +321,43 @@ service JourneyService {
   // Journey
   //
 
-  rpc CreateJourney(CreateJourneyRequest) returns (CreateJourneyResponse) {}
-  rpc DeleteJourney(DeleteJourneyRequest) returns (DeleteJourneyResponse) {}
-  rpc SetTitleForJourney(SetTitleForJourneyRequest) returns (SetTitleForJourneyResponse) {}
-  rpc SetTimeCreatedForJourney(SetTimeCreatedForJourneyRequest) returns (SetTimeCreatedForJourneyResponse) {}
-  rpc AddEntriesToJourney(AddEntriesToJourneyRequest) returns (AddEntriesToJourneyResponse) {}
-  rpc RemoveEntriesFromJourney(RemoveEntriesFromJourneyRequest) returns (RemoveEntriesFromJourneyResponse) {}
+  /* rpc CreateJourney(CreateJourneyRequest) returns (CreateJourneyResponse) {} */
+  /* rpc DeleteJourney(DeleteJourneyRequest) returns (DeleteJourneyResponse) {} */
+  /* rpc SetTitleForJourney(SetTitleForJourneyRequest) returns (SetTitleForJourneyResponse) {} */
+  /* rpc SetTimeCreatedForJourney(SetTimeCreatedForJourneyRequest) returns (SetTimeCreatedForJourneyResponse) {} */
+  /* rpc AddEntriesToJourney(AddEntriesToJourneyRequest) returns (AddEntriesToJourneyResponse) {} */
+  /* rpc RemoveEntriesFromJourney(RemoveEntriesFromJourneyRequest) returns (RemoveEntriesFromJourneyResponse) {} */
 
   //
   // Entry
   //
 
   rpc CreateEntry(CreateEntryRequest) returns (CreateEntryResponse) {}
-  rpc DeleteEntry(DeleteEntryRequest) returns (DeleteEntryResponse) {}
-  rpc SetTitleForEntry(SetTitleForEntryRequest) returns (SetTitleForEntryResponse) {}
-  rpc SetBodyOfEntry(SetBodyOfEntryRequest) returns (SetBodyOfEntryResponse) {}
-  rpc SetTimeCreatedForEntry(SetTimeCreatedForEntryRequest) returns (SetTimeCreatedForEntryResponse) {}
+  /* rpc DeleteEntry(DeleteEntryRequest) returns (DeleteEntryResponse) {} */
+  /* rpc SetTitleForEntry(SetTitleForEntryRequest) returns (SetTitleForEntryResponse) {} */
+  /* rpc SetBodyOfEntry(SetBodyOfEntryRequest) returns (SetBodyOfEntryResponse) {} */
+  /* rpc SetTimeCreatedForEntry(SetTimeCreatedForEntryRequest) returns (SetTimeCreatedForEntryResponse) {} */
 
   //
   // Links
   //
 
-  rpc CreateLink(CreateLinkRequest) returns (CreateLinkResponse) {}
-  rpc SetParentOfLink(SetParentOfLinkRequest) returns (SetParentOfLinkResponse) {}
-  rpc SetChildOfLink(SetChildOfLinkRequest) returns (SetChildOfLinkResponse) {}
-  rpc SetTitleOfLink(SetTitleOfLinkRequest) returns (SetTitleOfLinkResponse) {}
-  rpc SetBodyOfLink(SetBodyOfLinkRequest) returns (SetBodyOfLinkResponse) {}
-  rpc DeleteLink(DeleteLinkRequest) returns (DeleteLinkResponse) {}
+  /* rpc CreateLink(CreateLinkRequest) returns (CreateLinkResponse) {} */
+  /* rpc SetParentOfLink(SetParentOfLinkRequest) returns (SetParentOfLinkResponse) {} */
+  /* rpc SetChildOfLink(SetChildOfLinkRequest) returns (SetChildOfLinkResponse) {} */
+  /* rpc SetTitleOfLink(SetTitleOfLinkRequest) returns (SetTitleOfLinkResponse) {} */
+  /* rpc SetBodyOfLink(SetBodyOfLinkRequest) returns (SetBodyOfLinkResponse) {} */
+  /* rpc DeleteLink(DeleteLinkRequest) returns (DeleteLinkResponse) {} */
 
   //
   // internal objects
   //
-  rpc AddInternalObject(AddInternalObjectRequest) returns (AddInternalObjectResponse) {} // must be synchronous
-  rpc DeleteInternalObject(DeleteInternalObjectRequest) returns (DeleteInternalObjectResponse) {}
-
-  rpc AddExternalObject(AddExternalObjectRequest) returns (AddExternalObjectResponse) {} // must be synchronous
-  rpc DeleteExternalObject(DeleteExternalObjectRequest) returns (DeleteExternalObjectResponse) {}
-
-  rpc AddTimeObject(AddTimeObjectRequest) returns (AddTimeObjectResponse) {} // must be synchronous
-  rpc DeleteTimeObject(DeleteTimeObjectRequest) returns (DeleteTimeObjectResponse) {}
+  /* rpc AddInternalObject(AddInternalObjectRequest) returns (AddInternalObjectResponse) {} // must be synchronous */
+  /* rpc DeleteInternalObject(DeleteInternalObjectRequest) returns (DeleteInternalObjectResponse) {} */
+  /**/
+  /* rpc AddExternalObject(AddExternalObjectRequest) returns (AddExternalObjectResponse) {} // must be synchronous */
+  /* rpc DeleteExternalObject(DeleteExternalObjectRequest) returns (DeleteExternalObjectResponse) {} */
+  /**/
+  /* rpc AddTimeObject(AddTimeObjectRequest) returns (AddTimeObjectResponse) {} // must be synchronous */
+  /* rpc DeleteTimeObject(DeleteTimeObjectRequest) returns (DeleteTimeObjectResponse) {} */
 }
