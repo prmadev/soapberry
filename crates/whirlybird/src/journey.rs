@@ -11,7 +11,7 @@ pub mod title;
 use std::time::SystemTime;
 
 use getset_scoped::Getters;
-use redmaple::id::ID;
+use redmaple::{event_group::EventGroup, id::ID};
 
 use self::{
     body::Body,
@@ -22,7 +22,7 @@ use self::{
 
 /// [`JournelaEvent`] holds the meta data for [`Journal`] event
 pub struct JournalEvent {
-    id: ValidEventID,
+    event_id: ValidEventID,
     time: SystemTime,
     journal_id: ID,
     data: Journal,
@@ -31,9 +31,9 @@ pub struct JournalEvent {
 impl JournalEvent {
     /// this will create a new Journal event
     #[must_use]
-    pub const fn new(id: ID, time: SystemTime, journal_id: ID, data: Journal) -> Self {
+    pub const fn new(event_id: ID, time: SystemTime, journal_id: ID, data: Journal) -> Self {
         Self {
-            id: ValidEventID(id),
+            event_id: ValidEventID(event_id),
             time,
             journal_id,
             data,
@@ -42,14 +42,8 @@ impl JournalEvent {
 
     /// returns the valid ID of the event
     #[must_use]
-    pub const fn id(&self) -> &ValidEventID {
-        &self.id
-    }
-
-    /// returns the time the event was created
-    #[must_use]
-    pub const fn time(&self) -> SystemTime {
-        self.time
+    pub const fn event_id(&self) -> &ValidEventID {
+        &self.event_id
     }
 
     /// returns the ID of the [`RedMapl`] (which in here is the Journal) that the event belongs to
@@ -62,6 +56,21 @@ impl JournalEvent {
     #[must_use]
     pub const fn data(&self) -> &Journal {
         &self.data
+    }
+}
+impl EventGroup for JournalEvent {
+    type EventGroupError = DomainError;
+
+    fn id(&self) -> &ID {
+        self.event_id().inner()
+    }
+
+    fn redmaple_id(&self) -> &ID {
+        self.journal_id()
+    }
+
+    fn time(&self) -> &SystemTime {
+        &self.time
     }
 }
 

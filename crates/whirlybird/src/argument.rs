@@ -138,19 +138,6 @@ impl EventGroup for Argument {
             Self::PostDeleted(ref e) => e.created(),
         }
     }
-
-    fn has_the_same_contents(&self, other: &Self) -> bool {
-        match (self, other) {
-            (Self::Created(a), Self::Created(b)) => a.redmaple_id() == b.redmaple_id(),
-            (Self::PostAdded(a), Self::PostAdded(b)) => a.post() == b.post(),
-            (Self::PostDeleted(a), Self::PostDeleted(b)) => a.post_id() == b.post_id(),
-            (Self::PostModed(a), Self::PostModed(b)) => {
-                a.post_id() == b.post_id() && a.new_mod() == b.new_mod()
-            }
-            (Self::PostPublished(a), Self::PostPublished(b)) => a.post_id() == b.post_id(),
-            (_, _) => false,
-        }
-    }
 }
 
 impl Argument {
