@@ -17,6 +17,7 @@ split_commits = true
 filter_unconventional = true
 
 [dependencies]
-itertools = "0.10.5"
-thiserror = "1.0.38"
 uuid = { version = "1.2.2", features = ["v4"] }
+
+[dev-dependencies]
+thiserror = "1.0.40"

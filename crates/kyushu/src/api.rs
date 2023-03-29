@@ -14,3 +14,4 @@
     missing_docs
 )]
 tonic::include_proto!("health.v1");
+tonic::include_proto!("journey.v1");

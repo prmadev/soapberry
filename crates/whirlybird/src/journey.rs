@@ -21,6 +21,7 @@ use self::{
 };
 
 /// [`JournelaEvent`] holds the meta data for [`Journal`] event
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct JournalEvent {
     event_id: ValidEventID,
     time: SystemTime,

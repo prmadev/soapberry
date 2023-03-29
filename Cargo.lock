@@ -651,6 +651,8 @@ dependencies = [
  "clap",
  "inquire",
  "prost",
+ "prost-types",
+ "redmaple",
  "structsy",
  "thiserror",
  "tokio",
@@ -662,6 +664,7 @@ dependencies = [
  "tracing-subscriber",
  "uuid",
  "validators",
+ "whirlybird",
 ]
 
 [[package]]
@@ -1056,7 +1059,6 @@ dependencies = [
 name = "redmaple"
 version = "0.11.1"
 dependencies = [
- "itertools",
  "thiserror",
  "uuid",
 ]
