@@ -15,3 +15,19 @@
 )]
 tonic::include_proto!("health.v1");
 tonic::include_proto!("journey.v1");
+
+/// a set of helper function to deal with apis
+pub mod helper {
+    /// Converts a [`crate::api::Journey`]'s id  from `Option<String>` into `Result<String, E>`
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if if the id field is `Option::None`.
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn journey_id_extractor<E>(
+        x: crate::api::Journey,
+        when_id_not_found: E,
+    ) -> Result<String, E> {
+        Ok(x.id.ok_or(when_id_not_found)?.id)
+    }
+}

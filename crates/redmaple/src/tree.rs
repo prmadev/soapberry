@@ -1,6 +1,9 @@
 //! redmaple is the central data-structure that is underlying the whole crate
 
-use self::{event_group::EventGroup, id::ID};
+use self::{
+    event_group::EventGroup,
+    id::{IDGiver, ID},
+};
 use std::fmt::Debug;
 
 /// event module holds the types and functions that events could take and the operations that they
@@ -17,7 +20,7 @@ pub mod id;
 /// * `events`: a list of entities that happened in time series
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RedMaple<T: EventGroup + Sized + Clone> {
-    id: ID,
+    id: ValidRedMapleID,
     events: Vec<T>,
 }
 
@@ -27,19 +30,46 @@ impl<T: EventGroup + Sized + Clone> RedMaple<T> {
     /// * `view_mode`: sets the view mode of the `RedMaple`
     #[must_use]
     pub const fn new(id: ID, events: Vec<T>) -> Self {
-        Self { id, events }
+        Self {
+            id: ValidRedMapleID(id),
+            events,
+        }
     }
 
-    /// Gets the ID of the `RedMaple`
-    #[must_use]
-    pub const fn id(&self) -> &ID {
-        &self.id
-    }
+    // /// Gets the ID of the `RedMaple`
+    // #[must_use]
+    // pub const fn id(&self) -> &ValidRedMapleID {
+    //     &self.id
+    // }
 
     /// Gets an array of the events of the `RedMaple`
     #[must_use]
     pub const fn events(&self) -> &Vec<T> {
         &self.events
+    }
+}
+
+/// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Entry`]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ValidRedMapleID(ID);
+
+impl ValidRedMapleID {
+    /// exposes the inner [`ID`] of the [`Entry`]
+    #[must_use]
+    pub const fn inner(&self) -> &ID {
+        &self.0
+    }
+}
+
+impl<T: EventGroup + Sized + Clone> IDGiver for RedMaple<T> {
+    type Valid = ValidRedMapleID;
+
+    fn id(&self) -> &Self::Valid {
+        &self.id
+    }
+
+    fn into_id(self) -> Self::Valid {
+        self.id
     }
 }
 

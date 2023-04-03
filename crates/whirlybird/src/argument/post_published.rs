@@ -1,6 +1,9 @@
 use std::time::SystemTime;
 
-use redmaple::{id::ID, RedMaple};
+use redmaple::{
+    id::{IDGiver, ID},
+    RedMaple, ValidRedMapleID,
+};
 
 use super::{post::ValidPostID, Argument};
 
@@ -9,7 +12,7 @@ use super::{post::ValidPostID, Argument};
 pub struct ContentPublished {
     id: ID,
     created: SystemTime,
-    redmaple_id: ID,
+    redmaple_id: ValidRedMapleID,
     post_id: ValidPostID,
 }
 
@@ -28,7 +31,7 @@ impl ContentPublished {
         }
     }
 
-    pub const fn redmaple_id(&self) -> &ID {
+    pub const fn redmaple_id(&self) -> &ValidRedMapleID {
         &self.redmaple_id
     }
 

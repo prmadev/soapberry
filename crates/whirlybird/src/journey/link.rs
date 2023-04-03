@@ -2,7 +2,6 @@
 
 use std::time::SystemTime;
 
-use getset_scoped::Getters;
 use redmaple::id::ID;
 
 use super::{body::Body, entry::ValidEntryID, title::Title};
@@ -20,30 +19,24 @@ impl ValidLinkID {
 }
 
 /// [`Link`] is the holder of information between two valid objects
-#[derive(Clone, Debug, Getters, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Link {
     /// The unique [`ID`] of certain [`Link`].
-    #[getset(get = "pub")]
     id: ValidLinkID,
 
     /// The time it was created.
-    #[getset(get = "pub")]
     time_created: SystemTime,
 
     /// The unique [`ID`] of certain the [`Entry`] which the [`Link`] is started from.
-    #[getset(get = "pub")]
     from_id: ValidEntryID,
 
     /// The unique [`ID`] of certain the [`Entry`] which the [`Link`] is pointing to.
-    #[getset(get = "pub")]
     to_id: ValidEntryID,
 
     /// [`Title`] of the [`Entry`]
-    #[getset(get = "pub")]
     title: Title,
 
     /// [`Body`] of the [`Entry`]
-    #[getset(get = "pub")]
     body: Body,
 }
 

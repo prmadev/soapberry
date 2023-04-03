@@ -1,6 +1,9 @@
 use std::time::SystemTime;
 
-use redmaple::{id::ID, RedMaple};
+use redmaple::{
+    id::{IDGiver, ID},
+    RedMaple, ValidRedMapleID,
+};
 
 use super::{post::Post, Argument};
 
@@ -9,7 +12,7 @@ use super::{post::Post, Argument};
 pub struct PostCreated {
     id: ID,
     created: SystemTime,
-    redmaple_id: ID,
+    redmaple_id: ValidRedMapleID,
     post: Post<String, String>,
 }
 
@@ -35,7 +38,7 @@ impl PostCreated {
     }
 
     /// Gets the ID of the redmaple that holds this event
-    pub const fn redmaple_id(&self) -> &ID {
+    pub const fn redmaple_id(&self) -> &ValidRedMapleID {
         &self.redmaple_id
     }
 

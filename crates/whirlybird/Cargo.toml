@@ -24,9 +24,8 @@ split_commits = true
 filter_unconventional = true
 
 [dependencies]
-getset-scoped = {version= "0.1.2"}
 redmaple = { version = "0.11.1", path = "../redmaple"}
-thiserror = {version="1.0.38"}
+thiserror = {version="1.0.40"}
 
 [dev-dependencies]
 uuid = { version = "1.3.0", features = ["v4"] }

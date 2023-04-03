@@ -1,6 +1,9 @@
 use std::time::SystemTime;
 
-use redmaple::{id::ID, RedMaple};
+use redmaple::{
+    id::{IDGiver, ID},
+    RedMaple, ValidRedMapleID,
+};
 
 use super::{
     post::{Mode, ValidPostID},
@@ -12,7 +15,7 @@ use super::{
 pub struct ContentModed {
     id: ID,
     created: SystemTime,
-    redmaple_id: ID,
+    redmaple_id: ValidRedMapleID,
     post_id: ValidPostID,
     new_mod: Mode,
 }
@@ -41,7 +44,7 @@ impl ContentModed {
     }
 
     /// Gets the ID of the redmaple that holds this event
-    pub const fn redmaple_id(&self) -> &ID {
+    pub const fn redmaple_id(&self) -> &ValidRedMapleID {
         &self.redmaple_id
     }
 

@@ -2,36 +2,29 @@
 
 use std::time::SystemTime;
 
-use getset_scoped::Getters;
-use redmaple::id::ID;
+use redmaple::id::{IDGiver, ID};
 
 use super::{Body, Link, Title, ValidJourneyID};
 
 /// [`Entry`] contains information related to an specific user entry
-#[derive(Clone, Debug, Getters, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Entry {
     /// The unique [`ID`] of certain entry.
-    #[getset(get = "pub")]
     id: ValidEntryID,
 
     /// The time it was created.
-    #[getset(get = "pub")]
     time_created: SystemTime,
 
     /// [`Title`] of the [`Entry`]
-    #[getset(get = "pub")]
     title: Option<Title>,
 
     /// [`Body`] of the [`Entry`]
-    #[getset(get = "pub")]
     body: Option<Body>,
 
     /// list of [`Link`] s from this [`Entry`]
-    #[getset(get = "pub")]
     links: Vec<Link>,
 
     /// [`Journey`] s that this [`Entry`] is on
-    #[getset(get = "pub")]
     journeys: Vec<ValidJourneyID>,
 }
 
@@ -66,5 +59,17 @@ impl ValidEntryID {
     #[must_use]
     pub const fn inner(&self) -> &ID {
         &self.0
+    }
+}
+
+impl IDGiver for Entry {
+    type Valid = ValidEntryID;
+
+    fn id(&self) -> &Self::Valid {
+        &self.id
+    }
+
+    fn into_id(self) -> Self::Valid {
+        self.id
     }
 }

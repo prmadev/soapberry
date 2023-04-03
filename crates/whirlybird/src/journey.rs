@@ -10,8 +10,10 @@ pub mod title;
 
 use std::time::SystemTime;
 
-use getset_scoped::Getters;
-use redmaple::{event_group::EventGroup, id::ID};
+use redmaple::{
+    event_group::EventGroup,
+    id::{IDGiver, ID},
+};
 
 use self::{
     body::Body,
@@ -59,6 +61,7 @@ impl JournalEvent {
         &self.data
     }
 }
+
 impl EventGroup for JournalEvent {
     type EventGroupError = DomainError;
 
@@ -84,6 +87,18 @@ impl ValidEventID {
     #[must_use]
     pub const fn inner(&self) -> &ID {
         &self.0
+    }
+}
+
+impl IDGiver for JournalEvent {
+    type Valid = ValidEventID;
+
+    fn id(&self) -> &Self::Valid {
+        &self.event_id
+    }
+
+    fn into_id(self) -> Self::Valid {
+        self.event_id
     }
 }
 
@@ -127,19 +142,28 @@ impl ValidJourneyID {
     }
 }
 
+impl IDGiver for Journey {
+    type Valid = ValidJourneyID;
+
+    fn id(&self) -> &Self::Valid {
+        &self.id
+    }
+
+    fn into_id(self) -> Self::Valid {
+        self.id
+    }
+}
+
 /// [`Journey`] is the holder of meta information for journeys
-#[derive(Clone, Debug, Getters, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Journey {
     /// The unique [`ID`] of certain [`Journey`].
-    #[getset(get = "pub")]
     id: ValidJourneyID,
 
     /// The time it was created.
-    #[getset(get = "pub")]
     time_created: SystemTime,
 
     /// [`Title`] of the [`Entry`]
-    #[getset(get = "pub")]
     title: Title,
 }
 

@@ -64,3 +64,19 @@ impl ID {
         self.0
     }
 }
+
+/// Any object that implements this type can turn into id
+pub trait IDGiver {
+    /// valid ID type for the specific item
+    type Valid: Clone;
+    /// Returns a refrence to the underlying [`ID`]
+    fn id(&self) -> &Self::Valid;
+    /// Consumes self into its underlying [`ID`]
+    fn into_id(self) -> Self::Valid;
+}
+
+/// extractor for resulting id
+#[allow(clippy::module_name_repetitions)] // I cannot thing of a better name
+pub fn result_id<I: IDGiver, E>(x: Result<I, E>) -> Option<I::Valid> {
+    Some(x.ok()?.into_id())
+}
