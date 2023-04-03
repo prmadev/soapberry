@@ -7,7 +7,7 @@ authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
 
 homepage = "https://github.com/amirography/soapberry/tree/main/crates/kyushu"
 repository = "https://github.com/amirography/soapberry/tree/main/crates/kyushu"
-license = "Apache-2.0"
+license = "MPL-2.0"
 readme = "README.md"
 categories = ["command-line-utilities"]
 keywords = ["journaling", "events"]
