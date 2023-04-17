@@ -122,10 +122,10 @@ impl EventGroup for Argument {
     fn redmaple_id(&self) -> &ID {
         match *self {
             Self::Created(ref e) => e.redmaple_id(),
-            Self::PostAdded(ref e) => e.redmaple_id(),
-            Self::PostPublished(ref e) => e.redmaple_id(),
-            Self::PostModed(ref e) => e.redmaple_id(),
-            Self::PostDeleted(ref e) => e.redmaple_id(),
+            Self::PostAdded(ref e) => e.redmaple_id().inner(),
+            Self::PostPublished(ref e) => e.redmaple_id().inner(),
+            Self::PostModed(ref e) => e.redmaple_id().inner(),
+            Self::PostDeleted(ref e) => e.redmaple_id().inner(),
         }
     }
 

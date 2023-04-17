@@ -6,7 +6,7 @@ authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
 description = "whirlybird is a library of generic type implementations for RedMaple library, that offers workflows for different events compatible with common contents like todos, blogs and etc."
 homepage = "https://github.com/amirography/soapberry/tree/main/crates/whirlybird"
 repository = "https://github.com/amirography/soapberry/tree/main/crates/whirlybird"
-license = "Apache-2.0"
+license = "MPL-2.0"
 categories = ["data-structures"]
 keywords = ["data_model", "event-sourcing", "events"]
 readme = "README.md"
@@ -24,7 +24,6 @@ split_commits = true
 filter_unconventional = true
 
 [dependencies]
-getset-scoped = {version= "0.1.2"}
 redmaple = { version = "0.11.1", path = "../redmaple"}
 thiserror = {version="1.0.38"}
 

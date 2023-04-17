@@ -6,7 +6,7 @@ authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
 description = "RedMaple offers an oppinionated yet extremely flexible data modeling system based on events for backend applications"
 homepage = "https://github.com/amirography/soapberry/tree/main/crates/redmaple"
 repository = "https://github.com/amirography/soapberry/tree/main/crates/redmaple"
-license = "Apache-2.0"
+license = "MPL-2.0"
 categories = ["data-structures"]
 keywords = ["data_model", "event-sourcing", "events"]
 readme = "README.md"
@@ -17,6 +17,7 @@ split_commits = true
 filter_unconventional = true
 
 [dependencies]
-itertools = "0.10.5"
-thiserror = "1.0.38"
-uuid = { version = "1.2.2", features = ["v4"] }
+uuid = { version = "1.3.0", features = ["v4"] }
+
+[dev-dependencies]
+thiserror = "1.0.40"

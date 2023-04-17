@@ -39,6 +39,8 @@
 pub mod api;
 pub mod callers;
 pub mod client_configuration;
+pub mod domain;
+pub mod persistence;
 pub mod responders;
 pub mod server_configuration;
 pub mod telemetry;
