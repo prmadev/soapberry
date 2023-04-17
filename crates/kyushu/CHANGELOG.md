@@ -517,6 +517,77 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2](https://github.com/amirography/soapberry/compare/kyushu-v0.6.1...kyushu-v0.6.2) - 2023-04-17
+
+### Added
+- *(kyushu)* extract status handler from response handler in server
+- *(kyushu)* rename healthcheck to better demonstrate its insides
+- *(kyushu)* make configuration more pure
+- *(kyushu)* make controller more modularized for client kyushu
+- *(kyushu)* make controller more modularized for client kyushu
+- *(kyushu)* seperate some logic to see if we can make it clearer
+- *(whirlybird)* add logic for journey
+- *(kyushu)* add details for linking objects and links them selves
+- *(kyushu)* add command requests to proto files
+- add tracing instrumentalization
+- add tracing instrumentalization
+- *(kyushu)* add a basic client-server grpc connection
+- add kyushu
+
+### Other
+- relicensed the whole soapberry project to MPL-2.0
+- make a lot of helpers for creating a EventWasCreated function
+- *(kyushu)* add journey protobufs
+- *(kyushu)* add basic structsy structure for persistence
+- *(kyushu)* comment out sqlite implementation to avoid problems with RUSTSEC-2022-0090 CVE
+- *(kyushu)* comment out rpc service methods in order to focus on one small objective for now
+- release
+- release
+- Merge pull request #71 from amirography/refactor
+
+feat(kyushu): rename healthcheck to better demonstrate its insides
+- release
+- release
+- *(kyushu)* make try-from more pure
+- *(kyushu)* use try_from instead of build for configuration of kyushu
+- release
+- Merge pull request #62 from amirography/make_more_pure
+
+making the libraries more pure
+- remove hasty use of repr
+- defer handling of state from redmaple to later and make it more simplified
+- make commands more declaritive
+- release
+- release
+- release
+- Merge pull request #40 from amirography/outline_commands
+
+outline commands
+- Merge pull request #39 from amirography/outline_commands
+
+outline commands
+- Merge pull request #35 from amirography/instrumentalize
+
+instrumentalize
+- improve server's organization
+- release
+- release
+- Merge branch 'main' into CI
+- add CI case to labeler
+- release
+- Merge pull request #18 from amirography/readme
+
+doc(kyushu): update kyushu's readme
+- *(kyushu)* update kyushu's readme
+- add labeler
+- release
+- release
+- *(kyushu)* publish on crates.io
+- fix type
+- fix typo
+- add picture to kyushu docs
+- add some checks
+
 
 ## [0.1.5](https://github.com/amirography/soapberry/compare/kyushu-v0.1.4...kyushu-v0.1.5) - 2023-03-05
 
