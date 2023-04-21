@@ -1,0 +1,250 @@
+direction: right
+
+repos: Repositories {
+	style.font-size: 50
+
+	persistence: Persistence {
+		shape: package
+		style.font-size: 50
+
+		store: Structsy {
+			shape: cylinder 
+			style.font-size: 50
+
+			EntryCreated: {
+				shape: class
+				style.font-size: 50
+
+				id: uuid
+			}
+		}
+
+		ACL: "Anti\nCorruption\nLayer" {
+			shape: circle
+			style.font-size: 50
+		}
+
+		store <- ACL : store {
+			style.font-size: 50
+			style.stroke-width: 6
+			style.animated : true
+		}
+		store -> ACL : retrieve {
+			style.font-size: 50
+			style.stroke-width: 6
+			style.animated : true
+		}
+
+	}
+
+}
+
+
+logic: Logic  {
+	style.font-size: 50
+	domain:Domain {
+		shape: package
+		style.font-size: 50
+
+
+		ACL: "Anti\nCorruption\nLayer" {
+			shape: circle
+			style.font-size: 50
+		}
+
+		memory: In-Memory Repository {
+			shape: stored_data 
+			style.font-size: 50
+
+			EntryCreated: {
+				shape: class
+				style.font-size: 50
+
+				id: uuid
+			}
+		}
+
+		memory.EntryCreated <- ACL : retrieve {
+			style.font-size: 50
+			style.stroke-width: 6
+			style.animated : true
+		}
+		memory.EntryCreated -> ACL : store {
+			style.font-size: 50
+			style.stroke-width: 6
+			style.animated : true
+		}
+	}
+
+}
+
+logic.domain.ACL ->  repos.persistence.ACL: store{
+	style.font-size: 50
+	style.stroke-width: 6
+	style.animated : true
+}
+logic.domain.ACL <-  repos.persistence.ACL: retrieve{
+	style.font-size: 50
+	style.stroke-width: 6
+	style.animated : true
+}
+
+
+logic.domain.ACl -> Projectors.entry_list{
+	style.font-size: 50
+	style.stroke-width: 6
+	style.animated : true
+}
+logic.domain.ACl -> Projectors.journey_list{
+	style.font-size: 50
+	style.stroke-width: 6
+	style.animated : true
+}
+
+projectors: Projectors {
+	style.font-size: 50
+
+	entry_list: Entry List {
+		shape: document
+		style.font-size: 50
+
+		list:List {
+			shape: stored_data
+			style.multiple: true
+			style.font-size: 50
+
+			entry1: Entry 1 {
+				shape: class 
+				style.font-size: 50
+
+				entry_id: ID
+				created_at: Time
+				updated_at: Time 
+				jouneys: '[]ValidID'
+				contents: EntryContent
+			}
+		}
+
+	}
+
+	journey_list: Journey List {
+		shape: document
+		style.font-size: 50
+
+		list:List {
+			shape: stored_data
+			style.multiple: true
+			style.font-size: 50
+
+			journey1: Journey 1 {
+				shape:class 
+				style.multiple: true
+				style.font-size: 50
+
+				journey_id: ID
+				created_at: Time
+				updated_at: Time 
+				entries: '[]ValidID'
+			}
+		}
+	}
+
+}
+
+commander: Command Handlers {
+	shape: package
+	style.font-size: 50
+	create_entry_command {
+		shape: class	
+		style.font-size: 50
+
+		content: EntryContent
+	}
+}
+
+commander.create_entry_command -> logic.domain.ACL: request for change{
+	style.font-size: 50
+	style.stroke-width: 6
+	style.animated : true
+} 
+commander.create_entry_command <- logic.domain.ACL: status of message{
+	style.font-size: 50
+	style.stroke-width: 6
+	style.animated : true
+} 
+
+querier: Query Handlers {
+	shape: package
+	style.font-size: 50
+
+	get_entries {
+		shape: class
+		style.font-size: 50
+
+		content: '[]Event'
+	}
+
+	get_journeys {
+		shape: class
+		style.font-size: 50
+
+		content: '[]Journey'
+	}
+
+	
+}
+
+querier.get_entries <- projectors.entry_list {
+	style.font-size: 50
+	style.stroke-width: 6
+	style.animated : true
+} 
+querier.get_journeys <- projectors.journey_list {
+	style.font-size: 50
+	style.stroke-width: 6
+	style.animated : true
+} 
+
+UI: User Interface {
+	style.font-size: 50
+	height: 1500
+	width: 1500
+	
+}
+
+UI ->  commander.create_entry_command : Requests a new_entry {
+	style.font-size: 50
+	style.stroke-width: 6
+	style.animated : true
+} 
+
+UI <-  commander.create_entry_command : Gets Status of Delivery of Request  {
+	style.font-size: 50
+	style.stroke-width: 6
+	style.animated : true
+} 
+
+UI ->  querier.get_entries : Request Information {
+	style.font-size: 50
+	style.stroke-width: 6
+	style.animated : true
+} 
+UI <-  querier.get_entries : Respond Information {
+	style.font-size: 50
+	style.stroke-width: 6
+	style.animated : true
+} 
+
+
+
+
+user : User {
+	shape: person
+	style.font-size: 50
+	height: 1500
+	width: 1500
+	
+}
+
+user -> UI
+user <- UI
