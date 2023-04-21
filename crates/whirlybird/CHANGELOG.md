@@ -120,6 +120,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.7.0...whirlybird-v0.8.0) - 2023-04-17
+
+### Other
+- relicensed the whole soapberry project to MPL-2.0
+- make a lot of helpers for creating a EventWasCreated function
+- *(kyushu)* add journey protobufs
+
 ## 0.3.2 - 2023-03-05
 
 ### Other
