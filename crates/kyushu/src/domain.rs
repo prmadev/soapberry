@@ -59,12 +59,14 @@ where
           now: SystemTime,
           request: CreateEntryRequest|
           -> Result<JournalEvent, JournalEventError> {
+        // making a list of raw ids
         let (raw_ids, errs): (Vec<_>, Vec<_>) = request
             .journeys_to_be_added
             .into_iter()
             .map(api_journey_id_extractor)
             .partition(Result::is_ok);
 
+        // checking if
         if !errs.is_empty() {
             return Err(JournalEventError::JourneyBatchProblems(
                 errs.into_iter().filter_map(Result::err).collect(),
@@ -118,4 +120,8 @@ pub enum JournalEventError {
     /// problems converting JourneyCreation into Journey
     #[error("Could not convert")]
     CouldNotConvert,
+
+    /// could not get journey from database
+    #[error("Could get journey from database")]
+    CouldNotFindItenInDatabase,
 }
