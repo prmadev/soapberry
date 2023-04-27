@@ -127,6 +127,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.1](https://github.com/amirography/soapberry/compare/redmaple-v0.12.0...redmaple-v0.12.1) - 2023-04-27
+
+### Added
+- implement eventgroup for journal
+- *(redmaple)* add two function presets for sorter and deduplicator functions
+- *(redmaple)* add test for subscriberslist new function
+- *(redmaple)* use more functional way of making new subscriberlist
+- *(redmaple)* implement eq and partialeq for better apis
+- add redmaple
+
+### Other
+- add badges for licenses
+- Merge branch 'main' into journey
+- update
+- relicensed the whole soapberry project to MPL-2.0
+- make a lot of helpers for creating a EventWasCreated function
+- *(kyushu)* add journey protobufs
+- release
+- Merge pull request #73 from amirography/complete_redmaple
+- *(redmaple)* add a documentation point to emphasize other approaches for deduplicator
+- *(redmaple)* make unit tests use the built-in functions
+- Merge pull request #71 from amirography/refactor
+- merge items
+- release
+- Merge pull request #62 from amirography/make_more_pure
+- change naming and make sure every function in redmaple and whirlybird are pure
+- remove hasty use of repr
+- make redmaple immutable
+- delete irrelavent store library in redmaple this should not be redmaple-level concern
+- delete unused versioned trait
+- make ID creation pure
+- defer handling of state from redmaple to later and make it more simplified
+- change the name of a method to identity to be more declaritive
+- release
+- *(redmaple)* fix broken links in changelog
+- *(redmaple)* fix broken links in changelog
+- add CI case to labeler
+- release
+- *(redmaple)* fix picture
+- release
+- updated subcrates
+- Release 0.8.0
+- change redmaple information
+
 ## [0.12.0](https://github.com/amirography/soapberry/compare/redmaple-v0.11.1...redmaple-v0.12.0) - 2023-04-17
 
 ### Other
