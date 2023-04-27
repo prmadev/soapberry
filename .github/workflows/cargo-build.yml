@@ -1,4 +1,4 @@
-name: CI
+name: cargo can build it
 
 on:
   push:
@@ -11,8 +11,8 @@ env:
   CARGO_TERM_COLOR: always
   RUSTUP_MAX_RETRIES: 10
 jobs:
-  cargo-clippy:
-    name: "cargo clippy"
+  cargo-build:
+    name: "cargo build"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,10 +20,8 @@ jobs:
         uses: arduino/setup-protoc@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: 1.67
-          components: clippy,rustfmt
-      - uses: Swatinem/rust-cache@v2
-      - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
-
+      - name: "Install Rust toolchain"
+        run: rustup show
+      - uses: Swatinem/rust-cache@v1
+      - name: build
+        run: cargo build --all

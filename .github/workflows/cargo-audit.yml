@@ -1,4 +1,4 @@
-name: no vulnaribilities in dependencies
+name: no vulnurabilities in advisory
 
 on:
   push:
@@ -11,8 +11,8 @@ env:
   CARGO_TERM_COLOR: always
   RUSTUP_MAX_RETRIES: 10
 jobs:
-  cargo-pants:
-    name: "cargo pants"
+  cargo-audit:
+    name: "cargo audit"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -37,8 +37,9 @@ jobs:
         uses: arduino/setup-protoc@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: "Install cargo-pants"
+      - name: "Install cargo-udeps"
         run: |
-          cargo install --locked cargo-pants || true
+          cargo install --locked cargo-audit || true
       - run: |
-          rustup run nightly cargo pants
+          rm -rf ~/.cargo/advisory-db
+          rustup run nightly cargo audit

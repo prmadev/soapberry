@@ -1,4 +1,4 @@
-name: no vulnaribilities in dependencies
+name: no unused dependencies
 
 on:
   push:
@@ -11,14 +11,14 @@ env:
   CARGO_TERM_COLOR: always
   RUSTUP_MAX_RETRIES: 10
 jobs:
-  cargo-pants:
-    name: "cargo pants"
+  cargo-udeps:
+    name: "cargo udeps"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: nightly
+      - run: |
+          rustup set auto-self-update disable
+          rustup toolchain install nightly --profile minimal
       - uses: Swatinem/rust-cache@v2
       - name: set up cargo cache
         uses: actions/cache@v3
@@ -37,8 +37,10 @@ jobs:
         uses: arduino/setup-protoc@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: "Install cargo-pants"
+      - name: "Install cargo-udeps"
         run: |
-          cargo install --locked cargo-pants || true
+          cargo install --locked cargo-udeps || true
       - run: |
-          rustup run nightly cargo pants
+          rustup run nightly cargo udeps
+
+
