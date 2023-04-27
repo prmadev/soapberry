@@ -12,6 +12,9 @@
         - [Features](./usage/kyushu/development_scopes.md)
         - [Presumptions](./usage/kyushu/presumptions.md)
 - [Development](./development.md)
+    - [Architecture](./development/architecture.md)
+        - [Type Semantics](./development/architecture/type_semantics.md)
+        - [Kyushu's domain Architecture](./development/architecture/kyushu_domain_architecture.md)
     - [C4](./development/c4.md) 
         - [Context](./development/c4/context.md)
         - [Container](./development/c4/container.md)
@@ -21,4 +24,5 @@
         - [Workspaces](./development/adr/001_workspaces.md)
         - [gRPC](./development/adr/002_grpc.md)
         - [gRPC](./development/adr/003_rust.md)
+
 

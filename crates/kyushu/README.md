@@ -3,6 +3,10 @@ Kyushu
 </h1>
 
 <p align="center">
+<img alt="license" src="https://img.shields.io/crates/l/kyushu?color=f4dbd6&label=license&style=for-the-badge">
+</p>
+
+<p align="center">
 <img width="200" src="https://raw.githubusercontent.com/amirography/soapberry/main/crates/kyushu/assets/kyushu.png" alt="a picture of a Kyushu Maple in the style of a pixel art">
 </p>
 

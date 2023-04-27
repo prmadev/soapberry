@@ -1,0 +1,160 @@
+direction: down
+
+
+mdomain: Main Domain {
+	style.font-size: 35
+	style.fill: honeydew
+}
+
+
+mdomain.msg: Message {
+	projector: Projector Types {
+	style.multiple: true
+		view: View {
+			shape: class
+		}
+		
+	}
+}
+
+mdomain.msg.event: Event {
+	style.multiple: true
+
+	content: Content {
+		shape: class
+		event_id: ID
+		created_at: time
+	}
+	
+}
+mdomain.msg.event -> mdomain.msg.projector  {
+	style.animated: true
+	style.stroke-width: 5
+}
+
+mdomain.msg.command: Command {
+	style.multiple: true
+
+	content: Content {
+		shape: class
+	}
+	
+}
+
+mdomain.msg.query: Query {
+	style.multiple: true
+
+	content: Content {
+		shape: class
+	}
+	
+}
+
+
+pdomain: Persistence Domain {
+	style.font-size: 35
+	style.fill: honeydew
+}
+
+pdomain.structsy: Structsy-Friendly Event {
+	style.multiple: true
+
+	content: Content {
+		shape: class
+		event_id: ID
+		created_at: time
+	}
+
+}
+
+pdomain.structsy -> mdomain.msg.event {
+	style.animated: true
+	style.stroke-width: 5
+}
+
+pdomain.structsy <- mdomain.msg.event {
+	style.animated: true
+	style.stroke: orange 
+	style.stroke-width: 5
+}
+
+idomain: Interface Domain {
+	style.font-size: 35
+	style.fill: honeydew
+
+	command: Command {
+		protoreq: Proto Request {
+			content: Content {
+				shape: class
+			}
+		}		
+
+		protores: Proto Response {
+			content: Content {
+				shape: class
+			}
+		}		
+	} 
+
+	query: Query {
+		protoreq: Proto Request {
+			content: Content {
+				shape: class
+			}
+		}		
+		protores: Proto Response {
+			content: Content {
+				shape: class
+			}
+		}		
+		
+	}
+}
+
+mdomain.msg.command <- idomain.command.protoreq {
+	style.animated: true
+	style.stroke: orange
+	style.stroke-width: 5
+}
+
+mdomain.msg.query <- idomain.query.protoreq {
+	style.animated: true
+	style.stroke: orange
+	style.stroke-width: 5
+}
+
+user: User {
+	shape: person
+	height: 500
+	width: 500
+	style.font-size: 35
+} 
+
+user -> idomain.query.protoreq {
+	style.animated: true
+	style.stroke: orange
+	style.stroke-width: 5
+}
+
+user -> idomain.command.protoreq {
+	style.animated: true
+	style.stroke: orange
+	style.stroke-width: 5
+}
+
+user <- idomain.query.protores {
+	style.animated: true
+	style.stroke-width: 5
+}
+
+
+mdomain.msg.projector -> idomain.query.protores {
+	style.animated: true
+	style.stroke-width: 5
+}
+
+
+user <- idomain.command.protores {
+	style.animated: true
+	style.stroke-width: 5
+}
