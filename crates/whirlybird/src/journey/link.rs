@@ -2,7 +2,7 @@
 
 use std::time::SystemTime;
 
-use redmaple::id::ID;
+use redmaple::id::{IDGiver, ID};
 
 use super::{body::Body, entry::ValidEntryID, title::Title};
 
@@ -59,5 +59,16 @@ impl Link {
             title,
             body,
         }
+    }
+}
+impl IDGiver for Link {
+    type Valid = ValidLinkID;
+
+    fn id(&self) -> &Self::Valid {
+        &self.id
+    }
+
+    fn into_id(self) -> Self::Valid {
+        self.id
     }
 }

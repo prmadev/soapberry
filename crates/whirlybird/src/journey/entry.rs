@@ -48,6 +48,30 @@ impl Entry {
             journeys,
         }
     }
+
+    /// returns the [`Title`] if it is there
+    #[must_use]
+    pub const fn title(&self) -> &Option<Title> {
+        &self.title
+    }
+
+    /// returns the [`Body`] if it is there
+    #[must_use]
+    pub const fn body(&self) -> &Option<Body> {
+        &self.body
+    }
+
+    /// returns the [`Link`] if it is there
+    #[must_use]
+    pub const fn links(&self) -> &Vec<Link> {
+        &self.links
+    }
+
+    /// returns a vec of [`ValidJourneyID`] if it is there
+    #[must_use]
+    pub const fn journeys(&self) -> &Vec<ValidJourneyID> {
+        &self.journeys
+    }
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Entry`]
