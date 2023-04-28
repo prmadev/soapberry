@@ -34,9 +34,11 @@
 
 use std::net::SocketAddr;
 
-use kyushu::api::health_check_service_server::HealthCheckServiceServer;
-use kyushu::responders::health_respond;
+use kyushu::grpc_definitions::health_check_service_server::HealthCheckServiceServer;
+use kyushu::grpc_definitions::journey_service_server::JourneyServiceServer;
+use kyushu::persistence::structsy_store::persisted::entry_was_created::EntryWasCreated;
 use kyushu::server_configuration::Config;
+use kyushu::services::{health, journal};
 use kyushu::telemetry;
 use tonic::transport::Server;
 use tracing::instrument;
@@ -61,12 +63,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let conf = Config::try_from(std::env::args_os())?;
 
+    let db = structsy::Structsy::open("journey.db")?;
+    db.define::<EntryWasCreated>()?;
     //
     // servers
     //
 
     // main
-    let main_server_handler = MainServer::new(conf.server_address()).serve();
+    let main_server_handler = MainServer::new(conf.server_address(), db).serve();
     main_server_handler.await?;
 
     Ok(())
@@ -79,10 +83,15 @@ struct MainServer {
 }
 
 impl MainServer {
-    fn new(address: SocketAddr) -> Self {
-        let health_service = health_respond::HealthSevice::default();
+    fn new(address: SocketAddr, database: structsy::Structsy) -> Self {
+        let health_service = health::Sevice::default();
 
-        let server = Server::builder().add_service(HealthCheckServiceServer::new(health_service));
+        let server = Server::builder()
+            .add_service(HealthCheckServiceServer::new(health_service))
+            .add_service(JourneyServiceServer::new(journal::Service::new(
+                database,
+                uuid::Uuid::new_v4,
+            )));
 
         Self { address, server }
     }

@@ -3,7 +3,8 @@
 
 use structsy::{Structsy, StructsyQuery};
 
-use super::persisted::{JourneyWasCreated, JourneyWasCreatedQuery};
+use super::persisted::journey_was_created::JourneyWasCreated;
+use super::persisted::journey_was_created::Query;
 
 /// creates a side effectfull query for [`JourneyWasCreated`]
 pub fn query_journey_was_created(

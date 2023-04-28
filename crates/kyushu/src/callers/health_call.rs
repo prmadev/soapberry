@@ -6,7 +6,7 @@ use std::net::SocketAddr;
 use tonic::{codegen::http::uri::InvalidUri, transport::Channel, Request, Response, Status};
 use tracing::error;
 
-use crate::api::{
+use crate::grpc_definitions::{
     health_check_service_client::HealthCheckServiceClient, MarcoPoloRequest, MarcoPoloResponse,
 };
 
@@ -24,10 +24,10 @@ impl ConnectedHealthCheckClient {
     /// # Errors
     ///
     /// * [`HealthCheckError::ProblemConnecting`]: happens when client cannot connect
-    pub async fn connected_client(address: SocketAddr) -> Result<Self, HealthCheckError> {
+    pub async fn connected_client(address: SocketAddr) -> Result<Self, Error> {
         let client = HealthCheckServiceClient::connect(format!("http://{address}"))
             .await
-            .map_err(|x| HealthCheckError::ProblemConnecting(Box::new(x)))?;
+            .map_err(|x| Error::ProblemConnecting(Box::new(x)))?;
 
         Ok(Self(client))
     }
@@ -45,8 +45,8 @@ impl ConnectedHealthCheckClient {
 pub async fn marco_polo_response(
     client: &mut HealthCheckServiceClient<Channel>,
     request: Request<MarcoPoloRequest>,
-    error_handlr: impl Fn(Status) -> HealthCheckError,
-) -> Result<Response<MarcoPoloResponse>, HealthCheckError> {
+    error_handlr: impl Fn(Status) -> Error,
+) -> Result<Response<MarcoPoloResponse>, Error> {
     let resp = client.marco_polo(request).await.map_err(error_handlr)?;
 
     Ok(resp)
@@ -54,10 +54,10 @@ pub async fn marco_polo_response(
 
 #[allow(clippy::needless_pass_by_value)] // this is in order to recieve the status and being acceptable by compiler for map_err
 /// an error handler which checks the status for different errors and returns the appropiate error
-pub fn error_handlr(status: Status) -> HealthCheckError {
+pub fn error_handlr(status: Status) -> Error {
     match status.code() {
-        tonic::Code::Ok => HealthCheckError::OkStatus(status.message().to_owned()),
-        x => HealthCheckError::ServerError(x),
+        tonic::Code::Ok => Error::OkStatus(status.message().to_owned()),
+        x => Error::ServerError(x),
     }
 }
 
@@ -68,13 +68,13 @@ pub fn error_handlr(status: Status) -> HealthCheckError {
 /// it may return errors to be used by the test
 pub fn marco_polo_response_handler(
     expected_response_content: String,
-) -> impl Fn(Response<MarcoPoloResponse>) -> Result<(), HealthCheckError> {
-    move |response: Response<MarcoPoloResponse>| -> Result<(), HealthCheckError> {
+) -> impl Fn(Response<MarcoPoloResponse>) -> Result<(), Error> {
+    move |response: Response<MarcoPoloResponse>| -> Result<(), Error> {
         response
             .into_inner()
             .polo
             // matching the empty polo
-            .ok_or(HealthCheckError::MissMatchResponse(
+            .ok_or(Error::MissMatchResponse(
                 String::new(),
                 expected_response_content.clone(),
             ))
@@ -83,7 +83,7 @@ pub fn marco_polo_response_handler(
                 if p.content == expected_response_content {
                     return Ok(());
                 }
-                Err(HealthCheckError::MissMatchResponse(
+                Err(Error::MissMatchResponse(
                     p.content,
                     expected_response_content.clone(),
                 ))
@@ -94,7 +94,7 @@ pub fn marco_polo_response_handler(
 /// [`HealthCheckError`] checks for any error that can be resulted when building and testing
 /// the server during `HealthCheck`
 #[derive(thiserror::Error, Debug)]
-pub enum HealthCheckError {
+pub enum Error {
     /// [`InvalidURI`] marks the problem with a URL socket that is not in a valid form
     #[error("Invalid URI: {0}")]
     InvalidURI(InvalidUri),

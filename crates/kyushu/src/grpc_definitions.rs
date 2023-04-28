@@ -25,7 +25,7 @@ pub mod helper {
     /// This function will return an error if if the id field is `Option::None`.
     #[allow(clippy::needless_pass_by_value)]
     pub fn journey_id_extractor<E>(
-        x: crate::api::Journey,
+        x: crate::grpc_definitions::Journey,
         when_id_not_found: E,
     ) -> Result<String, E> {
         Ok(x.id.ok_or(when_id_not_found)?.id)

@@ -24,6 +24,8 @@ pub struct Config {
 pub enum Commands {
     /// checks for health
     HealthCheck,
+    /// entry creator
+    New,
 }
 
 /// arguemnts that starts with the app

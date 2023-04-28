@@ -3,16 +3,16 @@
 use tonic::{async_trait, Request, Response, Status};
 use tracing::instrument;
 
-use crate::api::{
+use crate::grpc_definitions::{
     health_check_service_server::HealthCheckService, MarcoPoloRequest, MarcoPoloResponse, Polo,
 };
 
 #[derive(Debug, Default)]
 /// [`HealthSevice`] is a service provider for checking the health of the server
-pub struct HealthSevice;
+pub struct Sevice;
 
 #[async_trait]
-impl HealthCheckService for HealthSevice {
+impl HealthCheckService for Sevice {
     #[instrument(level = "debug" , fields(request_id = %uuid::Uuid::new_v4()), skip(request))]
     async fn marco_polo(
         &self,
