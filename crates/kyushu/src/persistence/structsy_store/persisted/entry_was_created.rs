@@ -12,6 +12,7 @@ use super::PersistenceConversionError;
 /// Event Stored for when an event was created
 #[derive(Persistent, Clone)]
 pub struct EntryWasCreated {
+    id: String,
     time_created: u64,
     entry_id: String,
     title: Option<String>,
@@ -63,6 +64,7 @@ impl TryFrom<JournalEvent> for EntryWasCreated {
                 .iter()
                 .map(|j| j.inner().inner().to_string())
                 .collect(),
+            id: redmaple::id::IDGiver::id(&value).inner().to_string(),
         })
     }
 }
