@@ -127,6 +127,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.2](https://github.com/amirography/soapberry/compare/redmaple-v0.12.1...redmaple-v0.12.2) - 2023-05-06
+
+### Other
+- *(kyushu)* define domain level EntryWasCreated
+
 ## [0.12.1](https://github.com/amirography/soapberry/compare/redmaple-v0.12.0...redmaple-v0.12.1) - 2023-04-27
 
 ### Added
