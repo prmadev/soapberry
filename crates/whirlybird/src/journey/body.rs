@@ -1,7 +1,5 @@
 //! [`body`] module contains information about the text body of an entry
 
-use super::DomainError;
-
 /// `Body` is a wrapper around simple [`String`] to ensure that the text alway follows the domain rules
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Body(String);
@@ -12,9 +10,9 @@ impl Body {
     /// # Errors
     ///
     /// * [`JourneyError::TextCannotBeEmpty`] can be returned in-case of empty [`String`].
-    pub fn build(text: String) -> Result<Self, DomainError> {
+    pub fn build(text: String) -> Result<Self, BuildingError> {
         if text.is_empty() {
-            return Err(DomainError::TextCannotBeEmpty);
+            return Err(BuildingError::TextCannotBeEmpty);
         };
 
         Ok(Self(text))
@@ -32,4 +30,14 @@ impl Body {
     pub fn into_inner(self) -> String {
         self.0
     }
+}
+
+/// errors that may arise while making a [`Title`]
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum BuildingError {
+    /// the body text should have other characters.
+    /// in case you are looking for not adding a [`Body`] wrap it in `Option<Body>` and return
+    /// [`Option::None`]
+    #[error("the body text should have other characters")]
+    TextCannotBeEmpty,
 }

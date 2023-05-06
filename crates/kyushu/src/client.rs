@@ -37,17 +37,22 @@
 use std::net::SocketAddr;
 
 use kyushu::{
-    callers::health_call::{
-        error_handlr, marco_polo_response, marco_polo_response_handler, ConnectedHealthCheckClient,
-        HealthCheckError,
+    callers::{
+        health_call::{
+            error_handlr, marco_polo_response, marco_polo_response_handler,
+            ConnectedHealthCheckClient, Error,
+        },
+        journey::{self, ConnectedJourneyClient},
     },
     client_configuration::{Commands, Config, ConfigurationError},
+    grpc_definitions::{Body, Title},
 };
 
 #[tokio::main]
 async fn main() -> Result<(), CommandLineError> {
     let conf = Config::try_from(std::env::args_os())?;
     router(conf.command(), conf.server_address()).await?;
+
     Ok(())
 }
 
@@ -57,7 +62,10 @@ enum CommandLineError {
     Connection(#[from] tonic::transport::Error),
 
     #[error("failure during checking health: {0}")]
-    CheckingHealth(#[from] HealthCheckError),
+    CheckingHealth(#[from] Error),
+
+    #[error("failure during working with journey: {0}")]
+    JourneyDidWork(#[from] journey::Error),
 
     #[error("failure building configuration: {0}")]
     BuildingConfiguration(#[from] ConfigurationError),
@@ -67,22 +75,55 @@ async fn router(command: &Commands, server_address: SocketAddr) -> Result<(), Co
     match command {
         Commands::HealthCheck => {
             // making client
-            let mut client = ConnectedHealthCheckClient::connected_client(server_address)
-                .await
-                .map_err(CommandLineError::CheckingHealth)?;
-
-            // forming the request
-            let request = tonic::Request::new(kyushu::api::MarcoPoloRequest {
-                marco: Some(kyushu::api::Marco {
-                    content: String::from("Marco"),
-                }),
-            });
+            let (mut client, request) = health_check(server_address).await?;
 
             //
             marco_polo_response_handler(String::from("Polo"))(
                 marco_polo_response(client.inner_mut(), request, error_handlr).await?,
             )?;
         }
+        Commands::New => {
+            let mut client = ConnectedJourneyClient::connected_client(server_address)
+                .await
+                .map_err(CommandLineError::JourneyDidWork)?;
+
+            let request = tonic::Request::new(kyushu::grpc_definitions::CreateEntryRequest {
+                entry_title: Some(Title {
+                    content: "some title".to_owned(),
+                }),
+                body: Some(Body {
+                    content: ("some body".to_owned()),
+                }),
+                journeys_to_be_added: vec![],
+            });
+
+            let resp = client
+                .inner_mut()
+                .create_entry(request)
+                .await
+                .map_err(|e| println!("{e}"));
+            println!("{resp:#?}");
+        }
     };
     Ok(())
+}
+
+async fn health_check(
+    server_address: SocketAddr,
+) -> Result<
+    (
+        ConnectedHealthCheckClient,
+        tonic::Request<kyushu::grpc_definitions::MarcoPoloRequest>,
+    ),
+    CommandLineError,
+> {
+    let client = ConnectedHealthCheckClient::connected_client(server_address)
+        .await
+        .map_err(CommandLineError::CheckingHealth)?;
+    let request = tonic::Request::new(kyushu::grpc_definitions::MarcoPoloRequest {
+        marco: Some(kyushu::grpc_definitions::Marco {
+            content: String::from("Marco"),
+        }),
+    });
+    Ok((client, request))
 }

@@ -3,16 +3,20 @@
 use std::{
     net::{AddrParseError, IpAddr, SocketAddr},
     num::ParseIntError,
+    path::PathBuf,
     str::FromStr,
 };
 
 use clap::{command, Parser};
+
+use crate::persistence::structsy_store::{DBFile, DBFileError, KnownDBFile};
 
 /// [`Config`] holds the configuarion and command logic that the user runs to run [`kyushu_client`]
 ///
 /// * `server_address`: is socket address in the form of 127.0.0.1:10000
 pub struct Config {
     server_address: SocketAddr,
+    db_address: PathBuf,
 }
 
 /// arguemnts that starts with the app
@@ -25,6 +29,12 @@ pub struct Args {
 
     #[arg(short, long)]
     port: Option<u16>,
+
+    #[arg(short, long)]
+    db: Option<String>,
+
+    #[arg(short, long)]
+    create_db: bool,
 }
 
 /// these are the errors that happen when trying to form a configuration for client
@@ -45,6 +55,24 @@ pub enum ConfigurationError {
     /// mising port
     #[error("you should pass in the server's port number")]
     MissingPortArgument,
+
+    /// mising database file
+    #[error(
+        "you should add a database file, if not existing add the path that it should be located"
+    )]
+    MissingDatabaseArgument,
+
+    /// could not parse path
+    #[error("could not parse the path to database: {0}")]
+    CouldNotParseDBPathArgument(std::convert::Infallible),
+
+    /// could not determine the existence of the db file
+    #[error("could not confirm the state of the database file : {0}")]
+    CouldNotDetermineTheExistenceOfDBFile(DBFileError),
+
+    /// database file at the given path is not found. If you want me to create one, pass the appropiate arguemnt
+    #[error("database file at path {0} does not exist. If you want me to create, pass the appropiate flag")]
+    CouldNotFindDatabaseFile(PathBuf),
 }
 
 impl TryFrom<std::env::ArgsOs> for Config {
@@ -64,9 +92,24 @@ impl TryFrom<std::env::ArgsOs> for Config {
         let port = args.port.ok_or(ConfigurationError::MissingPortArgument)?;
 
         let sockadd = SocketAddr::new(IpAddr::from_str(&serve)?, port);
+        let db = DBFile::from(
+            PathBuf::from_str(&args.db.ok_or(ConfigurationError::MissingDatabaseArgument)?)
+                .map_err(ConfigurationError::CouldNotParseDBPathArgument)?,
+        );
+        let dbfile = KnownDBFile::try_from(db.clone())
+            .map_err(ConfigurationError::CouldNotDetermineTheExistenceOfDBFile)?;
+
+        let db_result = match (&dbfile, &args.create_db) {
+            (KnownDBFile::Existing(ref d), true | false) => Ok(d.inner()),
+            (KnownDBFile::NotExisting(ref d), true) => Ok(d.inner()),
+            (KnownDBFile::NotExisting(_), false) => Err(
+                ConfigurationError::CouldNotFindDatabaseFile(db.into_inner()),
+            ),
+        };
 
         Ok(Self {
             server_address: sockadd,
+            db_address: db_result?.clone(),
         })
     }
 }
@@ -76,5 +119,11 @@ impl Config {
     #[must_use]
     pub const fn server_address(&self) -> SocketAddr {
         self.server_address
+    }
+
+    /// Returns the address to the db file
+    #[must_use]
+    pub const fn db_address(&self) -> &PathBuf {
+        &self.db_address
     }
 }

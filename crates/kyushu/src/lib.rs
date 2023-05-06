@@ -36,11 +36,11 @@
 #![allow(clippy::multiple_crate_versions)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-pub mod api;
 pub mod callers;
 pub mod client_configuration;
 pub mod domain;
+pub mod grpc_definitions;
 pub mod persistence;
-pub mod responders;
 pub mod server_configuration;
+pub mod services;
 pub mod telemetry;
