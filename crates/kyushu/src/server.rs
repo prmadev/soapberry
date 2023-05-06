@@ -37,6 +37,7 @@ use std::net::SocketAddr;
 use kyushu::grpc_definitions::health_check_service_server::HealthCheckServiceServer;
 use kyushu::grpc_definitions::journey_service_server::JourneyServiceServer;
 use kyushu::persistence::structsy_store::events::entry_was_created::EntryWasCreated;
+
 use kyushu::server_configuration::Config;
 use kyushu::services::{health, journal};
 use kyushu::telemetry;
@@ -63,7 +64,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let conf = Config::try_from(std::env::args_os())?;
 
-    let db = structsy::Structsy::open("journey.db")?;
+    let db = structsy::Structsy::open(conf.db_address())?;
     db.define::<EntryWasCreated>()?;
     //
     // servers

@@ -15,27 +15,35 @@ use structsy::{Persistent, Structsy, StructsyError, StructsyQuery};
 ///////////////////////////////////
 
 /// [`DBFile`] is holder for a file that is supposed to be existing
+#[derive(Debug, Clone)]
 pub struct DBFile<State = NotKnown>(PathBuf, std::marker::PhantomData<State>);
 
 /// this is a zero sized struct holding state of [`DBFile`]
 /// for when the **file exists**
+#[derive(Debug, Clone)]
 pub struct Existing;
 
 /// this is a zero sized struct holding state of [`DBFile`]
 /// for when the file does **not exist**
+#[derive(Debug, Clone)]
 pub struct NotExisting;
 
 /// this is a zero sized struct holding state of [`DBFile`]
 /// for when the file is **not know to exist or not**
+#[derive(Debug, Clone)]
 pub struct NotKnown;
 
 impl<State> DBFile<State> {
-    const fn inner(&self) -> &PathBuf {
+    /// returns the inner pathbuf
+    #[must_use]
+    pub const fn inner(&self) -> &PathBuf {
         &self.0
     }
 
+    /// returns the inner pathbuf, consuming it self
     #[allow(clippy::missing_const_for_fn)] // clippy thinks it can be const, while it cannot
-    fn into_inner(self) -> PathBuf {
+    #[must_use]
+    pub fn into_inner(self) -> PathBuf {
         self.0
     }
 }
@@ -46,8 +54,12 @@ impl From<PathBuf> for DBFile {
     }
 }
 
-enum KnownDBFile {
+/// defines a state for the existence of db file
+#[derive(Debug, Clone)]
+pub enum KnownDBFile {
+    /// if the dbfile is existing
     Existing(DBFile<Existing>),
+    /// if the dbfile is non-exiting
     NotExisting(DBFile<NotExisting>),
 }
 
