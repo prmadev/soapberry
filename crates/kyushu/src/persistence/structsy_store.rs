@@ -8,7 +8,7 @@ pub mod queries;
 
 use std::path::PathBuf;
 
-use structsy::{Persistent, Structsy, StructsyError, StructsyQuery};
+use structsy::{Structsy, StructsyError};
 
 ////////////////////////////////////
 // main logic
@@ -102,34 +102,6 @@ impl TryFrom<DBFile<NotExisting>> for Structsy {
 
     fn try_from(file: DBFile<NotExisting>) -> Result<Self, Self::Error> {
         Self::open(file.inner())
-    }
-}
-
-////////////////////////////////////
-// Helper Abstraction
-////////////////////////////////////
-
-/// a handler for queries that makes the query and returns only the first result
-pub fn first_from_query<
-    S: Persistent + 'static + Clone,
-    R: TryFrom<S> + Clone,
-    E: std::error::Error + Clone,
-    T: Fn(String) -> StructsyQuery<S>,
->(
-    inquirer: T,
-    error_could_not_find: E,
-    error_could_not_convert: E,
-) -> impl Fn(String) -> Result<R, E> {
-    move |id: String| -> Result<R, E> {
-        inquirer(id)
-            .into_iter()
-            .map(|(_x, event)| event)
-            .collect::<Vec<S>>()
-            .first()
-            .ok_or(error_could_not_find.clone())?
-            .clone()
-            .try_into()
-            .map_err(|_e| error_could_not_convert.clone())
     }
 }
 
