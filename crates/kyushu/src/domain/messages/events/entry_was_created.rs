@@ -1,11 +1,11 @@
 //!indicated that a journey was created at some point in time;
 
-use std::time::SystemTime;
+use std::{fmt::Display, time::SystemTime};
 
 use redmaple::id::{IDGiver, ID};
-use whirlybird::journey::{body::Body, link::Link, title::Title, ValidJourneyID};
+use whirlybird::journey::{body::Body, title::Title};
 
-use super::ValidEventID;
+use super::{EventRepo, ValidEventID};
 
 /// indicates that an [`Entry`] was created
 pub struct EntryWasCreated {
@@ -14,21 +14,36 @@ pub struct EntryWasCreated {
     entry_id: ID,
     title: Option<Title>,
     body: Option<Body>,
-    links: Vec<Link>,
-    journeys: Vec<ValidJourneyID>,
+}
+
+/// repo actions that are tied to entries
+pub trait EntryRepo: EventRepo {
+    /// Errors that may happen in these functions
+    type EntryError: Display + std::error::Error;
+
+    /// find every event of this type that matches this [`ID`]
+    ///
+    /// # Errors
+    ///
+    /// If at any point it fails to convert types correctly or fails to match any item it will return an error
+    fn events_matching_entry_id(&self, id: &ID) -> Result<Vec<Self::Item>, Self::EntryError>;
+}
+
+/// traits for repos that hold [`domain::messages::events::entry_was_created::EntryWasCreated`]
+pub trait Repo: EntryRepo + EventRepo + Send + Sync {
+    /// Error that holds the entire stack of errors
+    type EntryWasCreatedError: Display + From<Self::EntryError> + From<Self::EventError>;
 }
 
 impl EntryWasCreated {
     /// creates a new instance of [`EntryWasCreated`]
     #[must_use]
-    pub fn new(
+    pub const fn new(
         event_id: ID,
         time_created: SystemTime,
         entry_id: ID,
         title: Option<Title>,
         body: Option<Body>,
-        links: Vec<Link>,
-        journeys: Vec<ValidJourneyID>,
     ) -> Self {
         Self {
             event_id: ValidEventID(event_id),
@@ -36,8 +51,6 @@ impl EntryWasCreated {
             entry_id,
             title,
             body,
-            links,
-            journeys,
         }
     }
 
@@ -63,18 +76,6 @@ impl EntryWasCreated {
     #[must_use]
     pub const fn body(&self) -> Option<&Body> {
         self.body.as_ref()
-    }
-
-    /// returns the links of this entry
-    #[must_use]
-    pub fn links(&self) -> &[Link] {
-        self.links.as_ref()
-    }
-
-    /// reutrns the journeys that this is on
-    #[must_use]
-    pub fn journeys(&self) -> &[ValidJourneyID] {
-        self.journeys.as_ref()
     }
 }
 

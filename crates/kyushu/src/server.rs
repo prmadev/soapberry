@@ -36,7 +36,7 @@ use std::net::SocketAddr;
 
 use kyushu::grpc_definitions::health_check_service_server::HealthCheckServiceServer;
 use kyushu::grpc_definitions::journey_service_server::JourneyServiceServer;
-use kyushu::persistence::structsy_store::persisted::entry_was_created::EntryWasCreated;
+use kyushu::persistence::structsy_store::events::entry_was_created::EntryWasCreated;
 use kyushu::server_configuration::Config;
 use kyushu::services::{health, journal};
 use kyushu::telemetry;

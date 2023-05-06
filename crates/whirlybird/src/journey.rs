@@ -164,13 +164,13 @@ pub struct Journey {
     time_created: SystemTime,
 
     /// [`Title`] of the [`Entry`]
-    title: Title,
+    title: Option<Title>,
 }
 
 impl Journey {
     /// new creates a new instance of [`Journey`]
     #[must_use]
-    pub const fn new(id: ID, time_created: SystemTime, title: Title) -> Self {
+    pub const fn new(id: ID, time_created: SystemTime, title: Option<Title>) -> Self {
         Self {
             id: ValidJourneyID(id),
             time_created,

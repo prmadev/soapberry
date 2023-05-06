@@ -3,7 +3,7 @@
 ////////////////////////////////////
 // imports
 ////////////////////////////////////
-pub mod persisted;
+pub mod events;
 pub mod queries;
 
 use std::path::PathBuf;

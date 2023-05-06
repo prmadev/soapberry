@@ -3,22 +3,17 @@
 pub mod commands;
 
 use redmaple::id::ID;
-use std::time::SystemTime;
-use structsy::StructsyTx;
+
 use tonic::{async_trait, Request, Response, Status};
 use uuid::Uuid;
-use whirlybird::journey::Journey;
 
 use crate::{
+    domain::{self, messages::events::EventRepo},
     grpc_definitions::{
         journey_service_server::JourneyService, CreateEntryRequest, CreateEntryResponse,
     },
-    persistence::structsy_store::{
-        persisted::entry_was_created::EntryWasCreated, queries::query_journey_was_created,
-    },
+    persistence::structsy_store::events::entry_was_created::StructsyStore,
 };
-
-use self::commands::create_entry::{entry_creator, Error};
 
 /// a service struct that is responds to the api calls
 pub struct Service {
@@ -39,61 +34,39 @@ impl JourneyService for Service {
         &self,
         request: Request<CreateEntryRequest>,
     ) -> Result<Response<CreateEntryResponse>, Status> {
-        let req = request.into_inner();
+        // command encoding
+        let command =
+            domain::messages::commands::create_entry::CreateEntry::try_from(request.into_inner())
+                .map_err(|err| match err {
+                crate::grpc_definitions::ToDomainCreateEntryError::TitleBuildingError(e) => {
+                    Status::invalid_argument(e.to_string())
+                }
+                crate::grpc_definitions::ToDomainCreateEntryError::BodyBuildingError(e) => {
+                    Status::invalid_argument(e.to_string())
+                }
+                crate::grpc_definitions::ToDomainCreateEntryError::IDConversionErrors(e) => {
+                    Status::invalid_argument(format!("{e:?}"))
+                }
+            })?;
+        let now = std::time::SystemTime::now();
 
-        let creator = entry_creator(
-            |id| {
-                if let Some(k) = query_journey_was_created(self.db.clone())(id)
-                    .fetch()
-                    .next()
-                {
-                    return Journey::try_from(k.1).map_err(|_e| Error::CouldNotConvert);
-                };
-
-                Err(Error::CouldNotFindItenInDatabase)
-            },
-            |n| n.id.ok_or(Error::JouneyIDNotFound).map(|j| j.id),
+        // Event Creation
+        let event = domain::messages::events::entry_was_created::EntryWasCreated::new(
+            ID::new((self.uuid_generator)()),
+            now,
+            ID::new((self.uuid_generator)()),
+            command.entry_title().clone(),
+            command.body().clone(),
         );
 
-        let entry = creator(
-            ID::new((self.uuid_generator)()),
-            ID::new((self.uuid_generator)()),
-            ID::new(uuid::Uuid::nil()),
-            SystemTime::now(),
-            req,
-        )
-        .map_err(|e| match e {
-            Error::TitleOrBodyCannotBeBuilt(err) => Status::invalid_argument(err.to_string()),
-            Error::CouldNotBuildUUID(err) => Status::invalid_argument(err.to_string()),
-            Error::JouneyIDNotFound => Status::not_found("Journey ID was not provided"),
-            Error::JouneyWasNotFound => {
-                Status::not_found("journey was not not found inside the database")
-            }
-            Error::JourneyBatchProblems(err) => Status::unknown(format!("{err:?}")),
-            Error::CouldNotConvert => Status::invalid_argument("Could not convert one the values"),
-            Error::CouldNotFindItenInDatabase => {
-                Status::not_found("could not find the item in the database")
-            }
-        })?;
+        // Storing event
+        let store = StructsyStore::new(self.db.clone());
 
-        let persisting_event =
-            EntryWasCreated::try_from(entry).map_err(|e| Status::internal(e.to_string()))?;
+        if let Err(err) = store.append(event) {
+            return Err(Status::internal(err.to_string()));
+        }
 
-        let mut tx = self
-            .db
-            .begin()
-            .map_err(|e| Status::internal(e.to_string()))?;
-
-        tx.insert(&persisting_event).map_err(|e| {
-            eprintln!("{e}");
-            Status::internal(e.to_string())
-        })?;
-
-        tx.commit().map_err(|e| Status::internal(e.to_string()))?;
-
+        // Response
         Ok(Response::new(CreateEntryResponse {}))
-
-        // TODO: make a MakeJournalEvent
-        // TODO: retrieve journals from redmaple
     }
 }

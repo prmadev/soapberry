@@ -29,12 +29,12 @@ split_commits = true
 filter_unconventional = true
 
 [dependencies]
-clap = { version = "4.2.5", features = ["derive"] }
+clap = { version = "4.2.7", features = ["derive"] }
 inquire = "0.6.1"
 prost = "0.11.9"
 prost-types = "0.11.9"
 redmaple = { version = "0.12.1", path = "../redmaple" }
-structsy = { version = "0.5.1", features = ["derive"] }
+structsy = { version = "0.5.2", features = ["derive"] }
 structsy-derive = "0.5.2"
 thiserror = "1.0.40"
 tokio = { version = "1.28.0", features = ["macros", "rt-multi-thread"] }
