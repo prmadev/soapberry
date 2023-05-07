@@ -1,6 +1,6 @@
 //! representation of request for creating an entry
 
-use whirlybird::journey::{body::Body, title::Title};
+use whirlybird::journey::entity::{body::Body, title::Title};
 
 /// requests an entry to be created
 #[derive(Debug, Clone)]

@@ -2,13 +2,13 @@
 
 pub mod commands;
 
-use redmaple::id::ID;
+use redmaple::{id::ID, EventRepo};
 
 use tonic::{async_trait, Request, Response, Status};
 use uuid::Uuid;
 
 use crate::{
-    domain::{self, messages::events::EventRepo},
+    domain,
     grpc_definitions::{
         journey_service_server::JourneyService, CreateEntryRequest, CreateEntryResponse,
     },
@@ -51,7 +51,7 @@ impl JourneyService for Service {
         let now = std::time::SystemTime::now();
 
         // Event Creation
-        let event = domain::messages::events::entry_was_created::EntryWasCreated::new(
+        let event = whirlybird::journey::event::entry_was_created::EntryWasCreated::new(
             ID::new((self.uuid_generator)()),
             now,
             ID::new((self.uuid_generator)()),

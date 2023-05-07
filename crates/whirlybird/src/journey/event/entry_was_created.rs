@@ -1,11 +1,14 @@
-//!indicated that a journey was created at some point in time;
+//! holds the information about an event of an information being created
 
 use std::{fmt::Display, time::SystemTime};
 
-use redmaple::id::{IDGiver, ID};
-use whirlybird::journey::{body::Body, title::Title};
+use crate::journey::entity::{body::Body, title::Title};
+use redmaple::{
+    id::{IDGiver, ID},
+    EventRepo,
+};
 
-use super::{EventRepo, ValidEventID};
+use crate::journey::ValidEventID;
 
 /// indicates that an [`Entry`] was created
 pub struct EntryWasCreated {

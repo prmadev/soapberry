@@ -4,7 +4,7 @@ use std::time::SystemTime;
 
 use redmaple::id::{IDGiver, ID};
 
-use super::{Body, Link, Title, ValidJourneyID};
+use super::{body::Body, title::Title};
 
 /// [`Entry`] contains information related to an specific user entry
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -20,12 +20,6 @@ pub struct Entry {
 
     /// [`Body`] of the [`Entry`]
     body: Option<Body>,
-
-    /// list of [`Link`] s from this [`Entry`]
-    links: Vec<Link>,
-
-    /// [`Journey`] s that this [`Entry`] is on
-    journeys: Vec<ValidJourneyID>,
 }
 
 impl Entry {
@@ -36,16 +30,12 @@ impl Entry {
         time_created: SystemTime,
         title: Option<Title>,
         body: Option<Body>,
-        links: Vec<Link>,
-        journeys: Vec<ValidJourneyID>,
     ) -> Self {
         Self {
             id: ValidEntryID(id),
             time_created,
             title,
             body,
-            links,
-            journeys,
         }
     }
 
@@ -59,18 +49,6 @@ impl Entry {
     #[must_use]
     pub const fn body(&self) -> &Option<Body> {
         &self.body
-    }
-
-    /// returns the [`Link`] if it is there
-    #[must_use]
-    pub const fn links(&self) -> &Vec<Link> {
-        &self.links
-    }
-
-    /// returns a vec of [`ValidJourneyID`] if it is there
-    #[must_use]
-    pub const fn journeys(&self) -> &Vec<ValidJourneyID> {
-        &self.journeys
     }
 }
 

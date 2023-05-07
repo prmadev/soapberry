@@ -34,11 +34,11 @@ pub enum FromPersistenceConversionError {
 
     /// errors related to title creation from input
     #[error("Title cannot get built: {0}")]
-    TitleCannotBeBuilt(whirlybird::journey::title::BuildingError),
+    TitleCannotBeBuilt(whirlybird::journey::entity::title::BuildingError),
 
     /// errors related to body creation from input
     #[error("Body cannot get built: {0}")]
-    BodyCannotBeBuilt(whirlybird::journey::body::BuildingError),
+    BodyCannotBeBuilt(whirlybird::journey::entity::body::BuildingError),
 
     /// not a correct event type
     #[error("Incorrect event type")]

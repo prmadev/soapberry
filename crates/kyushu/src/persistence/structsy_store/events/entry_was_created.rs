@@ -2,16 +2,12 @@
 //! implementations for persisting [`EntryWasCreated`] event
 
 use std::time::{self, UNIX_EPOCH};
+use whirlybird::journey::event::entry_was_created::EntryRepo;
 
-use redmaple::id::ID;
+use redmaple::{id::ID, EventRepo};
 use structsy::{Order, StructsyTx};
 use structsy_derive::{queries, Persistent};
-use whirlybird::journey::{body::Body, title::Title};
-
-use crate::domain::{
-    self,
-    messages::events::{entry_was_created::EntryRepo, EventRepo},
-};
+use whirlybird::journey::entity::{body::Body, title::Title};
 
 use super::{FromPersistenceConversionError, ToPersistenceConversionError};
 
@@ -46,7 +42,7 @@ pub trait Query {
 }
 
 /// conversion: persistent -> domain
-impl TryFrom<EntryWasCreated> for domain::messages::events::entry_was_created::EntryWasCreated {
+impl TryFrom<EntryWasCreated> for whirlybird::journey::event::entry_was_created::EntryWasCreated {
     type Error = FromPersistenceConversionError;
 
     fn try_from(value: EntryWasCreated) -> Result<Self, Self::Error> {
@@ -80,11 +76,11 @@ impl TryFrom<EntryWasCreated> for domain::messages::events::entry_was_created::E
 }
 
 /// conversion: domain -> persistent
-impl TryFrom<domain::messages::events::entry_was_created::EntryWasCreated> for EntryWasCreated {
+impl TryFrom<whirlybird::journey::event::entry_was_created::EntryWasCreated> for EntryWasCreated {
     type Error = ToPersistenceConversionError;
 
     fn try_from(
-        value: domain::messages::events::entry_was_created::EntryWasCreated,
+        value: whirlybird::journey::event::entry_was_created::EntryWasCreated,
     ) -> Result<Self, Self::Error> {
         let time_created = value
             .time_created()
@@ -114,7 +110,7 @@ impl StructsyStore {
 }
 
 impl EventRepo for StructsyStore {
-    type Item = domain::messages::events::entry_was_created::EntryWasCreated;
+    type Item = whirlybird::journey::event::entry_was_created::EntryWasCreated;
 
     type EventError = EventRepoError;
 
@@ -130,7 +126,7 @@ impl EventRepo for StructsyStore {
             .ok_or(Self::EventError::NoItemWithThatIDWasFound(id.clone()))?
             .1;
 
-        let event = domain::messages::events::entry_was_created::EntryWasCreated::try_from(item)?;
+        let event = whirlybird::journey::event::entry_was_created::EntryWasCreated::try_from(item)?;
         Ok(event)
     }
 
@@ -143,7 +139,7 @@ impl EventRepo for StructsyStore {
         let (items, errors): (Vec<_>, Vec<_>) = query
             .into_iter()
             .map(|(_, ent)| {
-                domain::messages::events::entry_was_created::EntryWasCreated::try_from(ent)
+                whirlybird::journey::event::entry_was_created::EntryWasCreated::try_from(ent)
             })
             .partition(Result::is_ok);
 
@@ -172,7 +168,7 @@ impl EventRepo for StructsyStore {
     }
 }
 
-/// errors that happen when communicating with this event repo  
+/// errors that happen when communicating with this event repo
 #[derive(Debug, thiserror::Error, Clone)]
 pub enum EventRepoError {
     /// No Item with That ID could be found
@@ -209,7 +205,7 @@ impl EntryRepo for StructsyStore {
             .search_by_entry_id(&id.inner().to_string())
             .into_iter()
             .map(|(_, ent)| {
-                domain::messages::events::entry_was_created::EntryWasCreated::try_from(ent)
+                whirlybird::journey::event::entry_was_created::EntryWasCreated::try_from(ent)
             })
             .partition(Result::is_ok);
 
@@ -223,11 +219,11 @@ impl EntryRepo for StructsyStore {
         Ok(items
             .into_iter()
             .filter_map(Result::ok)
-            .collect::<Vec<domain::messages::events::entry_was_created::EntryWasCreated>>())
+            .collect::<Vec<whirlybird::journey::event::entry_was_created::EntryWasCreated>>())
     }
 }
 
-/// errors that happen when communicating with this event repo  
+/// errors that happen when communicating with this event repo
 #[derive(Debug, thiserror::Error, Clone)]
 pub enum EntryRepoError {
     #[error("Could not convert back from persistence layer {0:?}")]

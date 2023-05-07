@@ -14,7 +14,7 @@
     missing_docs
 )]
 
-use whirlybird::journey::{body, title};
+use whirlybird::journey::entity::{body, title};
 
 use crate::domain;
 
@@ -52,7 +52,7 @@ pub enum TitleConversionError {
     TitleBuildingError(#[from] title::BuildingError),
 }
 
-impl TryFrom<Body> for whirlybird::journey::body::Body {
+impl TryFrom<Body> for body::Body {
     type Error = BodyConversionError;
 
     fn try_from(value: Body) -> Result<Self, Self::Error> {
@@ -80,12 +80,12 @@ impl TryFrom<CreateEntryRequest> for domain::messages::commands::create_entry::C
 
     fn try_from(value: CreateEntryRequest) -> Result<Self, Self::Error> {
         let entry_title = match value.entry_title {
-            Some(t) => Some(whirlybird::journey::title::Title::try_from(t)?),
+            Some(t) => Some(title::Title::try_from(t)?),
             None => None,
         };
 
         let body = match value.body {
-            Some(b) => Some(whirlybird::journey::body::Body::try_from(b)?),
+            Some(b) => Some(body::Body::try_from(b)?),
             None => None,
         };
 
