@@ -3,11 +3,10 @@
 //! in that each node entry has a time associated with it.
 //! and forms named relation ships.
 //! these relationships form journeys
-pub mod body;
-pub mod entry;
-pub mod link;
-pub mod title;
+pub mod entity;
+pub mod event;
 
+use crate::journey::event::ValidEventID;
 use std::time::SystemTime;
 
 use redmaple::{
@@ -15,10 +14,8 @@ use redmaple::{
     id::{IDGiver, ID},
 };
 
-use self::{
-    body::Body,
+use self::entity::{
     entry::{Entry, ValidEntryID},
-    link::Link,
     title::Title,
 };
 
@@ -78,20 +75,8 @@ impl EventGroup for JournalEvent {
     }
 }
 
-/// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`JournalEvent`]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ValidEventID(ID);
-
-impl ValidEventID {
-    /// exposes the inner [`ID`] of the [`JournalEvent`]
-    #[must_use]
-    pub const fn inner(&self) -> &ID {
-        &self.0
-    }
-}
-
 impl IDGiver for JournalEvent {
-    type Valid = ValidEventID;
+    type Valid = event::ValidEventID;
 
     fn id(&self) -> &Self::Valid {
         &self.event_id
@@ -108,17 +93,8 @@ pub enum Journal {
     /// Event: An [`Entry`] was created.
     EntryCreated(Entry),
 
-    /// Event: An already existing [`Entry`] was **added** to an already existing [`Journey`].
-    EntryAddedToJourney(ValidEntryID, ValidJourneyID),
-
-    /// Event: An already existing [`Entry`] was **removed** from an already existing [`Journey`].
-    EntryRemovedFromJourney(ValidEntryID, ValidJourneyID),
-
     /// Event: An already existing [`Entry`] was updated to a new version.
     EntryUpdated(ValidEntryID, Entry),
-
-    /// Event: An already existing [`Entry`] added a new [`Link`].
-    EntryLinked(Link),
 
     /// Event: A new [`Journey`] was created.
     JourneyCreated(Journey),

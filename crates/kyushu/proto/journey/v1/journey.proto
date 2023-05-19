@@ -18,105 +18,36 @@ message Body {
   string content = 1;
 }
 
-enum Valid {
-  VALID_UNSPECIFIED = 0;
-  VALID_VALID = 1;
-  VALID_INVALID = 2;
-}
-
-enum FileType {
-  FILE_TYPE_UNSPECIFIED = 0;
-  FILE_TYPE_PNG = 1;
-  FILE_TYPE_JPEG = 2;
-  FILE_TYPE_GIF = 3;
-  FILE_TYPE_SVG = 4;
-}
-
-enum ObjectType {
-  OBJECT_TYPE_UNSPECIFIED = 0;
-  OBJECT_TYPE_EXTERNAL_OBJECT = 1;
-  OBJECT_TYPE_INTERNAL_OBJECT = 2;
-  OBJECT_TYPE_TIME_OBJECT = 3;
-}
-
-message User {
-  ID user_id = 1;
-  google.protobuf.Timestamp time_created = 2;
-}
-
-message URL {
-  string address = 1;
-  Valid valid_status = 2;
-}
-
-message File {
-  bytes payload = 1;
-  FileType file_type = 2;
-  string file_name = 3;
-}
-
-message InternalObject {
-  ID id = 1;
-  google.protobuf.Timestamp time_created = 2;
-  File file = 3;
-}
-
-message ExternalObject {
-  ID id = 1;
-  google.protobuf.Timestamp time_created = 2;
-  URL url = 3;
-}
-
-message TimeObject {
-  ID id = 1;
-  google.protobuf.Timestamp time_created = 2;
-  google.protobuf.Timestamp time_point = 3;
-}
-
-message ObjectContainer {
-  ID id = 1;
-  ObjectType object_type = 2;
-  InternalObject internal_object = 3;
-  ExternalObject external_object = 4;
-  TimeObject time_object = 5;
-}
-
-message Link {
-  ID link_id = 1;
-  google.protobuf.Timestamp time_created = 2;
-  ID link_from = 3;
-  ID link_to = 4;
-  Title title = 5;
-  Body body = 6;
-}
-
 message Entry {
   ID id = 1;
   google.protobuf.Timestamp time_created = 2;
   Title title = 3;
   Body body = 4;
-  repeated Link link = 6;
+}
+message TimeRange {
+  bool has_start = 1;
+  google.protobuf.Timestamp start = 2;
+  bool has_end = 3;
+  google.protobuf.Timestamp end = 4;
 }
 
-message Journey {
-  ID id = 1;
-  google.protobuf.Timestamp time_created = 2;
-  Title title = 3;
-  repeated Entry entries = 4;
+message EntryFilter {
+  repeated TimeRange by_time_created = 1;
+  repeated TimeRange by_time_updated = 2;
+}
+enum EntrySortInfo {
+  UNSPECIFIED = 0;
+  CREATED = 1;
+  UPDATED = 2;
+}
+message EntrySort {
+  bool assending = 1;
+  EntrySortInfo by = 2;
 }
 
 //==================================
 //======= request / responses ======
 //==================================
-
-//
-// CreateJourney
-//
-
-message CreateJourneyRequest {
-  Title journey_name = 1;
-}
-message CreateJourneyResponse {}
 
 //
 // CreateEntry
@@ -125,239 +56,25 @@ message CreateJourneyResponse {}
 message CreateEntryRequest {
   Title entry_title = 1;
   Body body = 4;
-  repeated Journey journeys_to_be_added = 2;
 }
 
 message CreateEntryResponse {}
 
-//
-// DeleteJourney
-//
-
-message DeleteJourneyRequest {
-  ID journey_id = 1;
-}
-message DeleteJourneyResponse {}
-
-//
-// EditJourney
-//
-
-message SetTitleForJourneyRequest {
-  ID journey_id = 1;
-  Title new_title = 2;
-}
-message SetTitleForJourneyResponse {}
-
-message SetTimeCreatedForJourneyRequest {
-  ID journey_id = 1;
-  google.protobuf.Timestamp new_time_created = 2;
+message GetEntriesRequest {
+  uint32 number = 1;
+  EntrySort sorted_by = 2;
+  repeated EntryFilter filtered_by = 3;
 }
 
-message SetTimeCreatedForJourneyResponse {}
-
-message AddEntriesToJourneyRequest {
-  ID journey_id = 1;
-  repeated ID entry_ids = 2;
+message GetEntriesResponse {
+  repeated Entry entries = 1;
 }
 
-message AddEntriesToJourneyResponse {}
-
-message RemoveEntriesFromJourneyRequest {
-  ID journey_id = 1;
-  repeated ID entry_ids = 2;
-}
-
-message RemoveEntriesFromJourneyResponse {}
-
-//
-// DeleteEntry
-//
-
-message DeleteEntryRequest {
-  ID entry_id = 1;
-}
-message DeleteEntryResponse {}
-
-//
-// EditEntry
-//
-
-//====== title
-
-message SetTitleForEntryRequest {
-  ID entry_id = 1;
-  Title new_title = 2;
-}
-
-message SetTitleForEntryResponse {}
-
-//====== time_created
-
-message SetTimeCreatedForEntryRequest {
-  ID entry_id = 1;
-  google.protobuf.Timestamp new_time_created = 2;
-}
-
-message SetTimeCreatedForEntryResponse {}
-
-//====== body
-
-message SetBodyOfEntryRequest {
-  ID entry_id = 1;
-  Body new_time_created = 2;
-}
-
-message SetBodyOfEntryResponse {}
-
-//
-// CreateLink
-//
-
-message CreateLinkRequest {
-  ID link_from = 1;
-  ID link_to = 2;
-  Title title = 3;
-  Body body = 4;
-}
-
-message CreateLinkResponse {}
-
-//
-// DeleteLink
-//
-message DeleteLinkRequest {
-  ID link_id = 1;
-}
-
-message DeleteLinkResponse {}
-
-//
-// EditLink
-//
-
-//====== parent
-
-message SetParentOfLinkRequest {
-  ID link_id = 1;
-  ID new_parent = 2;
-}
-
-message SetParentOfLinkResponse {}
-
-//====== child
-
-message SetChildOfLinkRequest {
-  ID link_id = 1;
-  ID new_child = 2;
-}
-
-message SetChildOfLinkResponse {}
-
-//====== title
-
-message SetTitleOfLinkRequest {
-  ID link_id = 1;
-  Title new_title = 2;
-}
-
-message SetTitleOfLinkResponse {}
-
-//====== body
-
-message SetBodyOfLinkRequest {
-  ID link_id = 1;
-  Body new_body = 2;
-}
-
-message SetBodyOfLinkResponse {}
-
-//
-// objects
-//
-
-message AddInternalObjectRequest {
-  File file = 1;
-}
-message AddInternalObjectResponse {
-  ID object_id = 1;
-}
-
-message AddExternalObjectRequest {
-  URL url = 1;
-}
-message AddExternalObjectResponse {
-  ID object_id = 1;
-}
-
-message AddTimeObjectRequest {
-  google.protobuf.Timestamp time_point = 1;
-}
-
-message AddTimeObjectResponse {
-  ID object_id = 1;
-}
-
-message DeleteInternalObjectRequest {
-  ID object_id = 1;
-}
-message DeleteInternalObjectResponse {}
-
-message DeleteExternalObjectRequest {
-  ID object_id = 1;
-}
-message DeleteExternalObjectResponse {}
-
-message DeleteTimeObjectRequest {
-  ID object_id = 1;
-}
-message DeleteTimeObjectResponse {}
 //==================================
 //========== services ==============
 //==================================
 
 service JourneyService {
-  //
-  // Journey
-  //
-
-  /* rpc CreateJourney(CreateJourneyRequest) returns (CreateJourneyResponse) {} */
-  /* rpc DeleteJourney(DeleteJourneyRequest) returns (DeleteJourneyResponse) {} */
-  /* rpc SetTitleForJourney(SetTitleForJourneyRequest) returns (SetTitleForJourneyResponse) {} */
-  /* rpc SetTimeCreatedForJourney(SetTimeCreatedForJourneyRequest) returns (SetTimeCreatedForJourneyResponse) {} */
-  /* rpc AddEntriesToJourney(AddEntriesToJourneyRequest) returns (AddEntriesToJourneyResponse) {} */
-  /* rpc RemoveEntriesFromJourney(RemoveEntriesFromJourneyRequest) returns (RemoveEntriesFromJourneyResponse) {} */
-
-  //
-  // Entry
-  //
-
   rpc CreateEntry(CreateEntryRequest) returns (CreateEntryResponse) {}
-  /* rpc DeleteEntry(DeleteEntryRequest) returns (DeleteEntryResponse) {} */
-  /* rpc SetTitleForEntry(SetTitleForEntryRequest) returns (SetTitleForEntryResponse) {} */
-  /* rpc SetBodyOfEntry(SetBodyOfEntryRequest) returns (SetBodyOfEntryResponse) {} */
-  /* rpc SetTimeCreatedForEntry(SetTimeCreatedForEntryRequest) returns (SetTimeCreatedForEntryResponse) {} */
-
-  //
-  // Links
-  //
-
-  /* rpc CreateLink(CreateLinkRequest) returns (CreateLinkResponse) {} */
-  /* rpc SetParentOfLink(SetParentOfLinkRequest) returns (SetParentOfLinkResponse) {} */
-  /* rpc SetChildOfLink(SetChildOfLinkRequest) returns (SetChildOfLinkResponse) {} */
-  /* rpc SetTitleOfLink(SetTitleOfLinkRequest) returns (SetTitleOfLinkResponse) {} */
-  /* rpc SetBodyOfLink(SetBodyOfLinkRequest) returns (SetBodyOfLinkResponse) {} */
-  /* rpc DeleteLink(DeleteLinkRequest) returns (DeleteLinkResponse) {} */
-
-  //
-  // internal objects
-  //
-  /* rpc AddInternalObject(AddInternalObjectRequest) returns (AddInternalObjectResponse) {} // must be synchronous */
-  /* rpc DeleteInternalObject(DeleteInternalObjectRequest) returns (DeleteInternalObjectResponse) {} */
-  /**/
-  /* rpc AddExternalObject(AddExternalObjectRequest) returns (AddExternalObjectResponse) {} // must be synchronous */
-  /* rpc DeleteExternalObject(DeleteExternalObjectRequest) returns (DeleteExternalObjectResponse) {} */
-  /**/
-  /* rpc AddTimeObject(AddTimeObjectRequest) returns (AddTimeObjectResponse) {} // must be synchronous */
-  /* rpc DeleteTimeObject(DeleteTimeObjectRequest) returns (DeleteTimeObjectResponse) {} */
+  rpc GetEntries(GetEntriesRequest) returns (GetEntriesResponse) {}
 }
