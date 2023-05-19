@@ -37,10 +37,10 @@ impl JourneyService for Service {
         request: Request<CreateEntryRequest>,
     ) -> Result<Response<CreateEntryResponse>, Status> {
         // command encoding
-        let command = domain::messages::commands::create_entry::CreateEntry::try_from(
-            request.into_inner(),
-        )
-        .map_err(|err| match err {
+        let command =
+            domain::messages::commands::create_entry::CreateEntry::try_from(request.into_inner())
+                .map_err(|err| {
+                match err {
             crate::grpc_definitions::create_entry::ToDomainCreateEntryError::TitleBuildingError(
                 e,
             ) => Status::invalid_argument(e.to_string()),
@@ -50,7 +50,8 @@ impl JourneyService for Service {
             crate::grpc_definitions::create_entry::ToDomainCreateEntryError::IDConversionErrors(
                 e,
             ) => Status::invalid_argument(format!("{e:?}")),
-        })?;
+        }
+            })?;
         let now = std::time::SystemTime::now();
 
         // Event Creation
