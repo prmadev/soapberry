@@ -1,7 +1,7 @@
 [package]
 name = "kyushu"
 description = "kyushu is a journaling application which let you deliberate on events and your journey through them"
-version = "0.6.4"
+version = "0.7.0"
 edition = "2021"
 authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
 
@@ -33,7 +33,7 @@ clap = { version = "4.2.7", features = ["derive"] }
 inquire = "0.6.2"
 prost = "0.11.9"
 prost-types = "0.11.9"
-redmaple = { version = "0.12.2", path = "../redmaple" }
+redmaple = { version = "0.12.3", path = "../redmaple" }
 structsy = { version = "0.5.2", features = ["derive"] }
 structsy-derive = "0.5.2"
 thiserror = "1.0.40"
@@ -50,7 +50,7 @@ uuid = { version = "1.3.3", features = ["v4"] }
 validators = { version = "0.24.3", default-features = false, features = [
   "domain",
 ] }
-whirlybird = { version = "0.8.2", path = "../whirlybird", features = [
+whirlybird = { version = "0.9.0", path = "../whirlybird", features = [
   "journey",
 ], default-features = false }
 
