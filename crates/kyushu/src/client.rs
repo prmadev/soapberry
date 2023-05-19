@@ -94,7 +94,6 @@ async fn router(command: &Commands, server_address: SocketAddr) -> Result<(), Co
                 body: Some(Body {
                     content: ("some body".to_owned()),
                 }),
-                journeys_to_be_added: vec![],
             });
 
             let resp = client
