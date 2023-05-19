@@ -652,7 +652,7 @@ checksum = "453ad9f582a441959e5f0d088b02ce04cfe8d51a8eaf077f12ac6d3e94164ca6"
 
 [[package]]
 name = "kyushu"
-version = "0.6.4"
+version = "0.7.0"
 dependencies = [
  "clap",
  "inquire",
@@ -1040,7 +1040,7 @@ dependencies = [
 
 [[package]]
 name = "redmaple"
-version = "0.12.2"
+version = "0.12.3"
 dependencies = [
  "thiserror",
  "uuid",
@@ -1723,7 +1723,7 @@ dependencies = [
 
 [[package]]
 name = "whirlybird"
-version = "0.8.2"
+version = "0.9.0"
 dependencies = [
  "redmaple",
  "thiserror",

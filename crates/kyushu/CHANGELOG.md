@@ -517,6 +517,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0](https://github.com/amirography/soapberry/compare/kyushu-v0.6.4...kyushu-v0.7.0) - 2023-05-19
+
+### Added
+- complete create_entry controller
+- *(kyushu)* extract status handler from response handler in server
+- *(kyushu)* rename healthcheck to better demonstrate its insides
+- *(kyushu)* make configuration more pure
+- *(kyushu)* make controller more modularized for client kyushu
+- *(kyushu)* make controller more modularized for client kyushu
+- *(kyushu)* seperate some logic to see if we can make it clearer
+- *(whirlybird)* add logic for journey
+- *(kyushu)* add details for linking objects and links them selves
+- *(kyushu)* add command requests to proto files
+- add tracing instrumentalization
+- add tracing instrumentalization
+- *(kyushu)* add a basic client-server grpc connection
+- add kyushu
+
+### Other
+- Merge pull request #86 from amirography/restructure
+- format
+- remove unimplemented types
+- move event codes from event kyushu to redmaple and whirly
+- *(kyushu)* remove dead code
+- *(kyushu)* refactor the handling of the server component
+- *(kyushu)* rework the implementation the controller to be more type-driven
+- *(kyushu)* define domain level EntryWasCreated
+- *(kyushu)* restructure kyushu
+- Merge pull request #83 from amirography/entrywascreated
+- add badges for licenses
+- update type semantics file
+- update dependencies
+- Merge branch 'main' into journey
+- update
+- relicensed the whole soapberry project to MPL-2.0
+- make a lot of helpers for creating a EventWasCreated function
+- *(kyushu)* add journey protobufs
+- *(kyushu)* add basic structsy structure for persistence
+- *(kyushu)* comment out sqlite implementation to avoid problems with RUSTSEC-2022-0090 CVE
+- *(kyushu)* comment out rpc service methods in order to focus on one small objective for now
+- release
+- release
+- Merge pull request #71 from amirography/refactor
+- release
+- release
+- *(kyushu)* make try-from more pure
+- *(kyushu)* use try_from instead of build for configuration of kyushu
+- release
+- Merge pull request #62 from amirography/make_more_pure
+- remove hasty use of repr
+- defer handling of state from redmaple to later and make it more simplified
+- make commands more declaritive
+- release
+- release
+- release
+- Merge pull request #40 from amirography/outline_commands
+- Merge pull request #39 from amirography/outline_commands
+- Merge pull request #35 from amirography/instrumentalize
+- improve server's organization
+- release
+- release
+- Merge branch 'main' into CI
+- add CI case to labeler
+- release
+- Merge pull request #18 from amirography/readme
+- *(kyushu)* update kyushu's readme
+- add labeler
+- release
+- release
+- *(kyushu)* publish on crates.io
+- fix type
+- fix typo
+- add picture to kyushu docs
+- add some checks
+
 ## [0.6.4](https://github.com/amirography/soapberry/compare/kyushu-v0.6.3...kyushu-v0.6.4) - 2023-05-06
 
 ### Added
