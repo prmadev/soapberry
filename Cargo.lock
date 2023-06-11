@@ -355,6 +355,7 @@ dependencies = [
  "clap",
  "inquire",
  "redmaple",
+ "serde",
  "thiserror",
  "tokio",
  "tonic-build",
