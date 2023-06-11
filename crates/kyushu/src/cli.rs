@@ -25,10 +25,18 @@ pub struct Args {
 // # implementations
 //
 
-impl From<ArgsOs> for Args {
-    fn from(value: ArgsOs) -> Self {
-        Args::parse_from(value)
+impl TryFrom<ArgsOs> for Args {
+    type Error = ArgFromArgOSError;
+
+    fn try_from(value: ArgsOs) -> Result<Self, Self::Error> {
+        Args::try_parse_from(value).map_err(ArgFromArgOSError::CouldNotParseError)
     }
+}
+#[derive(thiserror::Error, Debug)]
+pub enum ArgFromArgOSError {
+    /// Couldnot parse!
+    #[error("Could not parse {0}")]
+    CouldNotParseError(#[from] clap::Error),
 }
 
 impl TryInto<crate::domain::requests::Request> for Args {

@@ -6,7 +6,7 @@
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Config {
-    file_store: Option<std::path::PathBuf>,
+    pub file_store: Option<std::path::PathBuf>,
 }
 
 //

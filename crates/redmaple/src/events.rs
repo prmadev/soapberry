@@ -16,14 +16,14 @@ pub trait EventRepo {
     /// # Errors
     ///
     /// if it cannot find any item or could not convert any of the types it will return an error.
-    fn events_matching_id(&self, id: &ID) -> Result<Self::Item, Self::EventError>;
+    fn events_matching_id(&self, id: &ID) -> Result<&Self::Item, Self::EventError>;
 
     /// returns all the events
     ///
     /// # Errors
     ///
     /// if at any point it could not convert any item it will return error
-    fn all_events(&self) -> Result<Vec<Self::Item>, Self::EventError>;
+    fn all_events(&self) -> Result<&Vec<Self::Item>, Self::EventError>;
 
     /// appends an item to the database
     ///
