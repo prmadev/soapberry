@@ -2,7 +2,7 @@
 
 use std::{fmt::Display, time::SystemTime};
 
-use crate::journey::entity::{body::Body, title::Title};
+use crate::journey::entity::Body;
 use redmaple::{
     id::{IDGiver, ID},
     EventRepo,
@@ -15,7 +15,6 @@ pub struct EntryWasCreated {
     event_id: ValidEventID,
     time_created: SystemTime,
     entry_id: ID,
-    title: Option<Title>,
     body: Option<Body>,
 }
 
@@ -45,14 +44,12 @@ impl EntryWasCreated {
         event_id: ID,
         time_created: SystemTime,
         entry_id: ID,
-        title: Option<Title>,
         body: Option<Body>,
     ) -> Self {
         Self {
             event_id: ValidEventID(event_id),
             time_created,
             entry_id,
-            title,
             body,
         }
     }
@@ -67,12 +64,6 @@ impl EntryWasCreated {
     #[must_use]
     pub const fn entry_id(&self) -> &ID {
         &self.entry_id
-    }
-
-    /// returns the title of the entry
-    #[must_use]
-    pub const fn title(&self) -> Option<&Title> {
-        self.title.as_ref()
     }
 
     /// returns the title of the entry

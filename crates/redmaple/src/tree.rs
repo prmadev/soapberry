@@ -9,6 +9,7 @@ use std::fmt::Debug;
 /// event module holds the types and functions that events could take and the operations that they
 /// can do.
 pub mod event_group;
+
 /// id module holds the implementation of ID type
 pub mod id;
 

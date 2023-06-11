@@ -1,5 +1,6 @@
 //! Entities that make up a the structure of events
 pub mod body;
+pub use body::*;
+
 pub mod entry;
-pub mod link;
-pub mod title;
+pub use entry::*;

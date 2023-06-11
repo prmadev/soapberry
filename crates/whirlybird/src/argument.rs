@@ -4,6 +4,7 @@
 use std::time::SystemTime;
 
 use redmaple::{event_group::EventGroup, id::ID};
+
 use thiserror::Error;
 
 use self::{

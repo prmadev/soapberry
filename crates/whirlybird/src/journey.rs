@@ -4,7 +4,10 @@
 //! and forms named relation ships.
 //! these relationships form journeys
 pub mod entity;
+pub use entity::*;
+
 pub mod event;
+pub use event::*;
 
 use crate::journey::event::ValidEventID;
 use std::time::SystemTime;
@@ -12,11 +15,6 @@ use std::time::SystemTime;
 use redmaple::{
     event_group::EventGroup,
     id::{IDGiver, ID},
-};
-
-use self::entity::{
-    entry::{Entry, ValidEntryID},
-    title::Title,
 };
 
 /// [`JournelaEvent`] holds the meta data for [`Journal`] event
@@ -99,9 +97,6 @@ pub enum Journal {
     /// Event: A new [`Journey`] was created.
     JourneyCreated(Journey),
 
-    /// Event: An already existing [`Journey`] Got a new [`Title`].
-    JourneyRenamed(ValidJourneyID, Title),
-
     /// Event: An already existing [`Journey`] was deleted.
     JourneyDeleted(ValidJourneyID),
 }
@@ -138,19 +133,15 @@ pub struct Journey {
 
     /// The time it was created.
     time_created: SystemTime,
-
-    /// [`Title`] of the [`Entry`]
-    title: Option<Title>,
 }
 
 impl Journey {
     /// new creates a new instance of [`Journey`]
     #[must_use]
-    pub const fn new(id: ID, time_created: SystemTime, title: Option<Title>) -> Self {
+    pub const fn new(id: ID, time_created: SystemTime) -> Self {
         Self {
             id: ValidJourneyID(id),
             time_created,
-            title,
         }
     }
 }

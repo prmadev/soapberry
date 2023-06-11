@@ -4,7 +4,7 @@ use std::time::SystemTime;
 
 use redmaple::id::{IDGiver, ID};
 
-use super::{body::Body, title::Title};
+use super::body::Body;
 
 /// [`Entry`] contains information related to an specific user entry
 #[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
@@ -15,9 +15,6 @@ pub struct Entry {
     /// The time it was created.
     time_created: SystemTime,
 
-    /// [`Title`] of the [`Entry`]
-    title: Option<Title>,
-
     /// [`Body`] of the [`Entry`]
     body: Option<Body>,
 }
@@ -25,24 +22,12 @@ pub struct Entry {
 impl Entry {
     /// `new` creates a new instance of [`Entry`]
     #[must_use]
-    pub const fn new(
-        id: ID,
-        time_created: SystemTime,
-        title: Option<Title>,
-        body: Option<Body>,
-    ) -> Self {
+    pub const fn new(id: ID, time_created: SystemTime, body: Option<Body>) -> Self {
         Self {
             id: ValidEntryID(id),
             time_created,
-            title,
             body,
         }
-    }
-
-    /// returns the [`Title`] if it is there
-    #[must_use]
-    pub const fn title(&self) -> &Option<Title> {
-        &self.title
     }
 
     /// returns the [`Body`] if it is there

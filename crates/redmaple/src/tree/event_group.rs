@@ -6,7 +6,7 @@
 
 use std::{error::Error, time::SystemTime};
 
-use super::id::ID;
+use super::ID;
 
 /// [`EventGroup`] trait describes the behavior of an event.
 /// Specific implementaiton is not defined here
