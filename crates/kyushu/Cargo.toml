@@ -16,7 +16,7 @@ keywords = ["journaling", "events"]
 path = "src/lib.rs"
 
 [[bin]]
-path = "src/kyushu.rs"
+path = "src/main.rs"
 name = "kyushu"
 
 
