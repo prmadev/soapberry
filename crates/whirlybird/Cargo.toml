@@ -25,6 +25,7 @@ filter_unconventional = true
 
 [dependencies]
 redmaple = { version = "0.12.3", path = "../redmaple"}
+serde = { version = "1.0.164", features = ["derive"] }
 thiserror = {version="1.0.40"}
 
 [dev-dependencies]

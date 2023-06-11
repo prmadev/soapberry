@@ -1039,6 +1039,7 @@ dependencies = [
 name = "redmaple"
 version = "0.12.3"
 dependencies = [
+ "serde",
  "thiserror",
  "uuid",
 ]
@@ -1119,6 +1120,20 @@ name = "serde"
 version = "1.0.164"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e8c8cf938e98f769bc164923b06dce91cea1751522f46f8466461af04c9027d"
+dependencies = [
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_derive"
+version = "1.0.164"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d9735b638ccc51c28bf6914d90a2e9725b377144fc612c49a611fddd1b631d68"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.18",
+]
 
 [[package]]
 name = "serde_json"
@@ -1634,6 +1649,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "345444e32442451b267fc254ae85a209c64be56d2890e601a0c37ff0c3c5ecd2"
 dependencies = [
  "getrandom",
+ "serde",
 ]
 
 [[package]]
@@ -1715,6 +1731,7 @@ name = "whirlybird"
 version = "0.9.0"
 dependencies = [
  "redmaple",
+ "serde",
  "thiserror",
  "uuid",
 ]

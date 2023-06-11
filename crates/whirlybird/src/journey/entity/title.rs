@@ -2,7 +2,7 @@
 
 /// [`Title`] is similar to [`Body`] in that it is a wrapper around simple [`String`] to
 /// ensure that the text alway follows the domain rules.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct Title(String);
 
 impl Title {

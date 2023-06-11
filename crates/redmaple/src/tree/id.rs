@@ -42,7 +42,9 @@ use uuid::Uuid;
 /// assert_ne!(ID::new(id1), ID::new(id2));
 /// ```
 
-#[derive(Default, Debug, PartialEq, Eq, Clone, PartialOrd, Ord)]
+#[derive(
+    Default, Debug, PartialEq, Eq, Clone, PartialOrd, Ord, serde::Deserialize, serde::Serialize,
+)]
 pub struct ID(Uuid);
 
 impl Display for ID {

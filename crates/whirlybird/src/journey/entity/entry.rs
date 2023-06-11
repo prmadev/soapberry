@@ -7,7 +7,7 @@ use redmaple::id::{IDGiver, ID};
 use super::{body::Body, title::Title};
 
 /// [`Entry`] contains information related to an specific user entry
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct Entry {
     /// The unique [`ID`] of certain entry.
     id: ValidEntryID,
@@ -53,7 +53,7 @@ impl Entry {
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Entry`]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct ValidEntryID(ID);
 
 impl ValidEntryID {

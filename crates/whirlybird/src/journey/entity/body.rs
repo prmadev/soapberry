@@ -1,7 +1,7 @@
 //! [`body`] module contains information about the text body of an entry
 
 /// `Body` is a wrapper around simple [`String`] to ensure that the text alway follows the domain rules
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct Body(String);
 
 impl Body {

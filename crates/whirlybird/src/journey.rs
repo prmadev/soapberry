@@ -20,7 +20,7 @@ use self::entity::{
 };
 
 /// [`JournelaEvent`] holds the meta data for [`Journal`] event
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct JournalEvent {
     event_id: ValidEventID,
     time: SystemTime,
@@ -88,7 +88,7 @@ impl IDGiver for JournalEvent {
 }
 
 /// Event hold all the events that could happened to a `RedMaple`
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub enum Journal {
     /// Event: An [`Entry`] was created.
     EntryCreated(Entry),
@@ -107,7 +107,7 @@ pub enum Journal {
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Journey`]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct ValidJourneyID(ID);
 
 impl ValidJourneyID {
@@ -131,7 +131,7 @@ impl IDGiver for Journey {
 }
 
 /// [`Journey`] is the holder of meta information for journeys
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct Journey {
     /// The unique [`ID`] of certain [`Journey`].
     id: ValidJourneyID,
