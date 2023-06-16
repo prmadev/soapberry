@@ -1,18 +1,23 @@
 //! persistence holds the logic for the persisting layer of the application
 
 use std::{
+    collections::HashMap,
     io::Write,
     path::PathBuf,
     time::{SystemTimeError, UNIX_EPOCH},
 };
 
-use redmaple::{event_group::EventGroup, id::ID, EventRepo};
+use redmaple::{
+    event_group::EventGroup,
+    id::{IDGiver, ID},
+    EventRepo, RedMaple,
+};
 use walkdir::WalkDir;
 use whirlybird::journey::JournalEvent;
 
 #[derive(Debug, Clone)]
 pub struct FileRepo {
-    events: redmaple::RedMaple<JournalEvent>,
+    events: std::collections::HashMap<ID, redmaple::RedMaple<JournalEvent>>,
     path: PathBuf,
 }
 
@@ -36,7 +41,9 @@ impl TryFrom<PathBuf> for FileRepo {
                 };
                 status
             }) // find out which ones are json
-            .map(|f| std::fs::read(f.path()).map(|c| serde_json::from_slice::<JournalEvent>(&c))) // read them and and turn them into journl events
+            .map(|f| {
+                std::fs::read(f.path()).map(|c| serde_json::from_slice::<Vec<JournalEvent>>(&c))
+            }) // read them and and turn them into journl events
             .partition(Result::is_ok);
 
         // pass 1 of errors: errors of not being able to read files
@@ -64,9 +71,15 @@ impl TryFrom<PathBuf> for FileRepo {
         };
 
         // the results
-        let je: Vec<_> = files.into_iter().filter_map(Result::ok).collect();
-
-        let events = redmaple::RedMaple::new(ID::new(uuid::Uuid::nil()), je);
+        let events: HashMap<ID, RedMaple<JournalEvent>> = files
+            .into_iter()
+            .filter_map(Result::ok)
+            .filter_map(|f| {
+                let i = EventGroup::id(f.get(0)?);
+                let rm = redmaple::RedMaple::new(i.to_owned(), f);
+                Some((rm.id().inner().clone(), rm))
+            })
+            .collect();
 
         Ok(Self {
             events,
@@ -95,16 +108,17 @@ impl EventRepo for FileRepo {
 
     type EventError = EventRepoError;
 
-    fn events_matching_id(&self, id: &redmaple::id::ID) -> Result<&Self::Item, Self::EventError> {
+    fn redmaple_matching_id(
+        &self,
+        id: &redmaple::id::ID,
+    ) -> Result<&RedMaple<Self::Item>, Self::EventError> {
         self.events
-            .events()
-            .iter()
-            .find(|ev| ev.event_id().inner().eq(id))
+            .get(id)
             .ok_or(EventRepoError::CouldNotFindTheEventWithThatID)
     }
 
-    fn all_events(&self) -> Result<&Vec<Self::Item>, Self::EventError> {
-        Ok(&self.events.events())
+    fn all_events(&self) -> Result<&HashMap<ID, RedMaple<Self::Item>>, Self::EventError> {
+        Ok(&self.events)
     }
 
     fn append(&self, item: Self::Item) -> Result<(), Self::EventError> {
@@ -112,6 +126,7 @@ impl EventRepo for FileRepo {
             "{}.json",
             item.time().duration_since(UNIX_EPOCH)?.as_nanos()
         ));
+
         if std::path::Path::exists(&file_path) {
             return Err(EventRepoError::FileAlreadyExist);
         }

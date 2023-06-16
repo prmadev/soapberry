@@ -50,7 +50,7 @@ impl<T: EventGroup + Sized + Clone> RedMaple<T> {
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Entry`]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ValidRedMapleID(ID);
 
 impl ValidRedMapleID {

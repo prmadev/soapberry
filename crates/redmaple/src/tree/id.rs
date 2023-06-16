@@ -43,7 +43,16 @@ use uuid::Uuid;
 /// ```
 
 #[derive(
-    Default, Debug, PartialEq, Eq, Clone, PartialOrd, Ord, serde::Deserialize, serde::Serialize,
+    Default,
+    Debug,
+    PartialEq,
+    Eq,
+    Clone,
+    PartialOrd,
+    Ord,
+    serde::Deserialize,
+    serde::Serialize,
+    Hash,
 )]
 pub struct ID(Uuid);
 
