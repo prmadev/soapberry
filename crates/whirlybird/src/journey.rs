@@ -22,18 +22,16 @@ use redmaple::{
 pub struct JournalEvent {
     event_id: ValidEventID,
     time: SystemTime,
-    journal_id: ID,
     data: Journal,
 }
 
 impl JournalEvent {
     /// this will create a new Journal event
     #[must_use]
-    pub const fn new(event_id: ID, time: SystemTime, journal_id: ID, data: Journal) -> Self {
+    pub const fn new(event_id: ID, time: SystemTime, data: Journal) -> Self {
         Self {
             event_id: ValidEventID(event_id),
             time,
-            journal_id,
             data,
         }
     }
@@ -42,12 +40,6 @@ impl JournalEvent {
     #[must_use]
     pub const fn event_id(&self) -> &ValidEventID {
         &self.event_id
-    }
-
-    /// returns the ID of the [`RedMapl`] (which in here is the Journal) that the event belongs to
-    #[must_use]
-    pub const fn journal_id(&self) -> &ID {
-        &self.journal_id
     }
 
     /// returns the specific data to be acted on
@@ -62,10 +54,6 @@ impl EventGroup for JournalEvent {
 
     fn id(&self) -> &ID {
         self.event_id().inner()
-    }
-
-    fn redmaple_id(&self) -> &ID {
-        self.journal_id()
     }
 
     fn time(&self) -> &SystemTime {

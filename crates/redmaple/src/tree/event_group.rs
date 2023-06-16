@@ -58,10 +58,6 @@ pub trait EventGroup {
     #[must_use]
     fn id(&self) -> &ID;
 
-    /// returns the id of the parent [`RedMaple`]
-    #[must_use]
-    fn redmaple_id(&self) -> &ID;
-
     /// returns the time of the time that that event happened at
     #[must_use]
     fn time(&self) -> &SystemTime;

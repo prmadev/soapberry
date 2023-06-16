@@ -1,3 +1,0 @@
-{
-		"ignore": [{"id": "CVE-2023-26964", "reason": "there has been a fix added to the upstream libraries and it is comming down. it should be fixed when this app goes into production, but for now, it should not pose any treat since there is no one actually using this application now." }]	
-}

@@ -17,7 +17,6 @@ pub mod id;
 /// `RedMaple` is essentially a series of related events that form a state
 ///
 /// * `id`: of type ID
-/// * `view_mode`: an enum that holds set view mode of an `RedMaple`
 /// * `events`: a list of entities that happened in time series
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RedMaple<T: EventGroup + Sized + Clone> {
