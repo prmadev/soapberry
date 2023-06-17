@@ -1,18 +1,29 @@
-use kyushu::{self, config::Config, domain::requests, persistence};
-use redmaple::EventRepo;
+use std::time::SystemTime;
+
+use kyushu::{
+    self,
+    cli::Args,
+    config::Config,
+    domain::requests::{Change, Request},
+    persistence,
+};
+use redmaple::{id::ID, EventRepo};
+use thiserror::Error;
+use uuid::Uuid;
+use whirlybird::journey::{Journal, JournalEvent};
 
 fn main() -> color_eyre::Result<()> {
     // setting up loggers
     color_eyre::install()?;
 
     // getting arguments
-    let cli_arguments = kyushu::cli::Args::try_from(std::env::args_os())?;
+    let cli_arguments = Args::try_from(std::env::args_os())?;
 
     // getting configurations from cli_arguments
     let configurations = Config::from(cli_arguments.clone());
 
     // forming a request
-    let req: requests::Request = cli_arguments.try_into()?;
+    let req: Request = cli_arguments.try_into()?;
 
     // creating persistence
     let per = persistence::FileRepo::try_from(
@@ -23,25 +34,26 @@ fn main() -> color_eyre::Result<()> {
 
     // matching requests to the appropiate functions
     match req {
-        requests::Request::Change(chng) => match chng {
-            requests::Change::CreateNewEntry(entr) => {
-                let m = whirlybird::journey::JournalEvent::new(
-                    redmaple::id::ID::new(uuid::Uuid::new_v4()),
-                    std::time::SystemTime::now(),
-                    whirlybird::journey::Journal::EntryCreated(entr),
-                );
-
+        Request::Change(chng) => match chng {
+            Change::CreateNewEntry(entr) => {
+                per.save(redmaple::RedMaple::new(
+                    ID::from(Uuid::new_v4()),
+                    vec![JournalEvent::new(
+                        ID::from(uuid::Uuid::new_v4()),
+                        SystemTime::now(),
+                        Journal::EntryCreated(entr),
+                    )],
+                ))?;
                 // saving in the permaenent storage
-                per.append(m)?;
             }
         },
 
-        requests::Request::Information(_) => todo!(),
+        Request::Information(_) => todo!(),
     };
     Ok(())
 }
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, Error)]
 enum MainError {
     #[error("file store must be given")]
     FileStoreCannotBeEmpty,

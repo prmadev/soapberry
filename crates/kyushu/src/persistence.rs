@@ -1,14 +1,8 @@
 //! persistence holds the logic for the persisting layer of the application
 
-use std::{
-    collections::HashMap,
-    io::Write,
-    path::PathBuf,
-    time::{SystemTimeError, UNIX_EPOCH},
-};
+use std::{collections::HashMap, io::Write, path::PathBuf, time::SystemTimeError};
 
 use redmaple::{
-    event_group::EventGroup,
     id::{IDGiver, ID},
     EventRepo, RedMaple,
 };
@@ -35,14 +29,14 @@ impl TryFrom<PathBuf> for FileRepo {
             .filter_map(Result::ok) // filter those that are ok
             .filter_map(|f| {
                 let ext = f.path().extension();
-                let status = match ext {
+                match ext {
                     Some(e) if e == "json" => Some(f),
                     _ => None,
-                };
-                status
+                }
             }) // find out which ones are json
             .map(|f| {
-                std::fs::read(f.path()).map(|c| serde_json::from_slice::<Vec<JournalEvent>>(&c))
+                std::fs::read(f.path())
+                    .map(|c| serde_json::from_slice::<RedMaple<JournalEvent>>(&c))
             }) // read them and and turn them into journl events
             .partition(Result::is_ok);
 
@@ -74,11 +68,7 @@ impl TryFrom<PathBuf> for FileRepo {
         let events: HashMap<ID, RedMaple<JournalEvent>> = files
             .into_iter()
             .filter_map(Result::ok)
-            .filter_map(|f| {
-                let i = EventGroup::id(f.get(0)?);
-                let rm = redmaple::RedMaple::new(i.to_owned(), f);
-                Some((rm.id().inner().clone(), rm))
-            })
+            .map(|f| (f.id().inner().to_owned(), f))
             .collect();
 
         Ok(Self {
@@ -121,24 +111,18 @@ impl EventRepo for FileRepo {
         Ok(&self.events)
     }
 
-    fn append(&self, item: Self::Item) -> Result<(), Self::EventError> {
-        let file_path = self.path.join(format!(
-            "{}.json",
-            item.time().duration_since(UNIX_EPOCH)?.as_nanos()
-        ));
-
-        if std::path::Path::exists(&file_path) {
-            return Err(EventRepoError::FileAlreadyExist);
-        }
-
-        let mut f =
-            std::fs::File::create(&file_path).map_err(EventRepoError::CouldNotCreateNewFile)?;
+    fn save(&self, item: RedMaple<Self::Item>) -> Result<(), Self::EventError> {
+        let file_path = self
+            .path
+            .join(format!("{}.json", item.id().inner().inner()));
 
         let s = serde_json::to_string_pretty(&item)
             .map_err(EventRepoError::CouldNotSerialize)?
             .into_bytes();
 
-        f.write_all(&s)
+        std::fs::File::create(file_path)
+            .map_err(EventRepoError::CouldNotCreateNewFile)?
+            .write_all(&s)
             .map_err(EventRepoError::CouldNotWriteIntoFile)?;
 
         Ok(())

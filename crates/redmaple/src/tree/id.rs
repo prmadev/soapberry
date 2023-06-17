@@ -91,3 +91,15 @@ pub trait IDGiver {
 pub fn result_id<I: IDGiver, E>(x: Result<I, E>) -> Option<I::Valid> {
     Some(x.ok()?.into_id())
 }
+
+impl From<Uuid> for ID {
+    fn from(value: Uuid) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<ID> for Uuid {
+    fn from(value: ID) -> Self {
+        value.inner()
+    }
+}

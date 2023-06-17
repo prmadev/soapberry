@@ -18,7 +18,7 @@ pub mod id;
 ///
 /// * `id`: of type ID
 /// * `events`: a list of entities that happened in time series
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct RedMaple<T: EventGroup + Sized + Clone> {
     id: ValidRedMapleID,
     events: Vec<T>,
@@ -50,7 +50,7 @@ impl<T: EventGroup + Sized + Clone> RedMaple<T> {
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Entry`]
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub struct ValidRedMapleID(ID);
 
 impl ValidRedMapleID {
