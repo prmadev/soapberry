@@ -1,6 +1,7 @@
 //! cli holds information about the cli interface
-
-use std::{env::ArgsOs, time};
+pub mod printers;
+pub use printers::*;
+use std::env::ArgsOs;
 
 use clap::Parser;
 use whirlybird::journey::Body;
@@ -42,17 +43,16 @@ pub enum ArgFromArgOSError {
 impl TryInto<crate::domain::requests::Request> for Args {
     fn try_into(self) -> Result<crate::domain::requests::Request, Self::Error> {
         match self.command {
-            Commands::Entry(entry_command) => match entry_command {
-                EntryCommands::New { content } => {
-                    let new_entry = whirlybird::journey::Entry::new(
+            Commands::Maple(maple_command) => match maple_command {
+                MapleCommands::New { content } => {
+                    let new_maple = whirlybird::journey::Maple::new(
                         redmaple::id::ID::new(uuid::Uuid::new_v4()),
-                        time::SystemTime::now(),
-                        Some(Body::build(content)?),
+                        Body::try_from(content)?,
                     );
-                    let ch = Change::CreateNewEntry(new_entry);
+                    let ch = Change::CreateNewMaple(new_maple);
                     Ok(Request::Change(ch))
                 }
-                EntryCommands::ListAll => Ok(Request::Information(Information::ListEntries)),
+                MapleCommands::ListAll => Ok(Request::Information(Information::ListEntries)),
             },
         }
     }
@@ -74,7 +74,7 @@ pub enum ArgToDomainRequestError {
 #[derive(clap::Subcommand, Debug, Clone, PartialEq, Eq)]
 pub enum Commands {
     #[command(subcommand)]
-    Entry(EntryCommands),
+    Maple(MapleCommands),
 }
 
 //
@@ -82,7 +82,7 @@ pub enum Commands {
 //
 
 #[derive(clap::Subcommand, Debug, Clone, PartialEq, Eq)]
-pub enum EntryCommands {
+pub enum MapleCommands {
     // creates a new entry
     New { content: String },
     // lists all the entries

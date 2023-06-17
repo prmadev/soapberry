@@ -11,7 +11,7 @@ use super::{
 };
 
 /// Changes the mode of a content
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ContentModed {
     id: ID,
     created: SystemTime,

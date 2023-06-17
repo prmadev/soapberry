@@ -7,19 +7,6 @@ use std::fmt::Display;
 pub struct Body(String);
 
 impl Body {
-    /// `build` checks if the the domain rules are being followed
-    ///
-    /// # Errors
-    ///
-    /// * [`JourneyError::TextCannotBeEmpty`] can be returned in-case of empty [`String`].
-    pub fn build(text: String) -> Result<Self, BuildingError> {
-        if text.is_empty() {
-            return Err(BuildingError::TextCannotBeEmpty);
-        };
-
-        Ok(Self(text))
-    }
-
     /// the inner string of [`Body`]
     #[must_use]
     pub const fn inner(&self) -> &String {
@@ -47,5 +34,17 @@ pub enum BuildingError {
 impl Display for Body {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.inner())
+    }
+}
+
+impl TryFrom<String> for Body {
+    type Error = BuildingError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        if value.is_empty() {
+            return Err(BuildingError::TextCannotBeEmpty);
+        };
+
+        Ok(Self(value))
     }
 }

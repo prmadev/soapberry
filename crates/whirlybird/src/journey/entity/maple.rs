@@ -1,6 +1,6 @@
 //! [`entry`] module contains logic about a uesr entry
 
-use std::{fmt::Display, time::SystemTime};
+use std::fmt::Display;
 
 use redmaple::id::{IDGiver, ID};
 
@@ -8,40 +8,36 @@ use super::body::Body;
 
 /// [`Entry`] contains information related to an specific user entry
 #[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
-pub struct Entry {
+pub struct Maple {
     /// The unique [`ID`] of certain entry.
-    id: ValidEntryID,
-
-    /// The time it was created.
-    time_created: SystemTime,
+    id: ValidMapleID,
 
     /// [`Body`] of the [`Entry`]
-    body: Option<Body>,
+    body: Body,
 }
 
-impl Entry {
+impl Maple {
     /// `new` creates a new instance of [`Entry`]
     #[must_use]
-    pub const fn new(id: ID, time_created: SystemTime, body: Option<Body>) -> Self {
+    pub const fn new(id: ID, body: Body) -> Self {
         Self {
-            id: ValidEntryID(id),
-            time_created,
+            id: ValidMapleID(id),
             body,
         }
     }
 
     /// returns the [`Body`] if it is there
     #[must_use]
-    pub const fn body(&self) -> &Option<Body> {
+    pub const fn body(&self) -> &Body {
         &self.body
     }
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Entry`]
 #[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
-pub struct ValidEntryID(ID);
+pub struct ValidMapleID(ID);
 
-impl ValidEntryID {
+impl ValidMapleID {
     /// exposes the inner [`ID`] of the [`Entry`]
     #[must_use]
     pub const fn inner(&self) -> &ID {
@@ -49,8 +45,8 @@ impl ValidEntryID {
     }
 }
 
-impl IDGiver for Entry {
-    type Valid = ValidEntryID;
+impl IDGiver for Maple {
+    type Valid = ValidMapleID;
 
     fn id(&self) -> &Self::Valid {
         &self.id
@@ -60,7 +56,7 @@ impl IDGiver for Entry {
         self.id
     }
 }
-impl Display for Entry {
+impl Display for Maple {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self.body())
     }

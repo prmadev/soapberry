@@ -1,9 +1,8 @@
 use std::time::SystemTime;
 
-use chrono::{DateTime, Local};
 use kyushu::{
     self,
-    cli::Args,
+    cli::{Args, EntryPrinter},
     config::Config,
     domain::requests::{Change, Request},
     persistence,
@@ -11,11 +10,10 @@ use kyushu::{
 use redmaple::{
     event_group::EventGroup,
     id::{IDGiver, ID},
-    EventRepo, RedMaple, RedMaplePrinter,
+    EventRepo, RedMaple, RedMapleProjector,
 };
 use thiserror::Error;
-use uuid::Uuid;
-use whirlybird::journey::{Journal, JournalEvent};
+use whirlybird::journey::{JournalEventWrapper, JourneyEvent};
 
 fn main() -> color_eyre::Result<()> {
     // setting up loggers
@@ -31,7 +29,7 @@ fn main() -> color_eyre::Result<()> {
     let req: Request = cli_arguments.try_into()?;
 
     // creating persistence
-    let per = persistence::FileRepo::try_from(
+    let repo = persistence::FileDB::try_from(
         configurations
             .file_store
             .ok_or(MainError::FileStoreCannotBeEmpty)?,
@@ -40,13 +38,16 @@ fn main() -> color_eyre::Result<()> {
     // matching requests to the appropiate functions
     match req {
         Request::Change(chng) => match chng {
-            Change::CreateNewEntry(entr) => {
-                per.save(redmaple::RedMaple::new(
-                    ID::from(Uuid::new_v4()),
-                    vec![JournalEvent::new(
+            Change::CreateNewMaple(mpl) => {
+                let new_id = mpl.id().inner();
+                let created_time = SystemTime::now();
+                repo.save(RedMaple::new(
+                    new_id.clone(),
+                    created_time,
+                    vec![JournalEventWrapper::new(
                         ID::from(uuid::Uuid::new_v4()),
-                        SystemTime::now(),
-                        Journal::EntryCreated(entr),
+                        created_time,
+                        JourneyEvent::MapleCreated(mpl),
                     )],
                 ))?;
                 // saving in the permaenent storage
@@ -55,23 +56,28 @@ fn main() -> color_eyre::Result<()> {
 
         Request::Information(i) => match i {
             kyushu::domain::requests::Information::ListEntries => {
-                let mut a = per.all_events()?.values().collect::<Vec<_>>();
-                a.sort_by(|a, b| {
+                let mut redmaples = repo.all_events()?.values().collect::<Vec<_>>();
+
+                redmaples.sort_by(|a, b| {
                     let at = a
                         .events()
                         .first()
-                        .map(|x| x.time())
+                        .map(JournalEventWrapper::time)
                         .unwrap_or(&SystemTime::UNIX_EPOCH);
+
                     let bt = b
                         .events()
                         .first()
-                        .map(|x| x.time())
+                        .map(JournalEventWrapper::time)
                         .unwrap_or(&SystemTime::UNIX_EPOCH);
+
                     at.cmp(bt)
                 });
-                a.iter()
+
+                redmaples
+                    .iter()
                     .map(|rm| {
-                        Printable::new(true, false, "%Y-%m-%d %H:%M:%S".to_string()).printer(rm)
+                        EntryPrinter::new(true, true, "%y-%m-%d %H:%M".to_string()).projector(rm)
                     })
                     .for_each(|each| println!("{each}"));
             }
@@ -84,54 +90,4 @@ fn main() -> color_eyre::Result<()> {
 enum MainError {
     #[error("file store must be given")]
     FileStoreCannotBeEmpty,
-}
-
-struct Printable {
-    show_time: bool,
-    show_id: bool,
-    time_format: String,
-}
-
-impl Printable {
-    fn new(show_time: bool, show_id: bool, time_format: String) -> Self {
-        Self {
-            show_time,
-            show_id,
-            time_format,
-        }
-    }
-}
-
-impl RedMaplePrinter for Printable {
-    type EventType = JournalEvent;
-
-    fn printer(&self, data: &RedMaple<Self::EventType>) -> String {
-        let id = match self.show_id {
-            true => data.id().inner().inner().to_string(),
-            false => "".to_string(),
-        };
-        let date = match self.show_time {
-            true => data
-                .events()
-                .first()
-                .map(|x| {
-                    let a: DateTime<Local> = x.time().to_owned().into();
-                    a.format(&self.time_format).to_string()
-                })
-                .unwrap_or(String::from("____-__-__ __:__:__")),
-            false => "".to_string(),
-        };
-
-        let body = data
-            .events()
-            .first()
-            .map(|x| match x.data() {
-                Journal::EntryCreated(e) => e.body().clone().map(|x| x.inner().to_owned()),
-                _ => None,
-            })
-            .flatten()
-            .unwrap_or_else(|| "".to_string());
-
-        format!("{date}: {body} -- {id} ")
-    }
 }

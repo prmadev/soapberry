@@ -20,7 +20,7 @@ mod post_moded;
 mod post_published;
 
 /// Event hold all the events that could happened to a `RedMaple`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Argument {
     /// States that a RedMaple is created
     Created(maple_created::Created),

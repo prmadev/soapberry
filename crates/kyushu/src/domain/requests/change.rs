@@ -1,6 +1,6 @@
 //! commands hold the formal message that goes through the system
 
-use whirlybird::journey::entity::entry::Entry;
+use whirlybird::journey::entity::maple::Maple;
 
 //
 // # type declaration
@@ -8,5 +8,5 @@ use whirlybird::journey::entity::entry::Entry;
 
 #[derive(Debug, Clone)]
 pub enum Change {
-    CreateNewEntry(Entry),
+    CreateNewMaple(Maple),
 }

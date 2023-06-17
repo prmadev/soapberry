@@ -4,7 +4,7 @@ use self::{
     event_group::EventGroup,
     id::{IDGiver, ID},
 };
-use std::fmt::Debug;
+use std::{fmt::Debug, time::SystemTime};
 
 /// event module holds the types and functions that events could take and the operations that they
 /// can do.
@@ -19,19 +19,23 @@ pub mod id;
 /// * `id`: of type ID
 /// * `events`: a list of entities that happened in time series
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-pub struct RedMaple<T: EventGroup + Sized + Clone> {
+pub struct RedMaple<T: EventGroup + Sized + Clone + PartialEq + Eq> {
     id: ValidRedMapleID,
+    time_created: SystemTime,
+    time_updated: SystemTime,
     events: Vec<T>,
 }
 
-impl<T: EventGroup + Sized + Clone> RedMaple<T> {
+impl<T: EventGroup + Sized + Clone + PartialEq + Eq> RedMaple<T> {
     /// Creates a new instance of [`RedMaple`]
     ///
     /// * `view_mode`: sets the view mode of the `RedMaple`
     #[must_use]
-    pub const fn new(id: ID, events: Vec<T>) -> Self {
+    pub const fn new(id: ID, time_created: SystemTime, events: Vec<T>) -> Self {
         Self {
             id: ValidRedMapleID(id),
+            time_created,
+            time_updated: time_created,
             events,
         }
     }
@@ -61,7 +65,7 @@ impl ValidRedMapleID {
     }
 }
 
-impl<T: EventGroup + Sized + Clone> IDGiver for RedMaple<T> {
+impl<T: EventGroup + Sized + Clone + PartialEq + Eq> IDGiver for RedMaple<T> {
     type Valid = ValidRedMapleID;
 
     fn id(&self) -> &Self::Valid {
@@ -261,11 +265,22 @@ impl<T: EventGroup + Sized + Clone> IDGiver for RedMaple<T> {
 //     }
 // }
 
-///
-pub trait RedMaplePrinter {
+/// a projector
+pub trait RedMapleProjector {
     ///
-    type EventType: EventGroup + Clone;
+    type EventType: EventGroup + Clone + Sized + PartialEq + Eq;
 
     ///
-    fn printer(&self, data: &RedMaple<Self::EventType>) -> String;
+    fn projector(&self, data: &RedMaple<Self::EventType>) -> String;
+}
+
+impl<T: EventGroup + Sized + Clone + PartialEq + Eq> PartialOrd for RedMaple<T> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.time_created.cmp(&other.time_updated))
+    }
+}
+impl<T: EventGroup + Sized + Clone + PartialEq + Eq> Ord for RedMaple<T> {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.time_created.cmp(&other.time_updated)
+    }
 }

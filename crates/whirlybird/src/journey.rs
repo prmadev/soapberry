@@ -19,16 +19,16 @@ use redmaple::{
 
 /// [`JournelaEvent`] holds the meta data for [`Journal`] event
 #[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
-pub struct JournalEvent {
+pub struct JournalEventWrapper {
     event_id: ValidEventID,
     time: SystemTime,
-    data: Journal,
+    data: JourneyEvent,
 }
 
-impl JournalEvent {
+impl JournalEventWrapper {
     /// this will create a new Journal event
     #[must_use]
-    pub const fn new(event_id: ID, time: SystemTime, data: Journal) -> Self {
+    pub const fn new(event_id: ID, time: SystemTime, data: JourneyEvent) -> Self {
         Self {
             event_id: ValidEventID(event_id),
             time,
@@ -44,12 +44,24 @@ impl JournalEvent {
 
     /// returns the specific data to be acted on
     #[must_use]
-    pub const fn data(&self) -> &Journal {
+    pub const fn data(&self) -> &JourneyEvent {
         &self.data
     }
 }
 
-impl EventGroup for JournalEvent {
+impl PartialOrd for JournalEventWrapper {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.time.cmp(&other.time))
+    }
+}
+
+impl Ord for JournalEventWrapper {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.time.cmp(&other.time)
+    }
+}
+
+impl EventGroup for JournalEventWrapper {
     type EventGroupError = DomainError;
 
     fn id(&self) -> &ID {
@@ -61,7 +73,7 @@ impl EventGroup for JournalEvent {
     }
 }
 
-impl IDGiver for JournalEvent {
+impl IDGiver for JournalEventWrapper {
     type Valid = event::ValidEventID;
 
     fn id(&self) -> &Self::Valid {
@@ -75,18 +87,12 @@ impl IDGiver for JournalEvent {
 
 /// Event hold all the events that could happened to a `RedMaple`
 #[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
-pub enum Journal {
+pub enum JourneyEvent {
     /// Event: An [`Entry`] was created.
-    EntryCreated(Entry),
+    MapleCreated(Maple),
 
     /// Event: An already existing [`Entry`] was updated to a new version.
-    EntryUpdated(ValidEntryID, Entry),
-
-    /// Event: A new [`Journey`] was created.
-    JourneyCreated(Journey),
-
-    /// Event: An already existing [`Journey`] was deleted.
-    JourneyDeleted(ValidJourneyID),
+    MapleUpdated(ValidMapleID, Maple),
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Journey`]

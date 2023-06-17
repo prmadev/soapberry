@@ -9,7 +9,7 @@ use redmaple::id::ID;
 ///
 /// * `id`: is of type ID.
 /// * `redmaple_id`: is of type ID.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Created {
     id: ID,
     created: SystemTime,

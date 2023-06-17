@@ -8,7 +8,7 @@ use redmaple::{
 use super::{post::ValidPostID, Argument};
 
 /// Sets a Content as published
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PostDeleted {
     id: ID,
     created: SystemTime,

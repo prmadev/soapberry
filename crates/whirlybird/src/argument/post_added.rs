@@ -8,7 +8,7 @@ use redmaple::{
 use super::{post::Post, Argument};
 
 /// Adds Content to that redmaple
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PostCreated {
     id: ID,
     created: SystemTime,

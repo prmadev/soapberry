@@ -29,6 +29,9 @@ filter_unconventional = true
 chrono = { version = "0.4.26", features = ["serde", "pure-rust-locales"] }
 clap = { version = "4.3.4", features = ["derive"] }
 color-eyre = "0.6.2"
+crossterm = "0.26.1"
+owo-colors = "3.5.0"
+ratatui = "0.21.0"
 redmaple = { version = "0.12.3", path = "../redmaple" }
 serde = { version = "1.0.164", features = ["derive"] }
 serde_json = "1.0.97"
