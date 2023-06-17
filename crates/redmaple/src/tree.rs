@@ -260,3 +260,12 @@ impl<T: EventGroup + Sized + Clone> IDGiver for RedMaple<T> {
 //         assert_eq!(new_subscribers_list.into_inner(), sorted_list);
 //     }
 // }
+
+///
+pub trait RedMaplePrinter {
+    ///
+    type EventType: EventGroup + Clone;
+
+    ///
+    fn printer(&self, data: &RedMaple<Self::EventType>) -> String;
+}

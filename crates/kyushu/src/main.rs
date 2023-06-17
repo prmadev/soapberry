@@ -11,7 +11,7 @@ use kyushu::{
 use redmaple::{
     event_group::EventGroup,
     id::{IDGiver, ID},
-    EventRepo, RedMaple,
+    EventRepo, RedMaple, RedMaplePrinter,
 };
 use thiserror::Error;
 use uuid::Uuid;
@@ -70,7 +70,9 @@ fn main() -> color_eyre::Result<()> {
                     at.cmp(bt)
                 });
                 a.iter()
-                    .map(|rm| redmaple_printer(rm))
+                    .map(|rm| {
+                        Printable::new(true, false, "%Y-%m-%d %H:%M:%S".to_string()).printer(rm)
+                    })
                     .for_each(|each| println!("{each}"));
             }
         },
@@ -84,25 +86,52 @@ enum MainError {
     FileStoreCannotBeEmpty,
 }
 
-fn redmaple_printer(rr: &RedMaple<JournalEvent>) -> String {
-    let id = rr.id().inner().inner();
-    let date = rr
-        .events()
-        .first()
-        .map(|x| {
-            let a: DateTime<Local> = x.time().to_owned().into();
-            a.format("%Y-%m-%d %H:%M:%S").to_string()
-        })
-        .unwrap_or(String::from("____-__-__ __:__:__"));
-    let body = rr
-        .events()
-        .first()
-        .map(|x| match x.data() {
-            Journal::EntryCreated(e) => e.body().clone().map(|x| x.inner().to_owned()),
-            _ => None,
-        })
-        .flatten()
-        .unwrap_or_else(|| "".to_string());
+struct Printable {
+    show_time: bool,
+    show_id: bool,
+    time_format: String,
+}
 
-    format!("{date}: {body} -- {id} ")
+impl Printable {
+    fn new(show_time: bool, show_id: bool, time_format: String) -> Self {
+        Self {
+            show_time,
+            show_id,
+            time_format,
+        }
+    }
+}
+
+impl RedMaplePrinter for Printable {
+    type EventType = JournalEvent;
+
+    fn printer(&self, data: &RedMaple<Self::EventType>) -> String {
+        let id = match self.show_id {
+            true => data.id().inner().inner().to_string(),
+            false => "".to_string(),
+        };
+        let date = match self.show_time {
+            true => data
+                .events()
+                .first()
+                .map(|x| {
+                    let a: DateTime<Local> = x.time().to_owned().into();
+                    a.format(&self.time_format).to_string()
+                })
+                .unwrap_or(String::from("____-__-__ __:__:__")),
+            false => "".to_string(),
+        };
+
+        let body = data
+            .events()
+            .first()
+            .map(|x| match x.data() {
+                Journal::EntryCreated(e) => e.body().clone().map(|x| x.inner().to_owned()),
+                _ => None,
+            })
+            .flatten()
+            .unwrap_or_else(|| "".to_string());
+
+        format!("{date}: {body} -- {id} ")
+    }
 }
