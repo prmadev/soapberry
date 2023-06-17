@@ -29,4 +29,4 @@ serde = { version = "1.0.164", features = ["derive"] }
 thiserror = {version="1.0.40"}
 
 [dev-dependencies]
-uuid = { version = "1.3.3", features = ["v4"] }
+uuid = { version = "1.3.4", features = ["v4"] }
