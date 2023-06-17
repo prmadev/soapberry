@@ -34,9 +34,6 @@ use super::ID;
 ///            &self.0
 ///        }
 ///
-///        fn redmaple_id(&self) -> &ID {
-///            &self.1
-///        }
 ///
 ///        fn time(&self) -> &SystemTime {
 ///            &self.2
