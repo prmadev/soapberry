@@ -1,6 +1,6 @@
 //! [`entry`] module contains logic about a uesr entry
 
-use std::time::SystemTime;
+use std::{fmt::Display, time::SystemTime};
 
 use redmaple::id::{IDGiver, ID};
 
@@ -58,5 +58,10 @@ impl IDGiver for Entry {
 
     fn into_id(self) -> Self::Valid {
         self.id
+    }
+}
+impl Display for Entry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.body())
     }
 }

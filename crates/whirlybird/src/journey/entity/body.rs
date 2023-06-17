@@ -1,5 +1,7 @@
 //! [`body`] module contains information about the text body of an entry
 
+use std::fmt::Display;
+
 /// `Body` is a wrapper around simple [`String`] to ensure that the text alway follows the domain rules
 #[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct Body(String);
@@ -40,4 +42,10 @@ pub enum BuildingError {
     /// [`Option::None`]
     #[error("the body text should have other characters")]
     TextCannotBeEmpty,
+}
+
+impl Display for Body {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.inner())
+    }
 }

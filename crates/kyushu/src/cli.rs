@@ -5,7 +5,7 @@ use std::{env::ArgsOs, time};
 use clap::Parser;
 use whirlybird::journey::Body;
 
-use crate::domain::requests::{Change, Request};
+use crate::domain::requests::{Change, Information, Request};
 
 //
 // # type declaration
@@ -52,6 +52,7 @@ impl TryInto<crate::domain::requests::Request> for Args {
                     let ch = Change::CreateNewEntry(new_entry);
                     Ok(Request::Change(ch))
                 }
+                EntryCommands::ListAll => Ok(Request::Information(Information::ListEntries)),
             },
         }
     }
@@ -84,4 +85,6 @@ pub enum Commands {
 pub enum EntryCommands {
     // creates a new entry
     New { content: String },
+    // lists all the entries
+    ListAll,
 }
