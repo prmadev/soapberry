@@ -120,6 +120,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.9.0...whirlybird-v0.10.0) - 2023-06-18
+
+### Added
+- use time crate for id and time
+- improve list all entries
+- implement entrycreated
+- improved api, removed title
+- add serialization and deserialization for whirlybird types
+
+### Other
+- clean up parts
+- cargo update
+
 ## [0.9.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.8.2...whirlybird-v0.9.0) - 2023-05-19
 
 ### Added
