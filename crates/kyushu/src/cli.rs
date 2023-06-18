@@ -2,7 +2,7 @@
 pub mod printers;
 pub use printers::*;
 use redmaple::id::ID;
-use std::env::ArgsOs;
+use std::{env::ArgsOs, path::PathBuf};
 
 use clap::Parser;
 use whirlybird::journey::{Body, Maple};
@@ -20,7 +20,7 @@ pub struct Args {
     pub command: Commands,
 
     #[arg(short, long)]
-    pub file_store: Option<std::path::PathBuf>,
+    pub file_store: Option<PathBuf>,
 }
 
 //

@@ -24,7 +24,11 @@ fn main() -> color_eyre::Result<()> {
     let cli_arguments = Args::try_from(std::env::args_os())?;
 
     // getting configurations from cli_arguments
-    let configurations = Config::from(cli_arguments.clone());
+    let mut configurations = Config::from(cli_arguments.clone());
+    let config_dir = dirs::config_dir();
+    if let Some(config) = config_dir {
+        configurations = Config::try_from(config.join("kyushu").join("config.json"))?;
+    }
 
     // forming a request
     let req = cli_arguments.to_request()?;
@@ -100,17 +104,3 @@ enum MainError {
     #[error("file store must be given")]
     FileStoreCannotBeEmpty,
 }
-
-// pub struct IDGenerator(SnowflakeIdBucket);
-
-// impl IdGenerator for IDGenerator {
-//     fn generate(&self) -> ID {
-//         ID::new(self.0.generate())
-//     }
-// }
-
-// impl IDGenerator {
-//     fn new(snowflake_id_generator: SnowflakeIdGenerator) -> IDGenerator {
-//         IDGenerator(snowflake_id_generator)
-//     }
-// }
