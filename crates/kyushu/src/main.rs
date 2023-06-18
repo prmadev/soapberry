@@ -1,5 +1,3 @@
-use std::time::SystemTime;
-
 use kyushu::{
     self,
     cli::{Args, EntryPrinter},
@@ -13,11 +11,14 @@ use redmaple::{
     EventRepo, RedMaple, RedMapleProjector,
 };
 use thiserror::Error;
-use whirlybird::journey::{JournalEventWrapper, JourneyEvent};
+use time::format_description;
+use whirlybird::journey::{Event, EventWrapper};
 
 fn main() -> color_eyre::Result<()> {
     // setting up loggers
     color_eyre::install()?;
+
+    // Firing up generator ID
 
     // getting arguments
     let cli_arguments = Args::try_from(std::env::args_os())?;
@@ -26,7 +27,7 @@ fn main() -> color_eyre::Result<()> {
     let configurations = Config::from(cli_arguments.clone());
 
     // forming a request
-    let req: Request = cli_arguments.try_into()?;
+    let req = cli_arguments.to_request()?;
 
     // creating persistence
     let repo = persistence::FileDB::try_from(
@@ -40,14 +41,14 @@ fn main() -> color_eyre::Result<()> {
         Request::Change(chng) => match chng {
             Change::CreateNewMaple(mpl) => {
                 let new_id = mpl.id().inner();
-                let created_time = SystemTime::now();
+                let created_time = time::OffsetDateTime::now_utc();
                 repo.save(RedMaple::new(
                     new_id.clone(),
                     created_time,
-                    vec![JournalEventWrapper::new(
-                        ID::from(uuid::Uuid::new_v4()),
+                    vec![EventWrapper::new(
+                        ID::from(created_time.unix_timestamp() as u64),
                         created_time,
-                        JourneyEvent::MapleCreated(mpl),
+                        Event::MapleCreated(mpl),
                     )],
                 ))?;
                 // saving in the permaenent storage
@@ -62,14 +63,14 @@ fn main() -> color_eyre::Result<()> {
                     let at = a
                         .events()
                         .first()
-                        .map(JournalEventWrapper::time)
-                        .unwrap_or(&SystemTime::UNIX_EPOCH);
+                        .map(EventWrapper::time)
+                        .unwrap_or(&time::OffsetDateTime::UNIX_EPOCH);
 
                     let bt = b
                         .events()
                         .first()
-                        .map(JournalEventWrapper::time)
-                        .unwrap_or(&SystemTime::UNIX_EPOCH);
+                        .map(EventWrapper::time)
+                        .unwrap_or(&time::OffsetDateTime::UNIX_EPOCH);
 
                     at.cmp(bt)
                 });
@@ -77,7 +78,15 @@ fn main() -> color_eyre::Result<()> {
                 redmaples
                     .iter()
                     .map(|rm| {
-                        EntryPrinter::new(true, true, "%y-%m-%d %H:%M".to_string()).projector(rm)
+                        EntryPrinter::new(
+                            true,
+                            true,
+                            format_description::parse(
+                                "[year]-[month]-[day]:[hour]-[minute]-[second]",
+                            )
+                            .unwrap_or_default(),
+                        )
+                        .projector(rm)
                     })
                     .for_each(|each| println!("{each}"));
             }
@@ -91,3 +100,17 @@ enum MainError {
     #[error("file store must be given")]
     FileStoreCannotBeEmpty,
 }
+
+// pub struct IDGenerator(SnowflakeIdBucket);
+
+// impl IdGenerator for IDGenerator {
+//     fn generate(&self) -> ID {
+//         ID::new(self.0.generate())
+//     }
+// }
+
+// impl IDGenerator {
+//     fn new(snowflake_id_generator: SnowflakeIdGenerator) -> IDGenerator {
+//         IDGenerator(snowflake_id_generator)
+//     }
+// }

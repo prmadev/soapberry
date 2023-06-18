@@ -1,16 +1,16 @@
 //! file db
-use std::{collections::HashMap, io::Write, path::PathBuf, time::SystemTimeError};
+use std::{collections::HashMap, io::Write, path::PathBuf};
 
 use redmaple::{
     id::{IDGiver, ID},
     EventRepo, RedMaple,
 };
 use walkdir::WalkDir;
-use whirlybird::journey::JournalEventWrapper;
+use whirlybird::journey::EventWrapper;
 
 #[derive(Debug, Clone)]
 pub struct FileDB {
-    events: std::collections::HashMap<ID, RedMaple<JournalEventWrapper>>,
+    events: std::collections::HashMap<ID, RedMaple<EventWrapper>>,
     path: PathBuf,
 }
 
@@ -35,7 +35,7 @@ impl TryFrom<PathBuf> for FileDB {
             }) // find out which ones are json
             .map(|f| {
                 std::fs::read(f.path())
-                    .map(|c| serde_json::from_slice::<RedMaple<JournalEventWrapper>>(&c))
+                    .map(|c| serde_json::from_slice::<RedMaple<EventWrapper>>(&c))
             }) // read them and and turn them into journl events
             .partition(Result::is_ok);
 
@@ -64,7 +64,7 @@ impl TryFrom<PathBuf> for FileDB {
         };
 
         // the results
-        let events: HashMap<ID, RedMaple<JournalEventWrapper>> = files
+        let events: HashMap<ID, RedMaple<EventWrapper>> = files
             .into_iter()
             .filter_map(Result::ok)
             .map(|f| (f.id().inner().to_owned(), f))
@@ -93,7 +93,7 @@ pub enum RebuildError {
 }
 
 impl EventRepo for FileDB {
-    type Item = JournalEventWrapper;
+    type Item = EventWrapper;
 
     type EventError = EventRepoError;
 
@@ -110,7 +110,7 @@ impl EventRepo for FileDB {
     fn save(&self, item: RedMaple<Self::Item>) -> Result<(), Self::EventError> {
         let file_path = self
             .path
-            .join(format!("{}.json", item.id().inner().inner()));
+            .join(format!("{}.json", item.id().inner().inner(),));
 
         let s = serde_json::to_string_pretty(&item)
             .map_err(EventRepoError::CouldNotSerialize)?
@@ -132,9 +132,6 @@ pub enum EventRepoError {
 
     #[error("couldn not serialize: {0}")]
     CouldNotSerialize(#[from] serde_json::Error),
-
-    #[error("couldn not create path for new file: {0}")]
-    CouldNotCreatePathForNewFile(#[from] SystemTimeError),
 
     #[error("file already exist.")]
     FileAlreadyExist,

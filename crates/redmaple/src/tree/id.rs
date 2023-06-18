@@ -1,6 +1,4 @@
-use std::fmt::{Debug, Display};
-
-use uuid::Uuid;
+use std::fmt::Display;
 
 /// The Implementation of the ID that the crate uses
 ///
@@ -54,7 +52,7 @@ use uuid::Uuid;
     serde::Serialize,
     Hash,
 )]
-pub struct ID(Uuid);
+pub struct ID(u64);
 
 impl Display for ID {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -65,13 +63,13 @@ impl Display for ID {
 impl ID {
     /// creats a new instance of the [`ID`]
     #[must_use]
-    pub const fn new(id: Uuid) -> Self {
+    pub const fn new(id: u64) -> Self {
         Self(id)
     }
 
     /// Returns the uuid of this [`ID`].
     #[must_use]
-    pub const fn inner(&self) -> Uuid {
+    pub const fn inner(&self) -> u64 {
         self.0
     }
 }
@@ -92,13 +90,13 @@ pub fn result_id<I: IDGiver, E>(x: Result<I, E>) -> Option<I::Valid> {
     Some(x.ok()?.into_id())
 }
 
-impl From<Uuid> for ID {
-    fn from(value: Uuid) -> Self {
+impl From<u64> for ID {
+    fn from(value: u64) -> Self {
         Self::new(value)
     }
 }
 
-impl From<ID> for Uuid {
+impl From<ID> for u64 {
     fn from(value: ID) -> Self {
         value.inner()
     }

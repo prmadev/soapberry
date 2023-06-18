@@ -10,7 +10,6 @@ pub mod event;
 pub use event::*;
 
 use crate::journey::event::ValidEventID;
-use std::time::SystemTime;
 
 use redmaple::{
     event_group::EventGroup,
@@ -19,16 +18,16 @@ use redmaple::{
 
 /// [`JournelaEvent`] holds the meta data for [`Journal`] event
 #[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
-pub struct JournalEventWrapper {
+pub struct EventWrapper {
     event_id: ValidEventID,
-    time: SystemTime,
-    data: JourneyEvent,
+    time: time::OffsetDateTime,
+    data: Event,
 }
 
-impl JournalEventWrapper {
+impl EventWrapper {
     /// this will create a new Journal event
     #[must_use]
-    pub const fn new(event_id: ID, time: SystemTime, data: JourneyEvent) -> Self {
+    pub const fn new(event_id: ID, time: time::OffsetDateTime, data: Event) -> Self {
         Self {
             event_id: ValidEventID(event_id),
             time,
@@ -44,36 +43,36 @@ impl JournalEventWrapper {
 
     /// returns the specific data to be acted on
     #[must_use]
-    pub const fn data(&self) -> &JourneyEvent {
+    pub const fn data(&self) -> &Event {
         &self.data
     }
 }
 
-impl PartialOrd for JournalEventWrapper {
+impl PartialOrd for EventWrapper {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.time.cmp(&other.time))
     }
 }
 
-impl Ord for JournalEventWrapper {
+impl Ord for EventWrapper {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.time.cmp(&other.time)
     }
 }
 
-impl EventGroup for JournalEventWrapper {
+impl EventGroup for EventWrapper {
     type EventGroupError = DomainError;
 
     fn id(&self) -> &ID {
         self.event_id().inner()
     }
 
-    fn time(&self) -> &SystemTime {
+    fn time(&self) -> &time::OffsetDateTime {
         &self.time
     }
 }
 
-impl IDGiver for JournalEventWrapper {
+impl IDGiver for EventWrapper {
     type Valid = event::ValidEventID;
 
     fn id(&self) -> &Self::Valid {
@@ -87,7 +86,7 @@ impl IDGiver for JournalEventWrapper {
 
 /// Event hold all the events that could happened to a `RedMaple`
 #[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
-pub enum JourneyEvent {
+pub enum Event {
     /// Event: An [`Entry`] was created.
     MapleCreated(Maple),
 
@@ -126,13 +125,13 @@ pub struct Journey {
     id: ValidJourneyID,
 
     /// The time it was created.
-    time_created: SystemTime,
+    time_created: time::OffsetDateTime,
 }
 
 impl Journey {
     /// new creates a new instance of [`Journey`]
     #[must_use]
-    pub const fn new(id: ID, time_created: SystemTime) -> Self {
+    pub const fn new(id: ID, time_created: time::OffsetDateTime) -> Self {
         Self {
             id: ValidJourneyID(id),
             time_created,

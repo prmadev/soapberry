@@ -35,8 +35,5 @@
 #![allow(clippy::multiple_crate_versions)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-#[cfg(feature = "argument")]
-pub mod argument;
-
 #[cfg(feature = "journey")]
 pub mod journey;

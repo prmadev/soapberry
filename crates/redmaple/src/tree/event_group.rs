@@ -4,7 +4,7 @@
 //! trying different ways and pattern for implementing it
 //! so enjoy
 
-use std::{error::Error, time::SystemTime};
+use std::error::Error;
 
 use super::ID;
 
@@ -57,5 +57,5 @@ pub trait EventGroup {
 
     /// returns the time of the time that that event happened at
     #[must_use]
-    fn time(&self) -> &SystemTime;
+    fn time(&self) -> &time::OffsetDateTime;
 }

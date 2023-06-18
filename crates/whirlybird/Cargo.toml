@@ -12,10 +12,9 @@ keywords = ["data_model", "event-sourcing", "events"]
 readme = "README.md"
 
 [features]
-default = ["journey", "argument"]
+default = ["journey"]
 journey = []
-argument = []
-all = ["journey", "argument"]
+all = ["journey"]
 
 
 [package.metadata.git-cliff.git]
@@ -27,6 +26,7 @@ filter_unconventional = true
 redmaple = { version = "0.12.3", path = "../redmaple"}
 serde = { version = "1.0.164", features = ["derive"] }
 thiserror = {version="1.0.40"}
+time = { version = "0.3.22", features = ["serde"] }
 
 [dev-dependencies]
 uuid = { version = "1.3.4", features = ["v4"] }

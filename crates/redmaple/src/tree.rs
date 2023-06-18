@@ -4,7 +4,7 @@ use self::{
     event_group::EventGroup,
     id::{IDGiver, ID},
 };
-use std::{fmt::Debug, time::SystemTime};
+use std::fmt::Debug;
 
 /// event module holds the types and functions that events could take and the operations that they
 /// can do.
@@ -21,8 +21,8 @@ pub mod id;
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct RedMaple<T: EventGroup + Sized + Clone + PartialEq + Eq> {
     id: ValidRedMapleID,
-    time_created: SystemTime,
-    time_updated: SystemTime,
+    time_created: time::OffsetDateTime,
+    time_updated: time::OffsetDateTime,
     events: Vec<T>,
 }
 
@@ -31,7 +31,7 @@ impl<T: EventGroup + Sized + Clone + PartialEq + Eq> RedMaple<T> {
     ///
     /// * `view_mode`: sets the view mode of the `RedMaple`
     #[must_use]
-    pub const fn new(id: ID, time_created: SystemTime, events: Vec<T>) -> Self {
+    pub const fn new(id: ID, time_created: time::OffsetDateTime, events: Vec<T>) -> Self {
         Self {
             id: ValidRedMapleID(id),
             time_created,

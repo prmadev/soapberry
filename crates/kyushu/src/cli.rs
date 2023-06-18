@@ -1,10 +1,11 @@
 //! cli holds information about the cli interface
 pub mod printers;
 pub use printers::*;
+use redmaple::id::ID;
 use std::env::ArgsOs;
 
 use clap::Parser;
-use whirlybird::journey::Body;
+use whirlybird::journey::{Body, Maple};
 
 use crate::domain::requests::{Change, Information, Request};
 
@@ -40,24 +41,28 @@ pub enum ArgFromArgOSError {
     CouldNotParseError(#[from] clap::Error),
 }
 
-impl TryInto<crate::domain::requests::Request> for Args {
-    fn try_into(self) -> Result<crate::domain::requests::Request, Self::Error> {
+impl Args {
+    pub fn to_request(self) -> Result<crate::domain::requests::Request, ArgToDomainRequestError> {
         match self.command {
             Commands::Maple(maple_command) => match maple_command {
                 MapleCommands::New { content } => {
-                    let new_maple = whirlybird::journey::Maple::new(
-                        redmaple::id::ID::new(uuid::Uuid::new_v4()),
+                    let new_maple = Maple::new(
+                        ID::new(
+                            time::OffsetDateTime::now_local()
+                                .map_err(ArgToDomainRequestError::TimeOffsetCouldNotBeGet)?
+                                .unix_timestamp() as u64,
+                        ),
                         Body::try_from(content)?,
                     );
                     let ch = Change::CreateNewMaple(new_maple);
+
                     Ok(Request::Change(ch))
                 }
+
                 MapleCommands::ListAll => Ok(Request::Information(Information::ListEntries)),
             },
         }
     }
-
-    type Error = ArgToDomainRequestError;
 }
 
 #[derive(thiserror::Error, Debug, Clone)]
@@ -65,6 +70,10 @@ pub enum ArgToDomainRequestError {
     /// Body Could not be built!
     #[error("body could not be built {0}")]
     BodyBuildingFailed(#[from] whirlybird::journey::BuildingError),
+
+    /// Could not get the time!
+    #[error("failed to get the time {0}")]
+    TimeOffsetCouldNotBeGet(time::error::IndeterminateOffset),
 }
 
 //
