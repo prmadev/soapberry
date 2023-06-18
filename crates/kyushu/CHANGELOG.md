@@ -517,6 +517,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0](https://github.com/amirography/soapberry/compare/kyushu-v0.7.0...kyushu-v0.8.0) - 2023-06-18
+
+### Added
+- use time crate for id and time
+- improve printer typing
+- improve list all entries
+- add remapled file format for kyushu
+- update structure
+- implement entrycreated
+- almost made it
+- improved api, removed title
+- *(kyushu)* add configuration and argument parsing
+- *(kyushu)* form the structure for kyushu
+- delete all the kyushu src files to overhaul it
+
+### Other
+- clean up parts
+- cargo update
+- update
+
 ## [0.7.0](https://github.com/amirography/soapberry/compare/kyushu-v0.6.4...kyushu-v0.7.0) - 2023-05-19
 
 ### Added

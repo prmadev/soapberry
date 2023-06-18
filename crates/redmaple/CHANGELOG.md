@@ -127,6 +127,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0](https://github.com/amirography/soapberry/compare/redmaple-v0.12.3...redmaple-v0.13.0) - 2023-06-18
+
+### Added
+- use time crate for id and time
+- improve printer typing
+- add remapled file format for kyushu
+- update structure
+- implement entrycreated
+- almost made it
+- improved api, removed title
+- add serialization and deserialization for whirlybird types
+
+### Fixed
+- fix the example in the event_group
+
+### Other
+- clean up parts
+- cargo update
+
 ## [0.12.3](https://github.com/amirography/soapberry/compare/redmaple-v0.12.2...redmaple-v0.12.3) - 2023-05-19
 
 ### Added
