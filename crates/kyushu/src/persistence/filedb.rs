@@ -68,7 +68,7 @@ impl TryFrom<PathBuf> for FileDB {
         let events: HashMap<ID, RedMaple<EventWrapper>> = files
             .into_iter()
             .filter_map(Result::ok)
-            .map(|f| (f.id().inner().to_owned(), f))
+            .map(|f| (f.id().inner().clone(), f))
             .collect();
 
         Ok(Self {

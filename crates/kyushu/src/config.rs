@@ -26,16 +26,16 @@ impl From<crate::cli::Args> for Config {
 }
 
 impl TryFrom<PathBuf> for Config {
-    type Error = ConfigFileGenerationError;
+    type Error = FileGenerationError;
 
     fn try_from(config_file: PathBuf) -> color_eyre::Result<Self, Self::Error> {
-        Ok(serde_json::from_slice::<Config>(&fs::read(config_file)?)?)
+        Ok(serde_json::from_slice::<Self>(&fs::read(config_file)?)?)
     }
 }
 
 /// Errors that arise when converting [`PathBuf`] to [`Config`]
 #[derive(Debug, thiserror::Error)]
-pub enum ConfigFileGenerationError {
+pub enum FileGenerationError {
     /// This error indicates that it could not read the file
     #[error("could not read file{0}")]
     CouldNotReadFile(#[from] std::io::Error),

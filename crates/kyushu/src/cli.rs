@@ -34,7 +34,7 @@ impl TryFrom<ArgsOs> for Args {
     type Error = ArgFromArgOSError;
 
     fn try_from(value: ArgsOs) -> Result<Self, Self::Error> {
-        Args::try_parse_from(value).map_err(ArgFromArgOSError::CouldNotParseError)
+        Self::try_parse_from(value).map_err(ArgFromArgOSError::CouldNotParseError)
     }
 }
 
@@ -49,9 +49,10 @@ pub enum ArgFromArgOSError {
 impl Args {
     /// Conversion to domain [`Request`]
     ///
-    /// # errors
+    /// # Errors
     ///
     /// if there are inconsistencies and domain problems, this conversion will return an error
+    #[allow(clippy::cast_sign_loss)] // timestamp is given in i64, but it can only be positive
     pub fn to_request(self) -> Result<crate::domain::requests::Request, ArgToDomainRequestError> {
         match self.command {
             Commands::Maple(maple_command) => match maple_command {

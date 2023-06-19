@@ -45,6 +45,7 @@ use thiserror::Error;
 use time::format_description;
 use whirlybird::journey::{Event, EventWrapper};
 
+#[allow(clippy::cast_sign_loss)] // timestamp is given in i64, but it can only be positive
 fn main() -> color_eyre::Result<()> {
     // setting up loggers
     color_eyre::install()?;
