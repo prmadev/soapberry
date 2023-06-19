@@ -517,6 +517,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1](https://github.com/amirography/soapberry/compare/kyushu-v0.9.0...kyushu-v0.9.1) - 2023-06-19
+
+### Fixed
+- remove hash32 from dependencies
+
+### Other
+- Merge branch 'main' of https://github.com/amirography/soapberry
+
 ## [0.9.0](https://github.com/amirography/soapberry/compare/kyushu-v0.8.1...kyushu-v0.9.0) - 2023-06-19
 
 ### Fixed
