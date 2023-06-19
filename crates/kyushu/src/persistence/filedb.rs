@@ -8,6 +8,7 @@ use redmaple::{
 use walkdir::WalkDir;
 use whirlybird::journey::EventWrapper;
 
+/// [`FileDB`] is a the implementation of file based local [`RedMapleRepo`]
 #[derive(Debug, Clone)]
 pub struct FileDB {
     events: std::collections::HashMap<ID, RedMaple<EventWrapper>>,
@@ -77,17 +78,23 @@ impl TryFrom<PathBuf> for FileDB {
     }
 }
 
+/// errors that can can arsie whene rebuilding information from files
 #[derive(Debug, thiserror::Error)]
 pub enum RebuildError {
+    /// if a path is not given
     #[error("the given path does not exist")]
     GivenPathDoesNotExit,
 
+    /// indicates that the file at the given address does not exist.
+    /// this should not happen.
     #[error("could not read the directory")]
     CouldNotReadTheDirectory(std::io::Error),
 
+    /// Error that happen when reading the files fail
     #[error("got error processing files {0:?}")]
     CouldNotProcessesAFile(Vec<std::io::Error>),
 
+    /// error that happen as a result of inconsistent formating of json files
     #[error("got error deserialize a files {0:?}")]
     CouldNotDeserializeAFile(Vec<serde_json::Error>),
 }
@@ -125,20 +132,27 @@ impl EventRepo for FileDB {
     }
 }
 
+/// Errors related to the implementation of [`EventRepo`] trait for the [`FileDB`]  
 #[derive(thiserror::Error, Debug)]
 pub enum EventRepoError {
+    /// Could not find a particular item
     #[error("could not find item")]
     CouldNotFindTheEventWithThatID,
 
+    /// could not serialize a given data
     #[error("couldn not serialize: {0}")]
     CouldNotSerialize(#[from] serde_json::Error),
 
+    /// when creating a redmaple, if it already exist this error happens
+    /// this should not happen in normal circimstances
     #[error("file already exist.")]
     FileAlreadyExist,
 
+    /// for some reason the file could not be created
     #[error("could not create new file: {0}")]
     CouldNotCreateNewFile(std::io::Error),
 
+    /// for some reason the file could not be write into
     #[error("could write data into file: {0}")]
     CouldNotWriteIntoFile(std::io::Error),
 }

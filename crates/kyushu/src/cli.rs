@@ -13,12 +13,15 @@ use crate::domain::requests::{Change, Information, Request};
 // # type declaration
 //
 
+/// interpretations of valid arguments given to the program
 #[derive(clap::Parser, Debug, Clone, PartialEq, Eq)]
 #[command(author, version, about)]
 pub struct Args {
+    /// commands that run with this program
     #[command(subcommand)]
     pub command: Commands,
 
+    /// the custom repo for the files
     #[arg(short, long)]
     pub file_store: Option<PathBuf>,
 }
@@ -34,6 +37,8 @@ impl TryFrom<ArgsOs> for Args {
         Args::try_parse_from(value).map_err(ArgFromArgOSError::CouldNotParseError)
     }
 }
+
+/// Errors for the conversion from [`ArgOs`] to [`Args`]
 #[derive(thiserror::Error, Debug)]
 pub enum ArgFromArgOSError {
     /// Couldnot parse!
@@ -42,6 +47,11 @@ pub enum ArgFromArgOSError {
 }
 
 impl Args {
+    /// Conversion to domain [`Request`]
+    ///
+    /// # errors
+    ///
+    /// if there are inconsistencies and domain problems, this conversion will return an error
     pub fn to_request(self) -> Result<crate::domain::requests::Request, ArgToDomainRequestError> {
         match self.command {
             Commands::Maple(maple_command) => match maple_command {
@@ -59,12 +69,13 @@ impl Args {
                     Ok(Request::Change(ch))
                 }
 
-                MapleCommands::ListAll => Ok(Request::Information(Information::ListEntries)),
+                MapleCommands::La => Ok(Request::Information(Information::ListEntries)),
             },
         }
     }
 }
 
+/// errors that happen when converting [`Args`] to [`Requst`] of domain
 #[derive(thiserror::Error, Debug, Clone)]
 pub enum ArgToDomainRequestError {
     /// Body Could not be built!
@@ -80,8 +91,12 @@ pub enum ArgToDomainRequestError {
 // # type declaration
 //
 
+/// Commands that can be given to the program as argument
 #[derive(clap::Subcommand, Debug, Clone, PartialEq, Eq)]
 pub enum Commands {
+    /// operations that happen to the [`Maple`]
+    /// a [`Maple`] is the structure that holds a [`Body`]
+    /// similar to an entry.
     #[command(subcommand)]
     Maple(MapleCommands),
 }
@@ -90,10 +105,15 @@ pub enum Commands {
 // # type declaration
 //
 
+/// commands that come after [`maple`]
 #[derive(clap::Subcommand, Debug, Clone, PartialEq, Eq)]
 pub enum MapleCommands {
-    // creates a new entry
-    New { content: String },
-    // lists all the entries
-    ListAll,
+    /// creates a new [`maple`]
+    New {
+        /// content of the body of the [`maple`] [`Body`]
+        content: String,
+    },
+
+    /// lists all the maples
+    La,
 }

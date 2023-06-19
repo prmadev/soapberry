@@ -6,7 +6,9 @@ use whirlybird::journey::entity::maple::Maple;
 // # type declaration
 //
 
+/// changes that can be made
 #[derive(Debug, Clone)]
 pub enum Change {
+    /// creating a new remaple
     CreateNewMaple(Maple),
 }

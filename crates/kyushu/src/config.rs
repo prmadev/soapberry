@@ -6,8 +6,10 @@
 
 use std::{fs, path::PathBuf};
 
+/// the Configuration of the program.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Config {
+    /// [`file_store`] holds the absolute path to the repo.
     pub file_store: Option<PathBuf>,
 }
 
@@ -31,10 +33,13 @@ impl TryFrom<PathBuf> for Config {
     }
 }
 
+/// Errors that arise when converting [`PathBuf`] to [`Config`]
 #[derive(Debug, thiserror::Error)]
 pub enum ConfigFileGenerationError {
+    /// This error indicates that it could not read the file
     #[error("could not read file{0}")]
     CouldNotReadFile(#[from] std::io::Error),
+    /// This error indicates that config file could not be parsed
     #[error("could not read file{0}")]
     ParsingConfigFileFailed(#[from] serde_json::Error),
 }

@@ -1,3 +1,5 @@
+//! printers are the projectors of events.
+//! they are the things that are used to interpret the data
 use owo_colors::OwoColorize;
 use redmaple::{event_group::EventGroup, id::IDGiver, RedMaple, RedMapleProjector};
 use whirlybird::journey::{Event, EventWrapper};
@@ -10,6 +12,7 @@ pub struct EntryPrinter<'a> {
 }
 
 impl<'a> EntryPrinter<'a> {
+    /// creates a new EntryPrinter
     pub fn new(
         show_time: bool,
         show_id: bool,
