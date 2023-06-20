@@ -66,15 +66,13 @@ impl From<ID> for i128 {
 
 impl From<time::OffsetDateTime> for ID {
     fn from(value: time::OffsetDateTime) -> Self {
-        ID::new(value.unix_timestamp_nanos())
+        Self::new(value.unix_timestamp_nanos())
     }
 }
 
 impl TryFrom<ID> for time::OffsetDateTime {
     type Error = time::Error;
-    fn try_from(value: ID) -> Result<time::OffsetDateTime, Self::Error> {
-        Ok(time::OffsetDateTime::from_unix_timestamp_nanos(
-            value.inner(),
-        )?)
+    fn try_from(value: ID) -> Result<Self, Self::Error> {
+        Ok(Self::from_unix_timestamp_nanos(value.inner())?)
     }
 }

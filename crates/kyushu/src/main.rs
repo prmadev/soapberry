@@ -32,7 +32,7 @@
 use kyushu::{
     self,
     cli::{Args, EntryPrinter},
-    config::Config,
+    config::{Config, InputInfo},
     domain::requests::{Change, Request},
     persistence,
 };
@@ -50,17 +50,26 @@ fn main() -> color_eyre::Result<()> {
     // setting up loggers
     color_eyre::install()?;
 
-    // Firing up generator ID
+    // checking for config file
+    let mut config_file_output: Option<Config> = Option::default();
+
+    let config_dir = dirs::config_dir();
+
+    if let Some(config) = config_dir {
+        let config_file_path = config.join("kyushu").join("config.json");
+        if config_file_path.exists() {
+            config_file_output = Some(Config::try_from(config_file_path)?);
+        };
+    };
 
     // getting arguments
     let cli_arguments = Args::try_from(std::env::args_os())?;
 
     // getting configurations from cli_arguments
-    let mut configurations = Config::from(cli_arguments.clone());
-    let config_dir = dirs::config_dir();
-    if let Some(config) = config_dir {
-        configurations = Config::try_from(config.join("kyushu").join("config.json"))?;
-    }
+    let configurations = Config::from(InputInfo::new(
+        Some(cli_arguments.clone()),
+        config_file_output,
+    ));
 
     // forming a request
     let req = cli_arguments.to_request()?;
