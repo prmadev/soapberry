@@ -13,7 +13,7 @@ use std::fmt::Display;
     serde::Serialize,
     Hash,
 )]
-pub struct ID(u64);
+pub struct ID(i128);
 
 impl Display for ID {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -24,13 +24,13 @@ impl Display for ID {
 impl ID {
     /// creats a new instance of the [`ID`]
     #[must_use]
-    pub const fn new(id: u64) -> Self {
+    pub const fn new(id: i128) -> Self {
         Self(id)
     }
 
     /// Returns the uuid of this [`ID`].
     #[must_use]
-    pub const fn inner(&self) -> u64 {
+    pub const fn inner(&self) -> i128 {
         self.0
     }
 }
@@ -46,19 +46,35 @@ pub trait IDGiver {
 }
 
 /// extractor for resulting id
-#[allow(clippy::module_name_repetitions)] // I cannot thing of a better name
-pub fn result_id<I: IDGiver, E>(x: Result<I, E>) -> Option<I::Valid> {
-    Some(x.ok()?.into_id())
-}
+// #[allow(clippy::module_name_repetitions)] // I cannot think of a better name
+// impl From <Result_id<I:
+// pub fn result_id<I: IDGiver, E>(x: Result<I, E>) -> Option<I::Valid> {
+//     Some(x.ok()?.into_id())
+// }
 
-impl From<u64> for ID {
-    fn from(value: u64) -> Self {
+impl From<i128> for ID {
+    fn from(value: i128) -> Self {
         Self::new(value)
     }
 }
 
-impl From<ID> for u64 {
+impl From<ID> for i128 {
     fn from(value: ID) -> Self {
         value.inner()
+    }
+}
+
+impl From<time::OffsetDateTime> for ID {
+    fn from(value: time::OffsetDateTime) -> Self {
+        ID::new(value.unix_timestamp_nanos())
+    }
+}
+
+impl TryFrom<ID> for time::OffsetDateTime {
+    type Error = time::Error;
+    fn try_from(value: ID) -> Result<time::OffsetDateTime, Self::Error> {
+        Ok(time::OffsetDateTime::from_unix_timestamp_nanos(
+            value.inner(),
+        )?)
     }
 }

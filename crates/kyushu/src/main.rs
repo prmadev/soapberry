@@ -82,7 +82,7 @@ fn main() -> color_eyre::Result<()> {
                     new_id.clone(),
                     created_time,
                     vec![EventWrapper::new(
-                        ID::from(created_time.unix_timestamp() as u64),
+                        ID::from(created_time),
                         created_time,
                         Event::MapleCreated(mpl),
                     )],
