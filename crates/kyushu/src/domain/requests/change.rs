@@ -1,6 +1,7 @@
 //! commands hold the formal message that goes through the system
 
-use whirlybird::journey::entity::maple::Maple;
+use redmaple::id::ID;
+use whirlybird::journey::{entity::maple::Maple, Body};
 
 //
 // # type declaration
@@ -11,4 +12,6 @@ use whirlybird::journey::entity::maple::Maple;
 pub enum Change {
     /// creating a new remaple
     CreateNewMaple(Maple),
+    /// updates the body of a maple
+    UpdateMapleBody(ID, Body),
 }

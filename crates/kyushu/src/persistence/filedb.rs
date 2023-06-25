@@ -1,5 +1,5 @@
 //! file db
-use std::{collections::HashMap, io::Write, path::PathBuf};
+use std::{collections::HashMap, path::PathBuf};
 
 use redmaple::{
     id::{IDGiver, ID},
@@ -123,12 +123,7 @@ impl EventRepo for FileDB {
             .map_err(EventRepoError::CouldNotSerialize)?
             .into_bytes();
 
-        std::fs::File::create(file_path)
-            .map_err(EventRepoError::CouldNotCreateNewFile)?
-            .write_all(&s)
-            .map_err(EventRepoError::CouldNotWriteIntoFile)?;
-
-        Ok(())
+        std::fs::write(file_path, &s).map_err(EventRepoError::CouldNotWriteIntoFile)
     }
 }
 
@@ -142,11 +137,6 @@ pub enum EventRepoError {
     /// could not serialize a given data
     #[error("couldn not serialize: {0}")]
     CouldNotSerialize(#[from] serde_json::Error),
-
-    /// when creating a redmaple, if it already exist this error happens
-    /// this should not happen in normal circimstances
-    #[error("file already exist.")]
-    FileAlreadyExist,
 
     /// for some reason the file could not be created
     #[error("could not create new file: {0}")]

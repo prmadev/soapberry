@@ -43,7 +43,7 @@ use redmaple::{
 };
 use thiserror::Error;
 use time::format_description;
-use whirlybird::journey::{Event, EventWrapper};
+use whirlybird::journey::{Body, Event, EventWrapper};
 
 #[allow(clippy::cast_sign_loss)] // timestamp is given in i64, but it can only be positive
 fn main() -> color_eyre::Result<()> {
@@ -84,20 +84,8 @@ fn main() -> color_eyre::Result<()> {
     // matching requests to the appropiate functions
     match req {
         Request::Change(chng) => match chng {
-            Change::CreateNewMaple(mpl) => {
-                let new_id = mpl.id().inner();
-                let created_time = time::OffsetDateTime::now_utc();
-                repo.save(RedMaple::new(
-                    new_id.clone(),
-                    created_time,
-                    vec![EventWrapper::new(
-                        ID::from(created_time),
-                        created_time,
-                        Event::MapleCreated(mpl),
-                    )],
-                ))?;
-                // saving in the permaenent storage
-            }
+            Change::CreateNewMaple(mpl) => create_maple(&repo, mpl)?,
+            Change::UpdateMapleBody(maple_id, new_body) => update_maple(&repo, maple_id, new_body)?,
         },
 
         Request::Information(i) => match i {
@@ -135,6 +123,42 @@ fn main() -> color_eyre::Result<()> {
             }
         },
     };
+    Ok(())
+}
+
+fn create_maple(
+    repo: &persistence::FileDB,
+    mpl: whirlybird::journey::Maple,
+) -> Result<(), color_eyre::Report> {
+    let new_id = mpl.id().inner();
+    let created_time = time::OffsetDateTime::now_utc();
+    repo.save(RedMaple::new(
+        new_id.clone(),
+        created_time,
+        vec![EventWrapper::new(
+            ID::from(created_time),
+            created_time,
+            Event::MapleCreated(mpl),
+        )],
+    ))?;
+    Ok(())
+}
+
+fn update_maple(
+    repo: &persistence::FileDB,
+    maple_id: ID,
+    new_body: Body,
+) -> Result<(), color_eyre::Report> {
+    let rdmpl = repo.redmaple_matching_id(&maple_id)?.clone();
+    let time_now = time::OffsetDateTime::now_utc();
+    let event = EventWrapper::new(
+        ID::from(time_now),
+        time_now,
+        Event::MapleBodyUpdated(rdmpl.id().to_owned(), new_body),
+    );
+
+    let rdmpl = rdmpl.into_appended(event);
+    repo.save(rdmpl)?;
     Ok(())
 }
 

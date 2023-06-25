@@ -15,8 +15,7 @@
 </p>
 
 <p align="center">
-  A constellation of event-driven libraries and application(s), including journaling (WIP), microblogging (TBA), and task managing (TBA). 
-  But for now, it's non-functional.
+Journaling, in an event-driven way.
 
 </p>
 

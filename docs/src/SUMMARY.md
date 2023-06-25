@@ -1,5 +1,10 @@
 # Summary
 - [Introduction](./introduction.md)
+- [Goals]
+    - [RedMaple](./goals/redmaple.md)
+    - [Whirlybird](./goals/whirlybird.md)
+    - [Kyushu](./goals/whirlybird.md)
+
 - [Usage](./usage.md)
     - [RedMaple](./usage/redmaple.md)
         - [Features](./usage/redmaple/development_scopes.md)

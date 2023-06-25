@@ -14,6 +14,7 @@ use crate::journey::event::ValidEventID;
 use redmaple::{
     event_group::EventGroup,
     id::{IDGiver, ID},
+    ValidRedMapleID,
 };
 
 /// [`JournelaEvent`] holds the meta data for [`Journal`] event
@@ -91,7 +92,7 @@ pub enum Event {
     MapleCreated(Maple),
 
     /// Event: An already existing [`Entry`] was updated to a new version.
-    MapleUpdated(ValidMapleID, Maple),
+    MapleBodyUpdated(ValidRedMapleID, Body),
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Journey`]

@@ -51,6 +51,14 @@ impl<T: EventGroup + Sized + Clone + PartialEq + Eq> RedMaple<T> {
     pub const fn events(&self) -> &Vec<T> {
         &self.events
     }
+
+    /// appends an event to the redmaple, while at the same time consuming it
+    pub fn into_appended(self, event: T) -> Self {
+        let mut s = self;
+        s.time_updated = event.time().clone();
+        s.events.push(event);
+        return s;
+    }
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Entry`]

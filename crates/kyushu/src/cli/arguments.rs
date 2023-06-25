@@ -59,6 +59,7 @@ impl Args {
     pub fn to_request(self) -> Result<crate::domain::requests::Request, ArgToDomainRequestError> {
         match self.command {
             Commands::Maple(maple_command) => match maple_command {
+                // request the creation of a brand new [`Maple`]
                 MapleCommands::New { content } => {
                     let new_maple = Maple::new(
                         ID::from(
@@ -72,7 +73,13 @@ impl Args {
                     Ok(Request::Change(ch))
                 }
 
+                // Request for listing of all maple
                 MapleCommands::List => Ok(Request::Information(Information::ListEntries)),
+
+                // Request a updating of body
+                MapleCommands::UpdateBody { content, maple_id } => Ok(Request::Change(
+                    Change::UpdateMapleBody(ID::from(maple_id), Body::try_from(content)?),
+                )),
             },
         }
     }
@@ -121,4 +128,15 @@ pub enum MapleCommands {
 
     /// lists all the maples
     List,
+
+    /// updates the [`Body`]
+    #[command(arg_required_else_help = true)]
+    UpdateBody {
+        /// ID of the maple that its body is being updated
+        #[arg(value_name = "Maple ID")]
+        maple_id: i128,
+        #[arg(value_name = "Body")]
+        /// content of the body of the [`maple`] [`Body`]
+        content: String,
+    },
 }

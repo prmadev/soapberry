@@ -59,7 +59,7 @@ impl<'a> RedMapleProjector for EntryPrinter<'a> {
             .first()
             .and_then(|x| match x.data() {
                 Event::MapleCreated(e) => Some(e.body().inner().clone()),
-                Event::MapleUpdated(_, _) => None,
+                Event::MapleBodyUpdated(_, _) => None,
             })
             .unwrap_or_default();
 
