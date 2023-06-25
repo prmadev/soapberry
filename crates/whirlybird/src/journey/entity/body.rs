@@ -2,8 +2,12 @@
 
 use std::fmt::Display;
 
+use redmaple::{id::ID, RedMaple};
+
+use crate::journey::EventWrapper;
+
 /// `Body` is a wrapper around simple [`String`] to ensure that the text alway follows the domain rules
-#[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Default)]
 pub struct Body(String);
 
 impl Body {
@@ -46,5 +50,18 @@ impl TryFrom<String> for Body {
         };
 
         Ok(Self(value))
+    }
+}
+
+impl From<RedMaple<EventWrapper>> for Body {
+    fn from(value: RedMaple<EventWrapper>) -> Self {
+        value
+            .events()
+            .into_iter()
+            .map(EventWrapper::data)
+            .fold(Body::default(), |_accu, event| match event {
+                crate::journey::Event::MapleCreated(m) => m.body().to_owned(),
+                crate::journey::Event::MapleBodyUpdated(_, b) => b.to_owned(),
+            })
     }
 }

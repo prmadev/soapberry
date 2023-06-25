@@ -1,12 +1,9 @@
 //! file db
 use std::{collections::HashMap, path::PathBuf};
 
-use redmaple::{
-    id::{IDGiver, ID},
-    EventRepo, RedMaple,
-};
+use redmaple::{id::ID, EventRepo, RedMaple};
 use walkdir::WalkDir;
-use whirlybird::journey::EventWrapper;
+use whirlybird::journey::{EventWrapper, IDGetterError, ValidMapleID};
 
 /// [`FileDB`] is a the implementation of file based local [`RedMapleRepo`]
 #[derive(Debug, Clone)]
@@ -24,52 +21,29 @@ impl TryFrom<PathBuf> for FileDB {
         }
 
         // read the directory for files
-        let (files, errs): (Vec<_>, Vec<_>) = WalkDir::new(&path_to_rep)
+        let events = WalkDir::new(&path_to_rep)
             .into_iter()
             .filter_map(Result::ok) // filter those that are ok
-            .filter_map(|f| {
-                let ext = f.path().extension();
-                match ext {
-                    Some(e) if e == "json" => Some(f),
-                    _ => None,
-                }
-            }) // find out which ones are json
-            .map(|f| {
-                std::fs::read(f.path())
-                    .map(|c| serde_json::from_slice::<RedMaple<EventWrapper>>(&c))
-            }) // read them and and turn them into journl events
-            .partition(Result::is_ok);
-
-        // pass 1 of errors: errors of not being able to read files
-        if !errs.is_empty() {
-            let errs: Vec<_> = errs.into_iter().filter_map(Result::err).collect();
-            return Err(RebuildError::CouldNotProcessesAFile(errs));
-        };
-
-        let (files, errs): (Vec<_>, Vec<_>) = files.into_iter().partition(Result::is_ok);
-
-        // pass 2 of errors
-        if !errs.is_empty() {
-            let errs: Vec<_> = errs.into_iter().filter_map(Result::err).collect();
-            return Err(RebuildError::CouldNotProcessesAFile(errs));
-        };
-
-        let files: Vec<_> = files.into_iter().filter_map(Result::ok).collect();
-
-        // pass 3 of errors
-        let (files, errs): (Vec<_>, Vec<_>) = files.into_iter().partition(Result::is_ok);
-
-        if !errs.is_empty() {
-            let errs: Vec<_> = errs.into_iter().filter_map(Result::err).collect();
-            return Err(RebuildError::CouldNotDeserializeAFile(errs));
-        };
-
-        // the results
-        let events: HashMap<ID, RedMaple<EventWrapper>> = files
-            .into_iter()
-            .filter_map(Result::ok)
-            .map(|f| (f.id().inner().clone(), f))
-            .collect();
+            .map(redmaple_from_file)
+            .filter_map(|x| match x {
+                Ok(o) => match o {
+                    Some(rm) => match ValidMapleID::try_from(&rm) {
+                        Ok(i) => Some(Ok((i.inner().clone(), rm))),
+                        Err(ers) => Some(Err(RebuildError::CouldNotGetTheIDRedmaple(ers))),
+                    },
+                    None => None,
+                },
+                Err(e) => Some(Err(RebuildError::CouldNotProcessesAFile(e))),
+            })
+            .fold(
+                Ok(HashMap::<ID, RedMaple<EventWrapper>>::new()),
+                |acc: Result<_, Self::Error>, item| {
+                    let i = item?;
+                    let mut res = acc?;
+                    _ = res.insert(i.0, i.1);
+                    Ok(res)
+                },
+            )?;
 
         Ok(Self {
             events,
@@ -92,11 +66,11 @@ pub enum RebuildError {
 
     /// Error that happen when reading the files fail
     #[error("got error processing files {0:?}")]
-    CouldNotProcessesAFile(Vec<std::io::Error>),
+    CouldNotProcessesAFile(FromFileError),
 
-    /// error that happen as a result of inconsistent formating of json files
-    #[error("got error deserialize a files {0:?}")]
-    CouldNotDeserializeAFile(Vec<serde_json::Error>),
+    /// ID of redmaple could not be read
+    #[error("got error processing files {0:?}")]
+    CouldNotGetTheIDRedmaple(IDGetterError),
 }
 
 impl EventRepo for FileDB {
@@ -117,7 +91,7 @@ impl EventRepo for FileDB {
     fn save(&self, item: RedMaple<Self::Item>) -> Result<(), Self::EventError> {
         let file_path = self
             .path
-            .join(format!("{}.json", item.id().inner().inner(),));
+            .join(format!("{}.json", ValidMapleID::try_from(&item)?.inner()));
 
         let s = serde_json::to_string_pretty(&item)
             .map_err(EventRepoError::CouldNotSerialize)?
@@ -145,4 +119,37 @@ pub enum EventRepoError {
     /// for some reason the file could not be write into
     #[error("could write data into file: {0}")]
     CouldNotWriteIntoFile(std::io::Error),
+
+    /// could not get id from event repo
+    #[error("could not get event redmaple id: {0}")]
+    IDGettingFailed(#[from] IDGetterError),
+}
+
+fn redmaple_from_file(
+    value: walkdir::DirEntry,
+) -> Result<Option<RedMaple<EventWrapper>>, FromFileError> {
+    if !value
+        .path()
+        .extension()
+        .map(|e| e == "json")
+        .unwrap_or(false)
+    {
+        return Ok(None);
+    }
+
+    Ok(Some(serde_json::from_slice::<RedMaple<EventWrapper>>(
+        &std::fs::read(value.path()).map_err(FromFileError::FileNotReadable)?,
+    )?))
+}
+
+/// failiure in converting DirEntry to to RedMaple
+#[derive(thiserror::Error, Debug)]
+pub enum FromFileError {
+    /// Not a Json file
+    #[error("could not read the content of the file: {0}")]
+    FileNotReadable(std::io::Error),
+
+    /// could not serialize a given data
+    #[error("couldn not serialize: {0}")]
+    CouldNotSerialize(#[from] serde_json::Error),
 }

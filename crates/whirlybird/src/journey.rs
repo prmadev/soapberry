@@ -4,6 +4,7 @@
 //! and forms named relation ships.
 //! these relationships form journeys
 pub mod entity;
+
 pub use entity::*;
 
 pub mod event;
@@ -14,7 +15,7 @@ use crate::journey::event::ValidEventID;
 use redmaple::{
     event_group::EventGroup,
     id::{IDGiver, ID},
-    ValidRedMapleID,
+    RedMaple,
 };
 
 /// [`JournelaEvent`] holds the meta data for [`Journal`] event
@@ -23,6 +24,29 @@ pub struct EventWrapper {
     event_id: ValidEventID,
     time: time::OffsetDateTime,
     data: Event,
+}
+
+impl TryFrom<&RedMaple<EventWrapper>> for ValidMapleID {
+    type Error = IDGetterError;
+
+    fn try_from(value: &RedMaple<EventWrapper>) -> Result<Self, Self::Error> {
+        value
+            .events()
+            .iter()
+            .fold(Option::None, |ac, m| match m.data() {
+                Event::MapleCreated(mp) => Some(mp.id().clone()),
+                _ => ac,
+            })
+            .ok_or(IDGetterError::NoEventsFound)
+    }
+}
+
+/// error that happens as the result of failing to geto ValidMapleID from RedMaple
+#[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
+pub enum IDGetterError {
+    /// For when a text field should contain 1 or more characters
+    #[error("RedMaple contains no events!")]
+    NoEventsFound,
 }
 
 impl EventWrapper {
@@ -92,7 +116,7 @@ pub enum Event {
     MapleCreated(Maple),
 
     /// Event: An already existing [`Entry`] was updated to a new version.
-    MapleBodyUpdated(ValidRedMapleID, Body),
+    MapleBodyUpdated(ValidMapleID, Body),
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Journey`]

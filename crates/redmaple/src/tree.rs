@@ -1,9 +1,6 @@
 //! redmaple is the central data-structure that is underlying the whole crate
 
-use self::{
-    event_group::EventGroup,
-    id::{IDGiver, ID},
-};
+use self::{event_group::EventGroup, id::ID};
 use std::fmt::Debug;
 
 /// event module holds the types and functions that events could take and the operations that they
@@ -20,7 +17,6 @@ pub mod id;
 /// * `events`: a list of entities that happened in time series
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct RedMaple<T: EventGroup + Sized + Clone + PartialEq + Eq> {
-    id: ValidRedMapleID,
     time_created: time::OffsetDateTime,
     time_updated: time::OffsetDateTime,
     events: Vec<T>,
@@ -31,9 +27,8 @@ impl<T: EventGroup + Sized + Clone + PartialEq + Eq> RedMaple<T> {
     ///
     /// * `view_mode`: sets the view mode of the `RedMaple`
     #[must_use]
-    pub const fn new(id: ID, time_created: time::OffsetDateTime, events: Vec<T>) -> Self {
+    pub const fn new(time_created: time::OffsetDateTime, events: Vec<T>) -> Self {
         Self {
-            id: ValidRedMapleID(id),
             time_created,
             time_updated: time_created,
             events,
@@ -70,18 +65,6 @@ impl ValidRedMapleID {
     #[must_use]
     pub const fn inner(&self) -> &ID {
         &self.0
-    }
-}
-
-impl<T: EventGroup + Sized + Clone + PartialEq + Eq> IDGiver for RedMaple<T> {
-    type Valid = ValidRedMapleID;
-
-    fn id(&self) -> &Self::Valid {
-        &self.id
-    }
-
-    fn into_id(self) -> Self::Valid {
-        self.id
     }
 }
 

@@ -1,8 +1,9 @@
 //! printers are the projectors of events.
 //! they are the things that are used to interpret the data
+
 use owo_colors::OwoColorize;
-use redmaple::{event_group::EventGroup, id::IDGiver, RedMaple, RedMapleProjector};
-use whirlybird::journey::{Event, EventWrapper};
+use redmaple::{event_group::EventGroup, RedMaple, RedMapleProjector};
+use whirlybird::journey::{Event, EventWrapper, ValidMapleID};
 
 ///  `EntryPrinter` struct
 pub struct EntryPrinter<'a> {
@@ -32,7 +33,10 @@ impl<'a> RedMapleProjector for EntryPrinter<'a> {
 
     fn projector(&self, data: &RedMaple<Self::EventType>) -> String {
         let id = if self.show_id {
-            data.id().inner().inner().to_string()
+            match ValidMapleID::try_from(data) {
+                Ok(o) => o.inner().inner().to_string(),
+                Err(_) => String::new(),
+            }
         } else {
             String::new()
         };

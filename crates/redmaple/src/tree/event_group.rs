@@ -6,7 +6,7 @@
 
 use std::error::Error;
 
-use super::ID;
+use crate::id::ID;
 
 /// [`EventGroup`] trait describes the behavior of an event.
 /// Specific implementaiton is not defined here

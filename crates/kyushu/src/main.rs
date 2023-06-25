@@ -43,7 +43,7 @@ use redmaple::{
 };
 use thiserror::Error;
 use time::format_description;
-use whirlybird::journey::{Body, Event, EventWrapper};
+use whirlybird::journey::{Body, Event, EventWrapper, ValidMapleID};
 
 #[allow(clippy::cast_sign_loss)] // timestamp is given in i64, but it can only be positive
 fn main() -> color_eyre::Result<()> {
@@ -130,13 +130,11 @@ fn create_maple(
     repo: &persistence::FileDB,
     mpl: whirlybird::journey::Maple,
 ) -> Result<(), color_eyre::Report> {
-    let new_id = mpl.id().inner();
     let created_time = time::OffsetDateTime::now_utc();
     repo.save(RedMaple::new(
-        new_id.clone(),
         created_time,
         vec![EventWrapper::new(
-            ID::from(created_time),
+            mpl.id().inner().to_owned(),
             created_time,
             Event::MapleCreated(mpl),
         )],
@@ -154,7 +152,7 @@ fn update_maple(
     let event = EventWrapper::new(
         ID::from(time_now),
         time_now,
-        Event::MapleBodyUpdated(rdmpl.id().to_owned(), new_body),
+        Event::MapleBodyUpdated(ValidMapleID::try_from(&rdmpl)?.to_owned(), new_body),
     );
 
     let rdmpl = rdmpl.into_appended(event);
