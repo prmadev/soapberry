@@ -120,6 +120,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.1](https://github.com/amirography/soapberry/compare/whirlybird-v0.11.0...whirlybird-v0.11.1) - 2023-06-26
+
+### Other
+- updated the following local packages: redmaple
+
 ## [0.11.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.10.1...whirlybird-v0.11.0) - 2023-06-26
 
 ### Added
