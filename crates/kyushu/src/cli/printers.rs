@@ -1,12 +1,12 @@
-//! printers are the projectors of events.
-//! they are the things that are used to interpret the data
+//! Printers are the projectors of events.
+//! They are the things that are used to interpret the data.
 
 use std::fmt::Display;
 
 use owo_colors::OwoColorize;
 use whirlybird::journey::{Body, ValidMapleID};
 
-/// creates a new printer for each maple
+/// Creates a new printer for each maple.
 pub struct MaplePrinter {
     id: ValidMapleID,
     body: Body,
@@ -14,12 +14,16 @@ pub struct MaplePrinter {
 }
 
 impl MaplePrinter {
-    /// Creates a new printer
-    pub fn new_with_local_offset<'a>(
+    /// Creates a new printer.
+    ///
+    /// # Errors
+    ///
+    /// In case there is a problem with getting local time offset or formatting the offset, it will return appropiate errors.
+    pub fn new_with_local_offset(
         id: ValidMapleID,
         body: Body,
         time_created: time::OffsetDateTime,
-        time_format: &Vec<time::format_description::FormatItem<'a>>,
+        time_format: &Vec<time::format_description::FormatItem<'_>>,
     ) -> Result<Self, NewPrinterError> {
         let time_offset = time::UtcOffset::current_local_offset()?; // may be we should get this from higher up?
         let time_string = time_created.to_offset(time_offset).format(time_format)?;
@@ -32,14 +36,14 @@ impl MaplePrinter {
     }
 }
 
-/// errors that may arise while making a [`Title`]
+/// Errors that may arise while making a [`Title`].
 #[derive(Debug, thiserror::Error)]
 pub enum NewPrinterError {
-    /// indeterminate local time
+    /// Indeterminate local time.
     #[error("local time could not gotten: {0}")]
     FailedToDetermineLocalTime(#[from] time::error::IndeterminateOffset),
 
-    /// formatting issue
+    /// Formatting issue.
     #[error("got some formatting issue: {0}")]
     FailedToFormatTime(#[from] time::error::Format),
 }

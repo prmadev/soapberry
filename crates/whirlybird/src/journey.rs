@@ -35,13 +35,13 @@ impl TryFrom<&RedMaple<EventWrapper>> for ValidMapleID {
             .iter()
             .fold(Option::None, |ac, m| match m.data() {
                 Event::MapleCreated(mp) => Some(mp.id().clone()),
-                _ => ac,
+                Event::MapleBodyUpdated(_, _) => ac,
             })
             .ok_or(IDGetterError::NoEventsFound)
     }
 }
 
-/// error that happens as the result of failing to geto ValidMapleID from RedMaple
+/// error that happens as the result of failing to geto `ValidMapleID` from `RedMaple`
 #[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum IDGetterError {
     /// For when a text field should contain 1 or more characters

@@ -42,23 +42,24 @@ impl<T: EventGroup + Sized + Clone + PartialEq + Eq + PartialOrd + Ord> RedMaple
     }
 
     /// appends an event to the redmaple, while at the same time consuming it
+    #[must_use]
     pub fn into_appended(self, event: T) -> Self {
         let mut s = self;
         s.events.push(event);
         s.events.sort();
-        return s;
+        s
     }
 
     /// checks for the time created
     #[must_use]
     pub fn time_created(&self) -> Option<&time::OffsetDateTime> {
-        self.events.first().map(|f| f.time())
+        self.events.first().map(EventGroup::time)
     }
 
     /// checks for the updated time
     #[must_use]
     pub fn time_updated(&self) -> Option<&time::OffsetDateTime> {
-        self.events.last().map(|f| f.time())
+        self.events.last().map(EventGroup::time)
     }
 }
 

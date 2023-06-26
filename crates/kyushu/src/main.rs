@@ -85,17 +85,19 @@ fn main() -> color_eyre::Result<()> {
     match req {
         Request::Change(chng) => match chng {
             Change::CreateNewMaple(mpl) => create_maple(&repo, mpl)?,
-            Change::UpdateMapleBody(maple_id, new_body) => update_maple(&repo, maple_id, new_body)?,
+            Change::UpdateMapleBody(maple_id, new_body) => {
+                update_maple(&repo, &maple_id, new_body)?;
+            }
         },
 
         Request::Information(i) => match i {
-            kyushu::domain::requests::Information::ListEntries => list_entries(repo)?,
+            kyushu::domain::requests::Information::ListEntries => list_entries(&repo)?,
         },
     };
     Ok(())
 }
 
-fn list_entries(repo: persistence::FileDB) -> Result<(), color_eyre::Report> {
+fn list_entries(repo: &persistence::FileDB) -> Result<(), color_eyre::Report> {
     let mut redmaples = repo.all_events()?.values().collect::<Vec<_>>();
     redmaples.sort_by(|a, b| {
         let at = a
@@ -113,17 +115,16 @@ fn list_entries(repo: persistence::FileDB) -> Result<(), color_eyre::Report> {
     redmaples
         .into_iter()
         .map(|rm| -> Result<MaplePrinter, String> {
-            Ok(MaplePrinter::new_with_local_offset(
+            MaplePrinter::new_with_local_offset(
                 ValidMapleID::try_from(rm)
                     .map_err(|er| format!("could nto create id for map{er}"))?,
-                Body::from(rm.to_owned()),
-                rm.time_created()
-                    .ok_or(format!("Could not find the time created"))?
-                    .to_owned(),
+                Body::from(rm.clone()),
+                *rm.time_created()
+                    .ok_or("Could not find the time created".to_owned())?,
                 &format_description::parse("[year]-[month]-[day]:[hour]-[minute]-[second]")
                     .unwrap_or_default(),
             )
-            .map_err(|er| format!("could not create printer: {er}"))?)
+            .map_err(|er| format!("could not create printer: {er}"))
         })
         .for_each(|each| {
             match each {
@@ -140,7 +141,7 @@ fn create_maple(
 ) -> Result<(), color_eyre::Report> {
     let created_time = time::OffsetDateTime::now_utc();
     repo.save(RedMaple::new(vec![EventWrapper::new(
-        mpl.id().inner().to_owned(),
+        mpl.id().inner().clone(),
         created_time,
         Event::MapleCreated(mpl),
     )]))?;
@@ -149,15 +150,15 @@ fn create_maple(
 
 fn update_maple(
     repo: &persistence::FileDB,
-    maple_id: ID,
+    maple_id: &ID,
     new_body: Body,
 ) -> Result<(), color_eyre::Report> {
-    let rdmpl = repo.redmaple_matching_id(&maple_id)?.clone();
+    let rdmpl = repo.redmaple_matching_id(maple_id)?.clone();
     let time_now = time::OffsetDateTime::now_utc();
     let event = EventWrapper::new(
         ID::from(time_now),
         time_now,
-        Event::MapleBodyUpdated(ValidMapleID::try_from(&rdmpl)?.to_owned(), new_body),
+        Event::MapleBodyUpdated(ValidMapleID::try_from(&rdmpl)?, new_body),
     );
 
     let rdmpl = rdmpl.into_appended(event);

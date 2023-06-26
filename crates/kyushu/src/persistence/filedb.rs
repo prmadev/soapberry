@@ -97,11 +97,11 @@ impl EventRepo for FileDB {
             .map_err(EventRepoError::CouldNotSerialize)?
             .into_bytes();
 
-        std::fs::write(file_path, &s).map_err(EventRepoError::CouldNotWriteIntoFile)
+        std::fs::write(file_path, s).map_err(EventRepoError::CouldNotWriteIntoFile)
     }
 }
 
-/// Errors related to the implementation of [`EventRepo`] trait for the [`FileDB`]  
+/// Errors related to the implementation of [`EventRepo`] trait for the [`FileDB`]
 #[derive(thiserror::Error, Debug)]
 pub enum EventRepoError {
     /// Could not find a particular item
@@ -125,15 +125,11 @@ pub enum EventRepoError {
     IDGettingFailed(#[from] IDGetterError),
 }
 
+#[allow(clippy::needless_pass_by_value)] // the value is not being used any further in the original function
 fn redmaple_from_file(
     value: walkdir::DirEntry,
 ) -> Result<Option<RedMaple<EventWrapper>>, FromFileError> {
-    if !value
-        .path()
-        .extension()
-        .map(|e| e == "json")
-        .unwrap_or(false)
-    {
+    if !value.path().extension().map_or(false, |e| e == "json") {
         return Ok(None);
     }
 
@@ -142,7 +138,7 @@ fn redmaple_from_file(
     )?))
 }
 
-/// failiure in converting DirEntry to to RedMaple
+/// failiure in converting `DirEntry` to to `RedMaple`
 #[derive(thiserror::Error, Debug)]
 pub enum FromFileError {
     /// Not a Json file

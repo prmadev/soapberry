@@ -57,11 +57,11 @@ impl From<RedMaple<EventWrapper>> for Body {
     fn from(value: RedMaple<EventWrapper>) -> Self {
         value
             .events()
-            .into_iter()
+            .iter()
             .map(EventWrapper::data)
-            .fold(Body::default(), |_accu, event| match event {
-                crate::journey::Event::MapleCreated(m) => m.body().to_owned(),
-                crate::journey::Event::MapleBodyUpdated(_, b) => b.to_owned(),
+            .fold(Self::default(), |_accu, event| match event {
+                crate::journey::Event::MapleCreated(m) => m.body().clone(),
+                crate::journey::Event::MapleBodyUpdated(_, b) => b.clone(),
             })
     }
 }
