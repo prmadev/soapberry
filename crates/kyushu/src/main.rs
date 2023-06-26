@@ -45,9 +45,7 @@ use thiserror::Error;
 use time::format_description;
 use whirlybird::journey::{Body, Event, EventWrapper, ValidMapleID};
 
-#[allow(clippy::cast_sign_loss)] // timestamp is given in i64, but it can only be positive
 fn main() -> color_eyre::Result<()> {
-    // setting up loggers
     color_eyre::install()?;
 
     // checking for config file
@@ -99,6 +97,7 @@ fn main() -> color_eyre::Result<()> {
 
 fn list_entries(repo: &persistence::FileDB) -> Result<(), color_eyre::Report> {
     let mut redmaples = repo.all_events()?.values().collect::<Vec<_>>();
+
     redmaples.sort_by(|a, b| {
         let at = a
             .events()
@@ -112,6 +111,7 @@ fn list_entries(repo: &persistence::FileDB) -> Result<(), color_eyre::Report> {
 
         at.cmp(bt)
     });
+
     redmaples
         .into_iter()
         .map(|rm| -> Result<MaplePrinter, String> {
@@ -153,7 +153,24 @@ fn update_maple(
     maple_id: &ID,
     new_body: Body,
 ) -> Result<(), color_eyre::Report> {
-    let rdmpl = repo.redmaple_matching_id(maple_id)?.clone();
+    let rdmpl = match repo.redmaple_matching_id(maple_id) {
+        Ok(o) => o.clone(),
+        Err(e) => match e {
+            persistence::EventRepoError::CouldNotFindTheEventWithThatID => {
+                match repo.redmaple_similar_id(maple_id) {
+                    Ok(o) => o.clone(),
+                    Err(er) => return Err(er)?,
+                }
+            }
+            persistence::EventRepoError::CouldNotSerialize(e) => return Err(e)?,
+            persistence::EventRepoError::CouldNotCreateNewFile(e) => return Err(e)?,
+            persistence::EventRepoError::CouldNotWriteIntoFile(e) => return Err(e)?,
+            persistence::EventRepoError::IDGettingFailed(e) => return Err(e)?,
+            persistence::EventRepoError::MultipleItemsFound(e) => {
+                return Err(color_eyre::Report::msg(format!("{:#?}", e)))?
+            }
+        },
+    };
     let time_now = time::OffsetDateTime::now_utc();
     let event = EventWrapper::new(
         ID::from(time_now),

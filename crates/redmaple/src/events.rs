@@ -22,6 +22,13 @@ pub trait EventRepo: Clone {
     /// if it cannot find any item or could not convert any of the types it will return an error.
     fn redmaple_matching_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError>;
 
+    /// returns events by finding the first one that is similar to the item
+    ///
+    /// # Errors
+    ///
+    /// if it cannot find any item or could not convert any of the types it will return an error.
+    fn redmaple_similar_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError>;
+
     /// returns all the events
     ///
     /// # Errors

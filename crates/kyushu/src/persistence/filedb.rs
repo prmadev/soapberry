@@ -84,6 +84,28 @@ impl EventRepo for FileDB {
             .ok_or(EventRepoError::CouldNotFindTheEventWithThatID)
     }
 
+    fn redmaple_similar_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
+        let sid = id.to_string();
+        let finding: Vec<_> = self
+            .events
+            .keys()
+            .filter(|x| x.to_string().contains(&sid))
+            .collect();
+
+        if finding.len() != 1 {
+            return Err(EventRepoError::MultipleItemsFound(
+                finding.into_iter().map(|x| x.to_owned()).collect(),
+            ));
+        }
+        let idfounded = finding
+            .first()
+            .ok_or(EventRepoError::CouldNotFindTheEventWithThatID)?;
+
+        self.events
+            .get(&idfounded)
+            .ok_or(EventRepoError::CouldNotFindTheEventWithThatID)
+    }
+
     fn all_events(&self) -> Result<&HashMap<ID, RedMaple<Self::Item>>, Self::EventError> {
         Ok(&self.events)
     }
@@ -123,6 +145,10 @@ pub enum EventRepoError {
     /// could not get id from event repo
     #[error("could not get event redmaple id: {0}")]
     IDGettingFailed(#[from] IDGetterError),
+
+    /// could not get id from event repo
+    #[error("multiple items found: {0:?}")]
+    MultipleItemsFound(Vec<ID>),
 }
 
 #[allow(clippy::needless_pass_by_value)] // the value is not being used any further in the original function
