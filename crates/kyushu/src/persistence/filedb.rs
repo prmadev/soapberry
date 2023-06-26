@@ -94,7 +94,7 @@ impl EventRepo for FileDB {
 
         if finding.len() != 1 {
             return Err(EventRepoError::MultipleItemsFound(
-                finding.into_iter().map(|x| x.to_owned()).collect(),
+                finding.into_iter().map(std::clone::Clone::clone).collect(),
             ));
         }
         let idfounded = finding
@@ -102,7 +102,7 @@ impl EventRepo for FileDB {
             .ok_or(EventRepoError::CouldNotFindTheEventWithThatID)?;
 
         self.events
-            .get(&idfounded)
+            .get(idfounded)
             .ok_or(EventRepoError::CouldNotFindTheEventWithThatID)
     }
 

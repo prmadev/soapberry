@@ -163,11 +163,11 @@ fn update_maple(
                 }
             }
             persistence::EventRepoError::CouldNotSerialize(e) => return Err(e)?,
-            persistence::EventRepoError::CouldNotCreateNewFile(e) => return Err(e)?,
-            persistence::EventRepoError::CouldNotWriteIntoFile(e) => return Err(e)?,
+            persistence::EventRepoError::CouldNotCreateNewFile(e)
+            | persistence::EventRepoError::CouldNotWriteIntoFile(e) => return Err(e)?,
             persistence::EventRepoError::IDGettingFailed(e) => return Err(e)?,
             persistence::EventRepoError::MultipleItemsFound(e) => {
-                return Err(color_eyre::Report::msg(format!("{:#?}", e)))?
+                return Err(color_eyre::Report::msg(format!("{e:#?}")))?
             }
         },
     };
