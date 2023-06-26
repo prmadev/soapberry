@@ -1,78 +1,58 @@
 //! printers are the projectors of events.
 //! they are the things that are used to interpret the data
 
-use owo_colors::OwoColorize;
-use redmaple::{event_group::EventGroup, RedMaple, RedMapleProjector};
-use whirlybird::journey::{Event, EventWrapper, ValidMapleID};
+use std::fmt::Display;
 
-///  `EntryPrinter` struct
-pub struct EntryPrinter<'a> {
-    show_time: bool,
-    show_id: bool,
-    time_format: Vec<time::format_description::FormatItem<'a>>,
+use owo_colors::OwoColorize;
+use whirlybird::journey::{Body, ValidMapleID};
+
+/// creates a new printer for each maple
+pub struct MaplePrinter {
+    id: ValidMapleID,
+    body: Body,
+    time_string: String,
 }
 
-impl<'a> EntryPrinter<'a> {
-    /// creates a new `EntryPrinter`
-    #[must_use]
-    pub fn new(
-        show_time: bool,
-        show_id: bool,
-        time_format: Vec<time::format_description::FormatItem<'a>>,
-    ) -> Self {
-        Self {
-            show_time,
-            show_id,
-            time_format,
-        }
+impl MaplePrinter {
+    /// Creates a new printer
+    pub fn new_with_local_offset<'a>(
+        id: ValidMapleID,
+        body: Body,
+        time_created: time::OffsetDateTime,
+        time_format: &Vec<time::format_description::FormatItem<'a>>,
+    ) -> Result<Self, NewPrinterError> {
+        let time_offset = time::UtcOffset::current_local_offset()?; // may be we should get this from higher up?
+        let time_string = time_created.to_offset(time_offset).format(time_format)?;
+
+        Ok(Self {
+            id,
+            body,
+            time_string,
+        })
     }
 }
 
-impl<'a> RedMapleProjector for EntryPrinter<'a> {
-    type EventType = EventWrapper;
+/// errors that may arise while making a [`Title`]
+#[derive(Debug, thiserror::Error)]
+pub enum NewPrinterError {
+    /// indeterminate local time
+    #[error("local time could not gotten: {0}")]
+    FailedToDetermineLocalTime(#[from] time::error::IndeterminateOffset),
 
-    fn projector(&self, data: &RedMaple<Self::EventType>) -> String {
-        let id = if self.show_id {
-            match ValidMapleID::try_from(data) {
-                Ok(o) => o.inner().inner().to_string(),
-                Err(_) => String::new(),
-            }
-        } else {
-            String::new()
-        };
+    /// formatting issue
+    #[error("got some formatting issue: {0}")]
+    FailedToFormatTime(#[from] time::error::Format),
+}
 
-        let date_string = if self.show_time {
-            data.events()
-                .first()
-                .map_or(String::from("____-__-__ __:__:__"), |x| {
-                    // let a: DateTime<Local> = x.time().to_owned().into();
-                    let time_offset =
-                        time::UtcOffset::current_local_offset().unwrap_or(time::UtcOffset::UTC);
-
-                    x.time()
-                        .to_offset(time_offset)
-                        .format(&self.time_format)
-                        .unwrap_or_default()
-                })
-        } else {
-            String::new()
-        };
-
-        let body = data
-            .events()
-            .first()
-            .and_then(|x| match x.data() {
-                Event::MapleCreated(e) => Some(e.body().inner().clone()),
-                Event::MapleBodyUpdated(_, _) => None,
-            })
-            .unwrap_or_default();
-
-        format!(
-            "{} {} {}\n{}\n",
-            date_string.bold().reversed(),
+impl Display for MaplePrinter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{} {} {}\n {} \n",
+            self.time_string.bold().reversed(),
             "=>".bold(),
-            body,
-            id.dimmed().italic(),
+            self.body,
+            self.id.dimmed().italic()
         )
     }
 }

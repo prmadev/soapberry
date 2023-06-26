@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::fmt::{Display, LowerHex};
 
 /// The Implementation of the ID that the crate uses
 #[derive(
@@ -17,7 +17,13 @@ pub struct ID(i128);
 
 impl Display for ID {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({})", self.0)
+        write!(f, "{}", self.0)
+    }
+}
+
+impl LowerHex for ID {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:x}", self.0)
     }
 }
 

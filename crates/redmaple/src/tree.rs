@@ -16,23 +16,17 @@ pub mod id;
 /// * `id`: of type ID
 /// * `events`: a list of entities that happened in time series
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-pub struct RedMaple<T: EventGroup + Sized + Clone + PartialEq + Eq> {
-    time_created: time::OffsetDateTime,
-    time_updated: time::OffsetDateTime,
+pub struct RedMaple<T: EventGroup + Sized + Clone + PartialEq + Eq + PartialOrd + Ord> {
     events: Vec<T>,
 }
 
-impl<T: EventGroup + Sized + Clone + PartialEq + Eq> RedMaple<T> {
+impl<T: EventGroup + Sized + Clone + PartialEq + Eq + PartialOrd + Ord> RedMaple<T> {
     /// Creates a new instance of [`RedMaple`]
     ///
     /// * `view_mode`: sets the view mode of the `RedMaple`
     #[must_use]
-    pub const fn new(time_created: time::OffsetDateTime, events: Vec<T>) -> Self {
-        Self {
-            time_created,
-            time_updated: time_created,
-            events,
-        }
+    pub const fn new(events: Vec<T>) -> Self {
+        Self { events }
     }
 
     // /// Gets the ID of the `RedMaple`
@@ -50,9 +44,21 @@ impl<T: EventGroup + Sized + Clone + PartialEq + Eq> RedMaple<T> {
     /// appends an event to the redmaple, while at the same time consuming it
     pub fn into_appended(self, event: T) -> Self {
         let mut s = self;
-        s.time_updated = event.time().clone();
         s.events.push(event);
+        s.events.sort();
         return s;
+    }
+
+    /// checks for the time created
+    #[must_use]
+    pub fn time_created(&self) -> Option<&time::OffsetDateTime> {
+        self.events.first().map(|f| f.time())
+    }
+
+    /// checks for the updated time
+    #[must_use]
+    pub fn time_updated(&self) -> Option<&time::OffsetDateTime> {
+        self.events.last().map(|f| f.time())
     }
 }
 
@@ -259,19 +265,20 @@ impl ValidRedMapleID {
 /// a projector
 pub trait RedMapleProjector {
     ///
-    type EventType: EventGroup + Clone + Sized + PartialEq + Eq;
+    type EventType: EventGroup + Clone + Sized + PartialEq + Eq + PartialOrd + Ord;
 
     ///
     fn projector(&self, data: &RedMaple<Self::EventType>) -> String;
 }
 
-impl<T: EventGroup + Sized + Clone + PartialEq + Eq> PartialOrd for RedMaple<T> {
+impl<T: EventGroup + Sized + Clone + PartialEq + Eq + PartialOrd + Ord> PartialOrd for RedMaple<T> {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.time_created.cmp(&other.time_updated))
+        Some(self.time_created().cmp(&other.time_created()))
     }
 }
-impl<T: EventGroup + Sized + Clone + PartialEq + Eq> Ord for RedMaple<T> {
+
+impl<T: EventGroup + Sized + Clone + PartialEq + Eq + PartialOrd + Ord> Ord for RedMaple<T> {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.time_created.cmp(&other.time_updated)
+        self.time_created().cmp(&other.time_created())
     }
 }

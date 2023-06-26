@@ -1,6 +1,6 @@
 //! [`entry`] module contains logic about a uesr entry
 
-use std::fmt::Display;
+use std::fmt::{Display, LowerHex};
 
 use redmaple::id::{IDGiver, ID};
 
@@ -37,6 +37,18 @@ impl Maple {
 #[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct ValidMapleID(ID);
 
+impl Display for ValidMapleID {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.inner())
+    }
+}
+
+impl LowerHex for ValidMapleID {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:x}", self.inner())
+    }
+}
+
 impl ValidMapleID {
     /// exposes the inner [`ID`] of the [`Entry`]
     #[must_use]
@@ -56,8 +68,9 @@ impl IDGiver for Maple {
         self.id
     }
 }
+
 impl Display for Maple {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self.body())
+        write!(f, "{}", self.body())
     }
 }

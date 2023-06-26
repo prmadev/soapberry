@@ -10,7 +10,7 @@ use crate::{
 /// defines the bare minimum implementation for storing events
 pub trait EventRepo: Clone {
     /// Item should be able to return ID
-    type Item: EventGroup + IDGiver + Clone + Eq;
+    type Item: EventGroup + IDGiver + Clone + Eq + PartialOrd + Ord;
 
     /// Errors that may happen in these functions
     type EventError: Display + std::error::Error;

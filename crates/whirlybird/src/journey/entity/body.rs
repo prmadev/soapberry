@@ -2,7 +2,7 @@
 
 use std::fmt::Display;
 
-use redmaple::{id::ID, RedMaple};
+use redmaple::RedMaple;
 
 use crate::journey::EventWrapper;
 

@@ -31,7 +31,7 @@
 
 use kyushu::{
     self,
-    cli::{Args, EntryPrinter},
+    cli::{Args, MaplePrinter},
     config::{Config, InputInfo},
     domain::requests::{Change, Request},
     persistence,
@@ -39,7 +39,7 @@ use kyushu::{
 use redmaple::{
     event_group::EventGroup,
     id::{IDGiver, ID},
-    EventRepo, RedMaple, RedMapleProjector,
+    EventRepo, RedMaple,
 };
 use thiserror::Error;
 use time::format_description;
@@ -89,40 +89,48 @@ fn main() -> color_eyre::Result<()> {
         },
 
         Request::Information(i) => match i {
-            kyushu::domain::requests::Information::ListEntries => {
-                let mut redmaples = repo.all_events()?.values().collect::<Vec<_>>();
-
-                redmaples.sort_by(|a, b| {
-                    let at = a
-                        .events()
-                        .first()
-                        .map_or(&time::OffsetDateTime::UNIX_EPOCH, EventWrapper::time);
-
-                    let bt = b
-                        .events()
-                        .first()
-                        .map_or(&time::OffsetDateTime::UNIX_EPOCH, EventWrapper::time);
-
-                    at.cmp(bt)
-                });
-
-                redmaples
-                    .iter()
-                    .map(|rm| {
-                        EntryPrinter::new(
-                            true,
-                            true,
-                            format_description::parse(
-                                "[year]-[month]-[day]:[hour]-[minute]-[second]",
-                            )
-                            .unwrap_or_default(),
-                        )
-                        .projector(rm)
-                    })
-                    .for_each(|each| println!("{each}"));
-            }
+            kyushu::domain::requests::Information::ListEntries => list_entries(repo)?,
         },
     };
+    Ok(())
+}
+
+fn list_entries(repo: persistence::FileDB) -> Result<(), color_eyre::Report> {
+    let mut redmaples = repo.all_events()?.values().collect::<Vec<_>>();
+    redmaples.sort_by(|a, b| {
+        let at = a
+            .events()
+            .first()
+            .map_or(&time::OffsetDateTime::UNIX_EPOCH, EventWrapper::time);
+
+        let bt = b
+            .events()
+            .first()
+            .map_or(&time::OffsetDateTime::UNIX_EPOCH, EventWrapper::time);
+
+        at.cmp(bt)
+    });
+    redmaples
+        .into_iter()
+        .map(|rm| -> Result<MaplePrinter, String> {
+            Ok(MaplePrinter::new_with_local_offset(
+                ValidMapleID::try_from(rm)
+                    .map_err(|er| format!("could nto create id for map{er}"))?,
+                Body::from(rm.to_owned()),
+                rm.time_created()
+                    .ok_or(format!("Could not find the time created"))?
+                    .to_owned(),
+                &format_description::parse("[year]-[month]-[day]:[hour]-[minute]-[second]")
+                    .unwrap_or_default(),
+            )
+            .map_err(|er| format!("could not create printer: {er}"))?)
+        })
+        .for_each(|each| {
+            match each {
+                Ok(o) => println!("{o}"),
+                Err(e) => eprintln!("{e}"),
+            };
+        });
     Ok(())
 }
 
@@ -131,14 +139,11 @@ fn create_maple(
     mpl: whirlybird::journey::Maple,
 ) -> Result<(), color_eyre::Report> {
     let created_time = time::OffsetDateTime::now_utc();
-    repo.save(RedMaple::new(
+    repo.save(RedMaple::new(vec![EventWrapper::new(
+        mpl.id().inner().to_owned(),
         created_time,
-        vec![EventWrapper::new(
-            mpl.id().inner().to_owned(),
-            created_time,
-            Event::MapleCreated(mpl),
-        )],
-    ))?;
+        Event::MapleCreated(mpl),
+    )]))?;
     Ok(())
 }
 

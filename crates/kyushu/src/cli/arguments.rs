@@ -77,7 +77,7 @@ impl Args {
                 MapleCommands::List => Ok(Request::Information(Information::ListEntries)),
 
                 // Request a updating of body
-                MapleCommands::UpdateBody { content, maple_id } => Ok(Request::Change(
+                MapleCommands::Update { content, maple_id } => Ok(Request::Change(
                     Change::UpdateMapleBody(ID::from(maple_id), Body::try_from(content)?),
                 )),
             },
@@ -131,7 +131,7 @@ pub enum MapleCommands {
 
     /// updates the [`Body`]
     #[command(arg_required_else_help = true)]
-    UpdateBody {
+    Update {
         /// ID of the maple that its body is being updated
         #[arg(value_name = "Maple ID")]
         maple_id: i128,
