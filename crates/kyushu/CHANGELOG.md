@@ -517,6 +517,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0](https://github.com/amirography/soapberry/compare/kyushu-v0.9.2...kyushu-v0.10.0) - 2023-06-26
+
+### Added
+- add some items
+- create maple body updated
+- improve handling of inputs
+
+### Other
+- Merge branch 'main' of https://github.com/amirography/soapberry
+- update dependencies
+- fix some linting issues
+- massive refactor and simplification
+
 ## [0.9.2](https://github.com/amirography/soapberry/compare/kyushu-v0.9.1...kyushu-v0.9.2) - 2023-06-19
 
 ### Other

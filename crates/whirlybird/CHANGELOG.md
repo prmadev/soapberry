@@ -120,6 +120,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.10.1...whirlybird-v0.11.0) - 2023-06-26
+
+### Added
+- add some items
+- create maple body updated
+
+### Other
+- Merge branch 'main' of https://github.com/amirography/soapberry
+- fix some linting issues
+- massive refactor and simplification
+
 ## [0.10.1](https://github.com/amirography/soapberry/compare/whirlybird-v0.10.0...whirlybird-v0.10.1) - 2023-06-19
 
 ### Other
