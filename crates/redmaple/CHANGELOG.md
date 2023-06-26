@@ -127,6 +127,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0](https://github.com/amirography/soapberry/compare/redmaple-v0.13.1...redmaple-v0.14.0) - 2023-06-26
+
+### Added
+- add some items
+- create maple body updated
+- improve handling of inputs
+
+### Other
+- Merge branch 'main' of https://github.com/amirography/soapberry
+- fix some linting issues
+- massive refactor and simplification
+
 ## [0.13.1](https://github.com/amirography/soapberry/compare/redmaple-v0.13.0...redmaple-v0.13.1) - 2023-06-19
 
 ### Fixed
