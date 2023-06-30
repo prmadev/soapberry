@@ -55,9 +55,10 @@ impl From<RedMaple<EventWrapper>> for Body {
             .events()
             .iter()
             .map(EventWrapper::data)
-            .fold(Self::default(), |_accu, event| match event {
+            .fold(Self::default(), |accu, event| match event {
                 Event::MapleCreated(m) => m.body().clone(),
                 Event::MapleBodyUpdated(_, b) => b.clone(),
+                Event::LinkAdded(_) => accu,
             })
     }
 }
