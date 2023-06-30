@@ -29,6 +29,8 @@
 )]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+use std::path::PathBuf;
+
 use kyushu::{
     self,
     cli::{Args, MaplePrinter},
@@ -51,7 +53,18 @@ fn main() -> color_eyre::Result<()> {
     // checking for config file
     let mut config_file_output: Option<Config> = Option::default();
 
-    let config_dir = dirs::config_dir();
+    // finding the platform specific directory
+    let config_dir = match std::env::consts::OS {
+        "linux" | "openbsd" | "netbsd" | "freebsd" | "dragonfly" => {
+            std::env::var_os("XDG_CONFIG_HOME").map(PathBuf::from)
+        }
+        "macos" => std::env::var_os("HOME")
+            .map(|o| PathBuf::from(o).join("Library").join("Application Support")),
+        "solaris" => std::env::var_os("HOME").map(|o| PathBuf::from(o).join(".config")),
+        "windows" => std::env::var_os("USERPROFILE")
+            .map(|o| PathBuf::from(o).join("AppData").join("Roaming")),
+        _ => None,
+    };
 
     if let Some(config) = config_dir {
         let config_file_path = config.join("kyushu").join("config.json");

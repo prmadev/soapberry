@@ -28,7 +28,6 @@ filter_unconventional = true
 [dependencies]
 clap = { version = "4.3.8", features = ["derive"] }
 color-eyre = "0.6.2"
-dirs = "5.0.1"
 owo-colors = "3.5.0"
 redmaple = { version = "0.14.0", path = "../redmaple" }
 serde = { version = "1.0.164", features = ["derive"] }
