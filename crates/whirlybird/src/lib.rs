@@ -5,6 +5,7 @@
 //! So please, do not use it for now. Version numbering will tell you if things got stabilised.
 //!
 
+#![forbid(unsafe_code)]
 #![deny(missing_docs)]
 #![deny(clippy::expect_used)]
 #![deny(clippy::unwrap_used)]

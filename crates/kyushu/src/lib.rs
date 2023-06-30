@@ -1,5 +1,6 @@
 //! Kyushu lib stores information about the logic and inner workings of kyushu
 
+#![forbid(unsafe_code)]
 #![deny(missing_docs)]
 #![deny(clippy::expect_used)]
 #![deny(clippy::unwrap_used)]
