@@ -1,12 +1,12 @@
 //! [`entry`] module contains logic about a uesr entry
 
-use std::fmt::{Display, LowerHex};
+use std::fmt;
 
-use redmaple::id::{IDGiver, ID};
+use redmaple::id::{Unique, ValidID, ID};
 
 use super::body::Body;
 
-/// [`Entry`] contains information related to an specific user entry
+/// [`Maple`] contains information related to an specific user entry
 #[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct Maple {
     /// The unique [`ID`] of certain entry.
@@ -37,27 +37,31 @@ impl Maple {
 #[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct ValidMapleID(ID);
 
-impl Display for ValidMapleID {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for ValidMapleID {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.inner())
     }
 }
 
-impl LowerHex for ValidMapleID {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::LowerHex for ValidMapleID {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:x}", self.inner())
     }
 }
 
-impl ValidMapleID {
+impl ValidID for ValidMapleID {
     /// exposes the inner [`ID`] of the [`Entry`]
     #[must_use]
-    pub const fn inner(&self) -> &ID {
+    fn inner(&self) -> &ID {
         &self.0
+    }
+
+    fn into_id(self) -> ID {
+        self.0
     }
 }
 
-impl IDGiver for Maple {
+impl Unique for Maple {
     type Valid = ValidMapleID;
 
     fn id(&self) -> &Self::Valid {
@@ -69,8 +73,8 @@ impl IDGiver for Maple {
     }
 }
 
-impl Display for Maple {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for Maple {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.body())
     }
 }

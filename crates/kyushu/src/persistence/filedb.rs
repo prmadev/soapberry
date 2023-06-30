@@ -1,7 +1,10 @@
 //! file db
 use std::{collections::HashMap, path::PathBuf};
 
-use redmaple::{id::ID, EventRepo, RedMaple};
+use redmaple::{
+    id::{ValidID, ID},
+    EventRepo, RedMaple,
+};
 use whirlybird::journey::{EventWrapper, IDGetterError, ValidMapleID};
 
 /// [`FileDB`] is a the implementation of file based local [`RedMapleRepo`]

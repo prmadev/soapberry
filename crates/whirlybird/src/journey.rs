@@ -13,8 +13,8 @@ pub use event::*;
 use crate::journey::event::ValidEventID;
 
 use redmaple::{
-    event_group::EventGroup,
-    id::{IDGiver, ID},
+    event_group::EventKind,
+    id::{Unique, ValidID, ID},
     RedMaple,
 };
 
@@ -85,19 +85,15 @@ impl Ord for EventWrapper {
     }
 }
 
-impl EventGroup for EventWrapper {
-    type EventGroupError = DomainError;
-
-    fn id(&self) -> &ID {
-        self.event_id().inner()
-    }
+impl EventKind for EventWrapper {
+    type EventKindError = DomainError;
 
     fn time(&self) -> &time::OffsetDateTime {
         &self.time
     }
 }
 
-impl IDGiver for EventWrapper {
+impl Unique for EventWrapper {
     type Valid = event::ValidEventID;
 
     fn id(&self) -> &Self::Valid {
@@ -123,15 +119,20 @@ pub enum Event {
 #[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct ValidJourneyID(ID);
 
-impl ValidJourneyID {
+impl ValidID for ValidJourneyID {
     /// exposes the inner [`ID`] of the [`Journey`]
     #[must_use]
-    pub const fn inner(&self) -> &ID {
+    fn inner(&self) -> &ID {
         &self.0
+    }
+
+    /// exposes the inner [`ID`] of the [`Journey`]
+    fn into_id(self) -> ID {
+        self.0
     }
 }
 
-impl IDGiver for Journey {
+impl Unique for Journey {
     type Valid = ValidJourneyID;
 
     fn id(&self) -> &Self::Valid {

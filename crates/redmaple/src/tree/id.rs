@@ -1,4 +1,4 @@
-use std::fmt::{Display, LowerHex};
+use std::fmt;
 
 /// The Implementation of the ID that the crate uses
 #[derive(
@@ -15,14 +15,14 @@ use std::fmt::{Display, LowerHex};
 )]
 pub struct ID(i128);
 
-impl Display for ID {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for ID {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
     }
 }
 
-impl LowerHex for ID {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::LowerHex for ID {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:x}", self.0)
     }
 }
@@ -41,10 +41,18 @@ impl ID {
     }
 }
 
+/// a valid ID form
+pub trait ValidID: Clone {
+    /// returns a refrence to the inner ID
+    fn inner(&self) -> &ID;
+    /// turns itself into ID
+    fn into_id(self) -> ID;
+}
+
 /// Any object that implements this type can turn into id
-pub trait IDGiver {
+pub trait Unique {
     /// valid ID type for the specific item
-    type Valid: Clone;
+    type Valid: ValidID;
     /// Returns a refrence to the underlying [`ID`]
     fn id(&self) -> &Self::Valid;
     /// Consumes self into its underlying [`ID`]

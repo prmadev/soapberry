@@ -1,27 +1,29 @@
 //! [`body`] module contains information about the text body of an entry
 
-use std::fmt::Display;
+use std::fmt;
 
 use redmaple::RedMaple;
 
-use crate::journey::EventWrapper;
+use crate::journey::{Event, EventWrapper};
 
 /// `Body` is a wrapper around simple [`String`] to ensure that the text alway follows the domain rules
-#[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Default)]
-pub struct Body(String);
+#[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
+pub enum Body {
+    /// A simple line text that should probably take only one line  
+    OneLineText(String),
+}
 
-impl Body {
-    /// the inner string of [`Body`]
-    #[must_use]
-    pub const fn inner(&self) -> &String {
-        &self.0
+impl Default for Body {
+    fn default() -> Self {
+        Self::OneLineText(String::default())
     }
+}
 
-    /// Return the inner string of [`Body`] and consumes itself in the process
-    #[must_use]
-    #[allow(clippy::missing_const_for_fn)] // currently a destructor method cannot be const
-    pub fn into_inner(self) -> String {
-        self.0
+impl fmt::Display for Body {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::OneLineText(t) => write!(f, "{t}"),
+        }
     }
 }
 
@@ -35,12 +37,6 @@ pub enum BuildingError {
     TextCannotBeEmpty,
 }
 
-impl Display for Body {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.inner())
-    }
-}
-
 impl TryFrom<String> for Body {
     type Error = BuildingError;
 
@@ -49,7 +45,7 @@ impl TryFrom<String> for Body {
             return Err(BuildingError::TextCannotBeEmpty);
         };
 
-        Ok(Self(value))
+        Ok(Self::OneLineText(value))
     }
 }
 
@@ -60,8 +56,8 @@ impl From<RedMaple<EventWrapper>> for Body {
             .iter()
             .map(EventWrapper::data)
             .fold(Self::default(), |_accu, event| match event {
-                crate::journey::Event::MapleCreated(m) => m.body().clone(),
-                crate::journey::Event::MapleBodyUpdated(_, b) => b.clone(),
+                Event::MapleCreated(m) => m.body().clone(),
+                Event::MapleBodyUpdated(_, b) => b.clone(),
             })
     }
 }

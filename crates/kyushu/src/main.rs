@@ -39,8 +39,8 @@ use kyushu::{
     persistence::{self, EventRepoError},
 };
 use redmaple::{
-    event_group::EventGroup,
-    id::{IDGiver, ID},
+    event_group::EventKind,
+    id::{Unique, ValidID, ID},
     EventRepo, RedMaple,
 };
 use thiserror::Error;

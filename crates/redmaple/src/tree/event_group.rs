@@ -6,17 +6,13 @@
 
 use std::error::Error;
 
-use crate::id::ID;
+use crate::id::Unique;
 
 /// [`EventGroup`] trait describes the behavior of an event.
 /// Specific implementaiton is not defined here
-pub trait EventGroup {
-    /// Errors related to [`EventGroup`]
-    type EventGroupError: Error;
-
-    /// returns the a reference to the inner [`ID`] of the event
-    #[must_use]
-    fn id(&self) -> &ID;
+pub trait EventKind: Unique {
+    /// Errors related to [`EventKind`]
+    type EventKindError: Error;
 
     /// returns the time of the time that that event happened at
     #[must_use]

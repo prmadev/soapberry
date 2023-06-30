@@ -4,3 +4,6 @@ pub use body::*;
 
 pub mod maple;
 pub use maple::*;
+
+pub mod link;
+pub use link::*;
