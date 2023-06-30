@@ -2,7 +2,6 @@
 use std::{collections::HashMap, path::PathBuf};
 
 use redmaple::{id::ID, EventRepo, RedMaple};
-use walkdir::WalkDir;
 use whirlybird::journey::{EventWrapper, IDGetterError, ValidMapleID};
 
 /// [`FileDB`] is a the implementation of file based local [`RedMapleRepo`]
@@ -21,7 +20,8 @@ impl TryFrom<PathBuf> for FileDB {
         }
 
         // read the directory for files
-        let events = WalkDir::new(&path_to_rep)
+        let events = std::fs::read_dir(&path_to_rep)
+            .map_err(RebuildError::CouldNotReadTheDirectory)?
             .into_iter()
             .filter_map(Result::ok) // filter those that are ok
             .map(redmaple_from_file)
@@ -71,6 +71,10 @@ pub enum RebuildError {
     /// ID of redmaple could not be read
     #[error("got error processing files {0:?}")]
     CouldNotGetTheIDRedmaple(IDGetterError),
+
+    /// Could not read directory
+    #[error("failed to read the directory")]
+    COuldNOtReadDirectory(std::io::Error),
 }
 
 impl EventRepo for FileDB {
@@ -153,7 +157,7 @@ pub enum EventRepoError {
 
 #[allow(clippy::needless_pass_by_value)] // the value is not being used any further in the original function
 fn redmaple_from_file(
-    value: walkdir::DirEntry,
+    value: std::fs::DirEntry,
 ) -> Result<Option<RedMaple<EventWrapper>>, FromFileError> {
     if !value.path().extension().map_or(false, |e| e == "json") {
         return Ok(None);

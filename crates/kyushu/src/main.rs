@@ -34,7 +34,7 @@ use kyushu::{
     cli::{Args, MaplePrinter},
     config::{Config, InputInfo},
     domain::requests::{Change, Request},
-    persistence,
+    persistence::{self, EventRepoError},
 };
 use redmaple::{
     event_group::EventGroup,
@@ -43,7 +43,7 @@ use redmaple::{
 };
 use thiserror::Error;
 use time::format_description;
-use whirlybird::journey::{Body, Event, EventWrapper, ValidMapleID};
+use whirlybird::journey::{self, Body, Event, EventWrapper, ValidMapleID};
 
 fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
@@ -135,10 +135,7 @@ fn list_entries(repo: &persistence::FileDB) -> Result<(), color_eyre::Report> {
     Ok(())
 }
 
-fn create_maple(
-    repo: &persistence::FileDB,
-    mpl: whirlybird::journey::Maple,
-) -> Result<(), color_eyre::Report> {
+fn create_maple(repo: &persistence::FileDB, mpl: journey::Maple) -> Result<(), color_eyre::Report> {
     let created_time = time::OffsetDateTime::now_utc();
     repo.save(RedMaple::new(vec![EventWrapper::new(
         mpl.id().inner().clone(),
@@ -156,17 +153,18 @@ fn update_maple(
     let rdmpl = match repo.redmaple_matching_id(maple_id) {
         Ok(o) => o.clone(),
         Err(e) => match e {
-            persistence::EventRepoError::CouldNotFindTheEventWithThatID => {
+            EventRepoError::CouldNotFindTheEventWithThatID => {
                 match repo.redmaple_similar_id(maple_id) {
                     Ok(o) => o.clone(),
                     Err(er) => return Err(er)?,
                 }
             }
-            persistence::EventRepoError::CouldNotSerialize(e) => return Err(e)?,
-            persistence::EventRepoError::CouldNotCreateNewFile(e)
-            | persistence::EventRepoError::CouldNotWriteIntoFile(e) => return Err(e)?,
-            persistence::EventRepoError::IDGettingFailed(e) => return Err(e)?,
-            persistence::EventRepoError::MultipleItemsFound(e) => {
+            EventRepoError::CouldNotSerialize(e) => return Err(e)?,
+            EventRepoError::CouldNotCreateNewFile(e) | EventRepoError::CouldNotWriteIntoFile(e) => {
+                return Err(e)?
+            }
+            EventRepoError::IDGettingFailed(e) => return Err(e)?,
+            EventRepoError::MultipleItemsFound(e) => {
                 return Err(color_eyre::Report::msg(format!("{e:#?}")))?
             }
         },
