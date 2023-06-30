@@ -46,7 +46,7 @@ pub trait ValidID: Clone {
     /// returns a refrence to the inner ID
     fn inner(&self) -> &ID;
     /// turns itself into ID
-    fn into_id(self) -> ID;
+    fn into_inner(self) -> ID;
 }
 
 /// Any object that implements this type can turn into id

@@ -15,7 +15,7 @@ impl ValidID for ValidEventID {
 
     /// exposes the inner [`ID`] of the [`JournalEvent`]
     #[must_use]
-    fn into_id(self) -> ID {
+    fn into_inner(self) -> ID {
         self.0
     }
 }

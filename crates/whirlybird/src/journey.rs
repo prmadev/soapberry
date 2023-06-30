@@ -127,7 +127,7 @@ impl ValidID for ValidJourneyID {
     }
 
     /// exposes the inner [`ID`] of the [`Journey`]
-    fn into_id(self) -> ID {
+    fn into_inner(self) -> ID {
         self.0
     }
 }

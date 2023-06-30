@@ -56,7 +56,7 @@ impl ValidID for ValidMapleID {
         &self.0
     }
 
-    fn into_id(self) -> ID {
+    fn into_inner(self) -> ID {
         self.0
     }
 }
