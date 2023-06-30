@@ -65,13 +65,13 @@ impl TryFrom<PathBuf> for Config {
     }
 }
 
-/// Errors that arise when converting [`PathBuf`] to [`Config`]
+/// Errors that can occur during the conversion of [`PathBuf`] to [`Config`].
 #[derive(Debug, thiserror::Error)]
 pub enum FileGenerationError {
-    /// This error indicates that it could not read the file
-    #[error("could not read file{0}")]
-    CouldNotReadFile(#[from] std::io::Error),
-    /// This error indicates that config file could not be parsed
-    #[error("could not read file{0}")]
-    ParsingConfigFileFailed(#[from] serde_json::Error),
+    /// Indicates that the file could not be read.
+    #[error("Failed to read the file: {0}")]
+    FailedToReadFile(#[from] std::io::Error),
+    /// Indicates that the configuration file could not be parsed.
+    #[error("Failed to parse the configuration file: {0}")]
+    FailedToParseConfigFile(#[from] serde_json::Error),
 }

@@ -19,15 +19,20 @@ impl TryFrom<PathBuf> for FileDB {
             return Err(RebuildError::GivenPathDoesNotExit);
         }
 
-        // read the directory for files
-        let events = std::fs::read_dir(&path_to_rep)
+        // Read the directory for files
+        let events = std::fs::read_dir(&path_to_rep) // create a directory reader
+            //then mapping the error of directory reading
             .map_err(RebuildError::CouldNotReadTheDirectory)?
+            // filtering all the items that are not ok
             .filter_map(Result::ok) // filter those that are ok
+            // creating a redmaple from each file
             .map(redmaple_from_file)
+            // then filtering all those that are not redmaples
             .filter_map(|x| match x {
                 Ok(o) => match o {
                     Some(rm) => match ValidMapleID::try_from(&rm) {
                         Ok(i) => Some(Ok((i.inner().clone(), rm))),
+                        // then for invalid redmaples
                         Err(ers) => Some(Err(RebuildError::CouldNotGetTheIDRedmaple(ers))),
                     },
                     None => None,

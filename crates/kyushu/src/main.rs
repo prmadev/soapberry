@@ -108,6 +108,22 @@ fn main() -> color_eyre::Result<()> {
     Ok(())
 }
 
+/// Retrieves a collection of events from the given `persistence::FileDB` repository,
+/// sorts them based on their timestamps, and prints formatted representations of each event
+/// using a `MaplePrinter`.
+///
+/// # Arguments
+///
+/// * `repo` - A reference to a `persistence::FileDB` object representing the repository
+///            from which the events are retrieved.
+///
+/// # Returns
+///
+/// This function returns a `Result<(), color_eyre::Report>` indicating success or failure.
+/// - If successful, `Ok(())` is returned.
+/// - If an error occurs during the retrieval, sorting, or printing process, an `Err` variant
+///   containing a `color_eyre::Report` is returned.
+///
 fn list_entries(repo: &persistence::FileDB) -> Result<(), color_eyre::Report> {
     let mut redmaples = repo.all_events()?.values().collect::<Vec<_>>();
 
