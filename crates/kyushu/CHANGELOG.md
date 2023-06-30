@@ -517,6 +517,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0](https://github.com/amirography/soapberry/compare/kyushu-v0.11.0...kyushu-v0.12.0) - 2023-06-30
+
+### Added
+- add no_unsafe_code gurantee
+
+### Other
+- git merge conflict resolution
+- do not rely on external libraries for finding the config directory
+- prune serde feature of time package
+- reduce dependency by removing walkdir and using std::fs
+
 ## [0.11.0](https://github.com/amirography/soapberry/compare/kyushu-v0.10.0...kyushu-v0.11.0) - 2023-06-26
 
 ### Added
