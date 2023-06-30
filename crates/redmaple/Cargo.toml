@@ -18,7 +18,7 @@ filter_unconventional = true
 
 [dependencies]
 serde = { version = "1.0.164", features = ["derive"] }
-time = { version = "0.3.22", features = ["serde"] }
+time = { version = "0.3.22" }
 
 [dev-dependencies]
 thiserror = "1.0.40"

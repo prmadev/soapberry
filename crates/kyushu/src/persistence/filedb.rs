@@ -22,7 +22,6 @@ impl TryFrom<PathBuf> for FileDB {
         // read the directory for files
         let events = std::fs::read_dir(&path_to_rep)
             .map_err(RebuildError::CouldNotReadTheDirectory)?
-            .into_iter()
             .filter_map(Result::ok) // filter those that are ok
             .map(redmaple_from_file)
             .filter_map(|x| match x {
