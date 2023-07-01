@@ -1,4 +1,4 @@
-//! Kyushu lib stores information about the logic and inner workings of kyushu
+//! Kyushu library - Stores information and logic related to Kyushu.
 
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]

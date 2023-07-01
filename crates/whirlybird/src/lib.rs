@@ -1,8 +1,14 @@
-//! `whirlybird` is a library of generic type implementations for [`RedMaple`](https://crates.io/crates/redmaple) library, that offers workflows for different events compatible with common contents like todos, blogs and etc.
+//! Whirlybird - A Fun and Dynamic Library for RedMaple-based Workflows
 //!
-//! `whirlybird` is still in its infancy. And for now, at least, it is not fully formed.
-//! There is a 100% certainty that if I can, I will strip away some items in it.
-//! So please, do not use it for now. Version numbering will tell you if things got stabilised.
+//! Welcome to the world of Whirlybird, a library of generic type implementations designed to complement the powerful [`RedMaple`](https://crates.io/crates/redmaple) library. Whirlybird offers a delightful array of workflows tailored for common content types like todos, blogs, and more!
+//!
+//! But hold on tight, because Whirlybird is still in its infancy. It's a vibrant and evolving project that's constantly growing and transforming. As the creator, I have an insatiable urge to experiment and refine, which means there's a 100% certainty that I'll be trimming and reshaping this library along the way.
+//!
+//! So, for now, I kindly ask you not to use Whirlybird in production just yet. But fear not! The version numbering will be your trusty guide, indicating when things have stabilized and Whirlybird is ready to soar.
+//!
+//! Join me on this exciting journey as we unleash the power of Whirlybird and create captivating workflows that will leave you spinning with joy!
+//!
+//! 🚀✨
 //!
 
 #![forbid(unsafe_code)]

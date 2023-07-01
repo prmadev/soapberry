@@ -1,19 +1,15 @@
-//! configurations
-
-//
-// # type declaration
-//
+//! Configurations Management
 
 use std::{fs, path::PathBuf};
 
-/// the Configuration of the program.
+/// Represents the configuration of the program.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Config {
-    /// [`file_store`] holds the absolute path to the repo.
+    /// Holds the absolute path to the repository.
     pub file_store: Option<PathBuf>,
 }
 
-/// holder for inputs of different format
+/// Holder for inputs in different formats.
 #[derive(Debug, Clone)]
 pub struct InputInfo {
     args: Option<crate::cli::Args>,
@@ -21,16 +17,12 @@ pub struct InputInfo {
 }
 
 impl InputInfo {
-    /// Creates a new input Info
+    /// Creates a new instance of InputInfo.
     #[must_use]
     pub const fn new(args: Option<crate::cli::Args>, file: Option<Config>) -> Self {
         Self { args, file }
     }
 }
-
-//
-// # implementations
-//
 
 impl From<InputInfo> for Config {
     fn from(value: InputInfo) -> Self {
@@ -65,7 +57,7 @@ impl TryFrom<PathBuf> for Config {
     }
 }
 
-/// Errors that can occur during the conversion of [`PathBuf`] to [`Config`].
+/// Errors that can occur during the conversion of `PathBuf` to `Config`.
 #[derive(Debug, thiserror::Error)]
 pub enum FileGenerationError {
     /// Indicates that the file could not be read.
