@@ -1,4 +1,4 @@
-//! messages hold the differnet messages that are passed through the system.
+//! This package encompasses the various messages that are transmitted throughout the system.
 
 mod change;
 mod information;
@@ -6,16 +6,10 @@ mod information;
 pub use change::*;
 pub use information::*;
 
-//
-// # type declaration
-//
-
-/// Valid [`Request`]s that can be made to the system
+/// Represents valid requests that can be made to the system.
 pub enum Request {
-    /// A request for change in data.
-    /// this is similar to commands in CQRS
+    /// A request to modify data, akin to commands in the CQRS pattern.
     Change(Change),
-    /// A request for information.
-    /// this is similar to queries in CQRS
+    /// A request to retrieve information, akin to queries in the CQRS pattern.
     Information(Information),
 }

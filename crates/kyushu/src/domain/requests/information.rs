@@ -1,11 +1,7 @@
-//! queries are the types that form a request for information from system
+//! Module responsible for handling queries, which are types used to request information from the system.
 
-//
-// # type declaration
-//
-
-/// information that can be extracted
+/// Represents various types of information that can be extracted from the system.
 pub enum Information {
-    /// a list of entries, sorted by the first to the last.
+    /// Request to retrieve a list of entries, sorted from first to last.
     ListEntries,
 }

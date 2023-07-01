@@ -182,18 +182,18 @@ fn update_maple(
     let rdmpl = match repo.redmaple_matching_id(maple_id) {
         Ok(o) => o.clone(),
         Err(e) => match e {
-            EventRepoError::CouldNotFindTheEventWithThatID => {
+            EventRepoError::FailedToFindTheEventWithThatID => {
                 match repo.redmaple_similar_id(maple_id) {
                     Ok(o) => o.clone(),
                     Err(er) => return Err(er)?,
                 }
             }
-            EventRepoError::CouldNotSerialize(e) => return Err(e)?,
-            EventRepoError::CouldNotCreateNewFile(e) | EventRepoError::CouldNotWriteIntoFile(e) => {
+            EventRepoError::FailedToSerialize(e) => return Err(e)?,
+            EventRepoError::FailedToCreateNewFile(e) | EventRepoError::FailedToWriteIntoFile(e) => {
                 return Err(e)?
             }
-            EventRepoError::IDGettingFailed(e) => return Err(e)?,
-            EventRepoError::MultipleItemsFound(e) => {
+            EventRepoError::FailedToGetID(e) => return Err(e)?,
+            EventRepoError::FailedToFindASingleMatchingItem(e) => {
                 return Err(color_eyre::Report::msg(format!("{e:#?}")))?
             }
         },

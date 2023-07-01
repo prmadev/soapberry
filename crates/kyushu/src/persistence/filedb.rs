@@ -1,4 +1,4 @@
-//! file db
+//! This module provides the FileDB implementation, which serves as a plaintext persistence layer for redmaple.
 use std::{collections::HashMap, path::PathBuf};
 
 use redmaple::{
@@ -7,7 +7,7 @@ use redmaple::{
 };
 use whirlybird::journey::{EventWrapper, IDGetterError, ValidMapleID};
 
-/// [`FileDB`] is a the implementation of file based local [`RedMapleRepo`]
+/// Represents the FileDB implementation, which is a file-based local RedMaple repository.
 #[derive(Debug, Clone)]
 pub struct FileDB {
     events: std::collections::HashMap<ID, RedMaple<EventWrapper>>,
@@ -19,7 +19,7 @@ impl TryFrom<PathBuf> for FileDB {
 
     fn try_from(path_to_rep: PathBuf) -> Result<Self, Self::Error> {
         if !path_to_rep.exists() {
-            return Err(RebuildError::GivenPathDoesNotExit);
+            return Err(RebuildError::GivenPathDoesNotExist);
         }
 
         // Read the directory for files
@@ -59,12 +59,12 @@ impl TryFrom<PathBuf> for FileDB {
     }
 }
 
-/// errors that can can arsie whene rebuilding information from files
+/// Represents errors that can occur during rebuilding information from files.
 #[derive(Debug, thiserror::Error)]
 pub enum RebuildError {
     /// if a path is not given
     #[error("the given path does not exist")]
-    GivenPathDoesNotExit,
+    GivenPathDoesNotExist,
 
     /// indicates that the file at the given address does not exist.
     /// this should not happen.
@@ -81,7 +81,7 @@ pub enum RebuildError {
 
     /// Could not read directory
     #[error("failed to read the directory")]
-    COuldNOtReadDirectory(std::io::Error),
+    CouldNotReadDirectory(std::io::Error),
 }
 
 impl EventRepo for FileDB {
@@ -92,7 +92,7 @@ impl EventRepo for FileDB {
     fn redmaple_matching_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
         self.events
             .get(id)
-            .ok_or(EventRepoError::CouldNotFindTheEventWithThatID)
+            .ok_or(EventRepoError::FailedToFindTheEventWithThatID)
     }
 
     fn redmaple_similar_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
@@ -104,17 +104,17 @@ impl EventRepo for FileDB {
             .collect();
 
         if finding.len() != 1 {
-            return Err(EventRepoError::MultipleItemsFound(
+            return Err(EventRepoError::FailedToFindASingleMatchingItem(
                 finding.into_iter().map(std::clone::Clone::clone).collect(),
             ));
         }
         let idfounded = finding
             .first()
-            .ok_or(EventRepoError::CouldNotFindTheEventWithThatID)?;
+            .ok_or(EventRepoError::FailedToFindTheEventWithThatID)?;
 
         self.events
             .get(idfounded)
-            .ok_or(EventRepoError::CouldNotFindTheEventWithThatID)
+            .ok_or(EventRepoError::FailedToFindTheEventWithThatID)
     }
 
     fn all_events(&self) -> Result<&HashMap<ID, RedMaple<Self::Item>>, Self::EventError> {
@@ -127,39 +127,39 @@ impl EventRepo for FileDB {
             .join(format!("{}.json", ValidMapleID::try_from(&item)?.inner()));
 
         let s = serde_json::to_string_pretty(&item)
-            .map_err(EventRepoError::CouldNotSerialize)?
+            .map_err(EventRepoError::FailedToSerialize)?
             .into_bytes();
 
-        std::fs::write(file_path, s).map_err(EventRepoError::CouldNotWriteIntoFile)
+        std::fs::write(file_path, s).map_err(EventRepoError::FailedToWriteIntoFile)
     }
 }
 
 /// Errors related to the implementation of [`EventRepo`] trait for the [`FileDB`]
 #[derive(thiserror::Error, Debug)]
 pub enum EventRepoError {
-    /// Could not find a particular item
+    /// Failed to find the requested item.
     #[error("could not find item")]
-    CouldNotFindTheEventWithThatID,
+    FailedToFindTheEventWithThatID,
 
-    /// could not serialize a given data
+    /// Failed to serialize the given data.
     #[error("couldn not serialize: {0}")]
-    CouldNotSerialize(#[from] serde_json::Error),
+    FailedToSerialize(#[from] serde_json::Error),
 
-    /// for some reason the file could not be created
+    /// Failed to create a new file.
     #[error("could not create new file: {0}")]
-    CouldNotCreateNewFile(std::io::Error),
+    FailedToCreateNewFile(std::io::Error),
 
-    /// for some reason the file could not be write into
+    /// Failed to write data into the file.
     #[error("could write data into file: {0}")]
-    CouldNotWriteIntoFile(std::io::Error),
+    FailedToWriteIntoFile(std::io::Error),
 
-    /// could not get id from event repo
+    /// Failed to retrieve the ID from the event repository.
     #[error("could not get event redmaple id: {0}")]
-    IDGettingFailed(#[from] IDGetterError),
+    FailedToGetID(#[from] IDGetterError),
 
-    /// could not get id from event repo
+    /// Multiple items with the same ID were found.
     #[error("multiple items found: {0:?}")]
-    MultipleItemsFound(Vec<ID>),
+    FailedToFindASingleMatchingItem(Vec<ID>),
 }
 
 #[allow(clippy::needless_pass_by_value)] // the value is not being used any further in the original function
@@ -171,18 +171,18 @@ fn redmaple_from_file(
     }
 
     Ok(Some(serde_json::from_slice::<RedMaple<EventWrapper>>(
-        &std::fs::read(value.path()).map_err(FromFileError::FileNotReadable)?,
+        &std::fs::read(value.path()).map_err(FromFileError::FileReadFailed)?,
     )?))
 }
 
-/// failiure in converting `DirEntry` to to `RedMaple`
+/// Error that occurs during the conversion from `DirEntry` to `RedMaple`.
 #[derive(thiserror::Error, Debug)]
 pub enum FromFileError {
-    /// Not a Json file
-    #[error("could not read the content of the file: {0}")]
-    FileNotReadable(std::io::Error),
+    /// The file content could not be read.
+    #[error("failed to read the content of the file: {0}")]
+    FileReadFailed(std::io::Error),
 
-    /// could not serialize a given data
-    #[error("couldn not serialize: {0}")]
-    CouldNotSerialize(#[from] serde_json::Error),
+    /// Failed to serialize the given data.
+    #[error("failed to serialize data: {0}")]
+    SerializationFailed(#[from] serde_json::Error),
 }

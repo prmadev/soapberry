@@ -1,17 +1,14 @@
-//! commands hold the formal message that goes through the system
+//! Module responsible for handling formal messages within the system.
 
 use redmaple::id::ID;
-use whirlybird::journey::{entity::maple::Maple, Body};
+use whirlybird::journey::entity::maple::Maple;
+use whirlybird::journey::Body;
 
-//
-// # type declaration
-//
-
-/// changes that can be made
+/// Represents various changes that can be made within the system.
 #[derive(Debug, Clone)]
 pub enum Change {
-    /// creating a new remaple
+    /// Command to create a new maple entity.
     CreateNewMaple(Maple),
-    /// updates the body of a maple
+    /// Command to update the body of a maple entity.
     UpdateMapleBody(ID, Body),
 }

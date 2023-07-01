@@ -8,10 +8,6 @@ use whirlybird::journey::{Body, Maple};
 
 use crate::domain::requests::{Change, Information, Request};
 
-//
-// # type declaration
-//
-
 /// interpretations of valid arguments given to the program
 #[derive(clap::Parser, Debug, Clone, PartialEq, Eq)]
 #[command(author)]
@@ -28,10 +24,6 @@ pub struct Args {
     #[arg(short, long)]
     pub file_store: Option<PathBuf>,
 }
-
-//
-// # implementations
-//
 
 impl TryFrom<ArgsOs> for Args {
     type Error = ArgFromArgOSError;
@@ -97,46 +89,38 @@ pub enum ArgToDomainRequestError {
     TimeOffsetCouldNotBeGet(time::error::IndeterminateOffset),
 }
 
-//
-// # type declaration
-//
-
-/// Commands that can be given to the program as argument
+/// Program arguments for issuing commands.
 #[derive(clap::Subcommand, Debug, Clone, PartialEq, Eq)]
 pub enum Commands {
-    /// operations that happen to the [`Maple`]
-    /// a [`Maple`] is the structure that holds a [`Body`]
-    /// similar to an entry.
+    /// Operations performed on a maple structure.
+    /// A maple serves as the container for events,
+    /// analogous to an entry, but expressed in the form of events rather than state.
     #[command(subcommand)]
     Maple(MapleCommands),
 }
 
-//
-// # type declaration
-//
-
-/// commands that come after [`maple`]
+/// Commands related to maple operations.
 #[derive(clap::Subcommand, Debug, Clone, PartialEq, Eq)]
 pub enum MapleCommands {
-    /// creates a new [`maple`]
+    /// Creates a new maple.
     #[command(arg_required_else_help = true)]
     New {
         #[arg(value_name = "CONTENT")]
-        /// content of the body of the [`maple`] [`Body`]
+        /// Content of the body of the maple's Body
         content: String,
     },
 
-    /// lists all the maples
+    /// Lists all the maples.
     List,
 
-    /// updates the [`Body`]
+    /// Updates the Body of a maple.
     #[command(arg_required_else_help = true)]
     Update {
-        /// ID of the maple that its body is being updated
+        /// ID of the maple for which the body is being updated.
         #[arg(value_name = "Maple ID")]
         maple_id: i128,
         #[arg(value_name = "Body")]
-        /// content of the body of the [`maple`] [`Body`]
+        /// Content of the body of the maple's Body.
         content: String,
     },
 }
