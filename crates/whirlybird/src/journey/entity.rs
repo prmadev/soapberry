@@ -1,4 +1,5 @@
-//! Entities that make up a the structure of events
+//! Welcome to the realm of entities, where the structure of events takes shape.
+
 pub mod body;
 pub use body::*;
 

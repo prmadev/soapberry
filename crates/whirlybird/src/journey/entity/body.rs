@@ -1,4 +1,4 @@
-//! [`body`] module contains information about the text body of an entry
+//! Welcome to the fascinating realm of the [`body`] module, where profound insights into the text body of an entry await.
 
 use std::fmt;
 
@@ -6,10 +6,11 @@ use redmaple::RedMaple;
 
 use crate::journey::{Event, EventWrapper};
 
-/// `Body` is a wrapper around simple [`String`] to ensure that the text alway follows the domain rules
+/// Behold the profound essence of the `Body`, the sacred vessel
+/// that encapsulates the diverse manifestations of description and the very essence of an entry's main point.
 #[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub enum Body {
-    /// A simple line text that should probably take only one line  
+    /// Prepare yourself for the simplicity embodied in the OneLineText variant, where a mere single line of text resides.
     OneLineText(String),
 }
 
@@ -27,13 +28,13 @@ impl fmt::Display for Body {
     }
 }
 
-/// errors that may arise while making a [`Title`]
+/// Let us venture into the realm of potential errors that may emerge during the creation of a [body], where mysteries of existence unravel.
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum BuildingError {
-    /// the body text should have other characters.
-    /// in case you are looking for not adding a [`Body`] wrap it in `Option<Body>` and return
-    /// [`Option::None`]
-    #[error("the body text should have other characters")]
+    /// Reflect upon the wisdom bestowed upon us, for it is decreed that the body text should not be devoid of characters.
+    /// In the event that you seek to abstain from adorning the body with a [Body] wrap,
+    /// contemplate enshrining it within the sanctity of Option<Body> and bestowing upon the world [Option::None].
+    #[error("The body text must contain characters to effectively convey the intricacies of the topic at hand.")]
     TextCannotBeEmpty,
 }
 
