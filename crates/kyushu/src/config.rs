@@ -17,7 +17,7 @@ pub struct InputInfo {
 }
 
 impl InputInfo {
-    /// Creates a new instance of InputInfo.
+    /// Creates a new instance of `InputInfo`.
     #[must_use]
     pub const fn new(args: Option<crate::cli::Args>, file: Option<Config>) -> Self {
         Self { args, file }
