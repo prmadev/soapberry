@@ -1,4 +1,4 @@
-//! This module provides the FileDB implementation, which serves as a plaintext persistence layer for redmaple.
+//! This module provides the `FileDB` implementation, which serves as a plaintext persistence layer for redmaple.
 use std::{collections::HashMap, path::PathBuf};
 
 use redmaple::{
@@ -7,7 +7,7 @@ use redmaple::{
 };
 use whirlybird::journey::{EventWrapper, IDGetterError, ValidMapleID};
 
-/// Represents the FileDB implementation, which is a file-based local RedMaple repository.
+/// Represents the `FileDB` implementation, which is a file-based local `RedMaple` repository.
 #[derive(Debug, Clone)]
 pub struct FileDB {
     events: std::collections::HashMap<ID, RedMaple<EventWrapper>>,
