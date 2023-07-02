@@ -50,8 +50,8 @@ impl TryFrom<String> for Body {
     }
 }
 
-impl From<RedMaple<EventWrapper>> for Body {
-    fn from(value: RedMaple<EventWrapper>) -> Self {
+impl From<&RedMaple<EventWrapper>> for Body {
+    fn from(value: &RedMaple<EventWrapper>) -> Self {
         value
             .events()
             .iter()

@@ -72,6 +72,16 @@ impl Args {
                 MapleCommands::Update { content, maple_id } => Ok(Request::Change(
                     Change::UpdateMapleBody(ID::from(maple_id), Body::try_from(content)?),
                 )),
+
+                MapleCommands::Link {
+                    maple_from,
+                    maple_to,
+                    explanation,
+                } => Ok(Request::Change(Change::AddLinkToMaple {
+                    from: maple_from.into(),
+                    to: maple_to.into(),
+                    why: explanation,
+                })),
             },
         }
     }
@@ -123,4 +133,25 @@ pub enum MapleCommands {
         /// Content of the body of the maple's Body.
         content: String,
     },
+
+    /// links a maple to another
+    Link {
+        /// ID of the maple which we are linking from.
+        #[arg(value_name = "Maple ID Of Origin")]
+        maple_from: i128,
+        /// ID of the maple which we are linking to.
+        #[arg(value_name = "Maple ID Of Target")]
+        maple_to: i128,
+        /// Why the link?
+        #[arg(value_name = "Why are you linking?")]
+        explanation: String,
+    },
+}
+
+/// Commands related to housing maples.
+#[derive(clap::Subcommand, Debug, Clone, PartialEq, Eq)]
+pub enum HouseCommands {
+    /// Creates a new house.
+    #[command(arg_required_else_help = true)]
+    New {},
 }

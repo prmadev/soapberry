@@ -4,13 +4,14 @@
 use std::fmt::Display;
 
 use owo_colors::OwoColorize;
-use whirlybird::journey::{Body, ValidMapleID};
+use whirlybird::journey::{Body, Link, ValidMapleID};
 
 /// Creates a new printer for each maple.
 pub struct MaplePrinter {
     id: ValidMapleID,
     body: Body,
     time_string: String,
+    links: Vec<Link>,
 }
 
 impl MaplePrinter {
@@ -24,6 +25,7 @@ impl MaplePrinter {
         body: Body,
         time_created: time::OffsetDateTime,
         time_format: &Vec<time::format_description::FormatItem<'_>>,
+        links: Vec<Link>,
     ) -> Result<Self, NewPrinterError> {
         let time_offset = time::UtcOffset::current_local_offset()?; // may be we should get this from higher up?
         let time_string = time_created.to_offset(time_offset).format(time_format)?;
@@ -32,6 +34,7 @@ impl MaplePrinter {
             id,
             body,
             time_string,
+            links,
         })
     }
 }
@@ -50,13 +53,23 @@ pub enum NewPrinterError {
 
 impl Display for MaplePrinter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let line = format!(
+            "{} {}\n{}",
+            self.time_string.bold().reversed(),
+            self.id.italic().reversed(),
+            self.body,
+        );
+
+        if self.links.is_empty() {
+            return write!(f, "{}\n", line);
+        }
+
         write!(
             f,
-            "{} {} {}\n {} \n",
-            self.time_string.bold().reversed(),
-            "=>".bold(),
-            self.body,
-            self.id.dimmed().italic()
+            "{}\n",
+            self.links
+                .iter()
+                .fold(line, |accu, f| format!("{accu}\n{}", f.dimmed()))
         )
     }
 }

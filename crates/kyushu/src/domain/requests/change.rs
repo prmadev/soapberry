@@ -11,4 +11,14 @@ pub enum Change {
     CreateNewMaple(Maple),
     /// Command to update the body of a maple entity.
     UpdateMapleBody(ID, Body),
+
+    /// Command to add a link to a maple to another maple.
+    AddLinkToMaple {
+        /// The origin maple.
+        from: ID,
+        /// The Maple we are pointing to.
+        to: ID,
+        /// the explanantion of linking
+        why: String,
+    },
 }

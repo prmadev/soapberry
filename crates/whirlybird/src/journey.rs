@@ -130,7 +130,7 @@ pub enum Event {
     MapleBodyUpdated(ValidMapleID, Body),
 
     /// Event: Represents the addition of a link between multiple [`Maple`]s.
-    LinkAdded(Vec<(ValidMapleID, Option<String>)>),
+    LinkAdded((ValidMapleID, String)),
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Journey`]

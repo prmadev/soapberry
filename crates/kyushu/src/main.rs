@@ -45,7 +45,7 @@ use redmaple::{
 };
 use thiserror::Error;
 use time::format_description;
-use whirlybird::journey::{self, Body, Event, EventWrapper, ValidMapleID};
+use whirlybird::journey::{self, Body, Event, EventWrapper, Links, ValidMapleID};
 
 fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
@@ -99,12 +99,26 @@ fn main() -> color_eyre::Result<()> {
             Change::UpdateMapleBody(maple_id, new_body) => {
                 update_maple(&repo, &maple_id, new_body)?;
             }
+            Change::AddLinkToMaple { from, to, why } => add_link(&repo, from, to, why)?,
         },
 
         Request::Information(i) => match i {
             kyushu::domain::requests::Information::ListEntries => list_entries(&repo)?,
         },
     };
+    Ok(())
+}
+
+fn add_link(
+    repo: &persistence::FileDB,
+    from: ID,
+    to: ID,
+    why: String,
+) -> Result<(), color_eyre::Report> {
+    let des = ValidMapleID::try_from(repo.redmaple_similar_id(&to)?)?;
+    let time_now = time::OffsetDateTime::now_utc();
+    let ev = EventWrapper::new(time_now.into(), time_now, Event::LinkAdded((des, why)));
+    repo.save(repo.redmaple_similar_id(&from)?.clone().into_appended(ev))?;
     Ok(())
 }
 
@@ -147,11 +161,12 @@ fn list_entries(repo: &persistence::FileDB) -> Result<(), color_eyre::Report> {
             MaplePrinter::new_with_local_offset(
                 ValidMapleID::try_from(rm)
                     .map_err(|er| format!("could nto create id for map{er}"))?,
-                Body::from(rm.clone()),
+                Body::from(rm),
                 *rm.time_created()
                     .ok_or("Could not find the time created".to_owned())?,
                 &format_description::parse("[year]-[month]-[day]:[hour]-[minute]-[second]")
                     .unwrap_or_default(),
+                Links::from(rm).0,
             )
             .map_err(|er| format!("could not create printer: {er}"))
         })
