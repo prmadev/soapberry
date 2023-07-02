@@ -115,10 +115,10 @@ fn add_link(
     to: &ID,
     why: String,
 ) -> Result<(), color_eyre::Report> {
-    let des = ValidMapleID::try_from(repo.redmaple_similar_id(&to)?)?;
+    let des = ValidMapleID::try_from(repo.redmaple_similar_id(to)?)?;
     let time_now = time::OffsetDateTime::now_utc();
     let ev = EventWrapper::new(time_now.into(), time_now, Event::LinkAdded((des, why)));
-    repo.save(repo.redmaple_similar_id(&from)?.clone().into_appended(ev))?;
+    repo.save(repo.redmaple_similar_id(from)?.clone().into_appended(ev))?;
     Ok(())
 }
 
