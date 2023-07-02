@@ -26,7 +26,7 @@ split_commits = true
 filter_unconventional = true
 
 [dependencies]
-clap = { version = "4.3.8", features = ["derive"] }
+clap = { version = "4.3.10", features = ["derive"] }
 color-eyre = "0.6.2"
 owo-colors = "3.5.0"
 redmaple = { version = "0.14.2", path = "../redmaple" }
