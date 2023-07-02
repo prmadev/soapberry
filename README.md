@@ -15,10 +15,10 @@
 </p>
 
 <p align="center">
-Journaling, in an event-driven way.
-
+Event-sourced libraries and binary for aggregating, shaping, and journaling, as inspired by the wisdom of maple trees.
 </p>
 
+## What of it
 
 ## Documentation
 <p align="center">
@@ -51,32 +51,40 @@ Journaling, in an event-driven way.
 
 ## Project Structure
 
-### Applications
+Welcome to the enchanting realm of Soapberry, a captivating GitHub repository that brings forth a trio of remarkable crates, each bearing the name of a majestic maple tree analogy.
+Within this repository, you will discover the boundless potential of event-driven systems, elegantly manifested through the Rust programming language.
+Together, these masterful creations of Soapberry invite you to embark on a journey of innovation and craftsmanship, crafting resilient and immersive event-driven architectures that resonate with the beauty and wisdom of maple trees
 
-#### [`crates/kyushu`](./crates/kyushu) :notebook_with_decorative_cover:
-<img alt="kyushu's license" src="https://img.shields.io/crates/l/kyushu?color=f4dbd6&label=license&style=flat-square"> ![Crates.io](https://img.shields.io/crates/v/kyushu?color=8bd5ca&label=version&logo=rust&logoColor=8bd5ca&style=flat-square)  
-
-A journaling client-server application
-which is based on contemplating on events being inside different journeys.
 
 ### Libraries
+
+#### [`crates/redmaple`](./crates/redmaple) :deciduous_tree: 
+<img alt="redmaple's license" src="https://img.shields.io/crates/l/redmaple?color=f4dbd6&label=license&style=flat-square"> ![Crates.io](https://img.shields.io/crates/v/redmaple?color=8bd5ca&label=version&logo=rust&logoColor=8bd5ca&style=flat-square)
+
+At the core of Soapberry lies RedMaple,
+a versatile and robust crate boasting a generic datatype specifically crafted to hold event aggregates with grace and efficiency.
 
 ####  [`crates/whirlybird`](./crates/whirlybird) :fallen_leaf:
 
 <img alt="whirlybird's license" src="https://img.shields.io/crates/l/whirlybird?color=f4dbd6&label=license&style=flat-square"> ![Crates.io](https://img.shields.io/crates/v/whirlybird?color=8bd5ca&label=version&logo=rust&logoColor=8bd5ca&style=flat-square)
 
-A set of implementations for `RedMaple`.
-this is where you can implement bussiness logics on top of `RedMaple`. 
+As RedMaple sets the stage, Whirlybird gracefully emerges, presenting a crate adorned with a rich assortment of domain logic tools.
+Through its wisdom, Whirlybird shapes and molds the events held within RedMaple, empowering developers to navigate the intricate nuances of event processing and transformation.
 
-#### [`crates/redmaple`](./crates/redmaple) :deciduous_tree: 
-<img alt="redmaple's license" src="https://img.shields.io/crates/l/redmaple?color=f4dbd6&label=license&style=flat-square"> ![Crates.io](https://img.shields.io/crates/v/redmaple?color=8bd5ca&label=version&logo=rust&logoColor=8bd5ca&style=flat-square)
 
-A very basic data-structure which is formed for
-holding **event-sourced** and **event-first** data. 
+### Applications
+
+#### [`crates/kyushu`](./crates/kyushu) :notebook_with_decorative_cover:
+<img alt="kyushu's license" src="https://img.shields.io/crates/l/kyushu?color=f4dbd6&label=license&style=flat-square"> ![Crates.io](https://img.shields.io/crates/v/kyushu?color=8bd5ca&label=version&logo=rust&logoColor=8bd5ca&style=flat-square)  
+
+Completing this exquisite trio is Kyushu, a local-first, event-sourced CLI application that embraces the essence of journalling.
+With Kyushu, you can effortlessly capture and track events, embracing a seamless and intuitive CLI experience.
+
 
 ## Current status
 
-I try to update the status of the project rigorously. However, there are many badges here that are automatically updated.
+In the realm of Soapberry,
+I meticulously update project status, while automated badges dynamically reflect its evolving nature.
 
 
 ### Development
@@ -84,14 +92,10 @@ I try to update the status of the project rigorously. However, there are many ba
 
 <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/y/amirography/soapberry?color=%238bd5ca&logo=git&logoColor=%238bd5ca&style=for-the-badge">
 
-The project is under active development.
-Although I often commit changes, I'm working on the overall design of the project now.
-And more than code's I'm researching and experimenting with different forms.
-I consider this project to be a long-term one.
-So, I'm not in hurray to release it. 
-
-For now, consider the whole project to be in **pre-alpha stage**.
-
+Engaged in active development, I currently prioritize the project's overarching design.
+Beyond mere code, I delve into diverse forms, conducting research and experimentation.
+Embracing a long-term perspective, I refrain from rushing its release.
+Presently, consider the project to reside in the pre-alpha stage.
 
 
 
@@ -103,11 +107,10 @@ For now, consider the whole project to be in **pre-alpha stage**.
   <img alt="license consistency" src="https://img.shields.io/github/actions/workflow/status/amirography/soapberry/cargo-deny.yml?color=%238aadf4&label=licenses-compatible&logo=Rust&logoColor=%238aadf4&style=for-the-badge">
 </p>
 
-I use libraries. I Cannot help it. But I can:
-1. Keep them updated.
-2. Trim-down the unused ones.
-3. Make sure that I my license is compatible with theirs.
-
+Inevitably reliant on libraries, I diligently undertake several measures:
+1. I diligently update them to ensure their optimal functionality.
+2. I meticulously trim down any unused libraries, streamlining the project.
+3. I conscientiously ensure compatibility between my chosen license and the libraries employed.
 
 ### Security
 
@@ -116,16 +119,15 @@ I use libraries. I Cannot help it. But I can:
   <img alt="secure dependencies" src="https://img.shields.io/github/actions/workflow/status/amirography/soapberry/cargo-pants.yml?color=%23f0c6c6&label=secure-dependencies&logo=Rust&logoColor=%23f0c6c6&style=for-the-badge">
 </p>
 
-I take security pretty seriously. You should too.
-Although I do not always have the resources to make sure every CVE is resolved with my dependencies, I will:
-1. make sure that I only include those that have good track record.
-2. not hide any potential vulnerability in my dependencies.
-3. update my dependencies as soon as a security update is out. 
+Imbued with a deep sense of responsibility towards security, I earnestly emphasize its significance.
+While I may not possess boundless resources to address every CVE within my dependencies, I commit to the following principles:
+1. Meticulously selecting dependencies with a proven track record, ensuring their reliability and robustness.
+2. Transparently acknowledging any potential vulnerabilities present in my dependencies, refusing to conceal them.
+3. Swiftly updating my dependencies upon the release of security updates, prioritizing the safeguarding of the project's integrity.
 
 ## Contributions
 
-Currently the only contributor of this project is myself,
-but as soon as I stabilize the fundamental structure of the project, 
-I will accept Pull Requests from others, and make a `CONTRIBUTING.md` file.
-For now please use [code of conduct](/CODE_OF_CONDUCT.md) for all other regards.
-
+Being the sole contributor to this project at present,
+my primary objective revolves around stabilizing its fundamental structure. Once accomplished,
+I eagerly anticipate welcoming Pull Requests from fellow collaborators, accompanied by the inclusion of a `CONTRIBUTING.md` file.
+In the meantime, I kindly request adhering to the established [code of conduct](/CODE_OF_CONDUCT.md) for all other matters related to the project.
