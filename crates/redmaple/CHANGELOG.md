@@ -127,6 +127,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0](https://github.com/amirography/soapberry/compare/redmaple-v0.14.2...redmaple-v0.15.0) - 2023-07-02
+
+### Added
+- formalize the ValidID by defining it as a trait
+
+### Other
+- use a more idiomatic name for trait method
+
 ## [0.14.2](https://github.com/amirography/soapberry/compare/redmaple-v0.14.1...redmaple-v0.14.2) - 2023-06-30
 
 ### Added

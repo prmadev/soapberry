@@ -120,6 +120,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.11.2...whirlybird-v0.12.0) - 2023-07-02
+
+### Added
+- add and view links in the maples
+- add link event to whirlybird
+- formalize the ValidID by defining it as a trait
+
+### Other
+- fix some linting issues
+- fix some linting issues
+- fix some linting issues
+- improve inline documentation
+- imrpove inline documentation
+- use a more idiomatic name for trait method
+
 ## [0.11.2](https://github.com/amirography/soapberry/compare/whirlybird-v0.11.1...whirlybird-v0.11.2) - 2023-06-30
 
 ### Added
