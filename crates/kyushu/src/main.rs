@@ -99,7 +99,7 @@ fn main() -> color_eyre::Result<()> {
             Change::UpdateMapleBody(maple_id, new_body) => {
                 update_maple(&repo, &maple_id, new_body)?;
             }
-            Change::AddLinkToMaple { from, to, why } => add_link(&repo, from, to, why)?,
+            Change::AddLinkToMaple { from, to, why } => add_link(&repo, &from, &to, why)?,
         },
 
         Request::Information(i) => match i {
@@ -111,8 +111,8 @@ fn main() -> color_eyre::Result<()> {
 
 fn add_link(
     repo: &persistence::FileDB,
-    from: ID,
-    to: ID,
+    from: &ID,
+    to: &ID,
     why: String,
 ) -> Result<(), color_eyre::Report> {
     let des = ValidMapleID::try_from(repo.redmaple_similar_id(&to)?)?;
