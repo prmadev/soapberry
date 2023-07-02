@@ -517,6 +517,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0](https://github.com/amirography/soapberry/compare/kyushu-v0.12.0...kyushu-v0.13.0) - 2023-07-02
+
+### Added
+- add and view links in the maples
+- improve inline documentation
+- formalize the ValidID by defining it as a trait
+- add some documentations
+
+### Other
+- fix some linting issues
+- fix some linting issues
+- fix some linting issues
+- update cargo.toml
+- fix a few linting problems
+- imrpove inline documentation
+- fix a few linting problems
+
 ## [0.12.0](https://github.com/amirography/soapberry/compare/kyushu-v0.11.0...kyushu-v0.12.0) - 2023-06-30
 
 ### Added
