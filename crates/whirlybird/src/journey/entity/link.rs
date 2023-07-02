@@ -30,8 +30,7 @@ impl From<&RedMaple<EventWrapper>> for Links {
         let links: Vec<Link> = value.events().iter().map(EventWrapper::data).fold(
             vec![],
             |mut accu, event| match event {
-                Event::MapleCreated(_) => accu,
-                Event::MapleBodyUpdated(_, _) => accu,
+                Event::MapleCreated(_) | Event::MapleBodyUpdated(_, _) => accu,
                 Event::LinkAdded(l) => {
                     accu.push(Link {
                         to: l.0.clone(),
