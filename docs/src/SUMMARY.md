@@ -2,8 +2,8 @@
 - [Introduction](./introduction.md)
 - [Goals]
     - [RedMaple](./goals/redmaple.md)
-    - [Whirlybird](./goals/whirlybird.md)
-    - [Kyushu](./goals/whirlybird.md)
+    - [Whirlybird](./goals/Whirlybird.md)
+    - [Kyushu](./goals/Kyushu.md)
 
 - [Usage](./usage.md)
     - [RedMaple](./usage/redmaple.md)
