@@ -61,12 +61,12 @@ impl Display for MaplePrinter {
         );
 
         if self.links.is_empty() {
-            return write!(f, "{}\n", line);
+            return writeln!(f, "{line}");
         }
 
-        write!(
+        writeln!(
             f,
-            "{}\n",
+            "{}",
             self.links
                 .iter()
                 .fold(line, |accu, f| format!("{accu}\n{}", f.dimmed()))

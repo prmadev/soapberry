@@ -41,6 +41,6 @@ impl From<&RedMaple<EventWrapper>> for Links {
                 }
             },
         );
-        Links(links)
+        Self(links)
     }
 }
