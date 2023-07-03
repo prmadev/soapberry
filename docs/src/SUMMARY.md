@@ -1,6 +1,6 @@
 # Summary
 - [Introduction](./introduction.md)
-- [Goals]
+- [Goals](./goals.md)
     - [RedMaple](./goals/redmaple.md)
     - [Whirlybird](./goals/Whirlybird.md)
     - [Kyushu](./goals/Kyushu.md)
