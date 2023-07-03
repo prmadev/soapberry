@@ -33,19 +33,16 @@ Event-sourced libraries and binary for aggregating, shaping, and journaling, as 
   </a>
 </p>
 
-> *Yes. I know! This page looks like a unicorn has been exploded in the candy factory here. Bare with me to complete the documentation in time. These colors will probably look less like the face of a kid left alone in the art shop.* 
+> *Indeed, I am aware of the vibrant and seemingly chaotic appearance of this page, reminiscent of a unicorn's explosion within a candy factory. Please bear with me as I diligently work towards completing the documentation within the allotted time. Rest assured, the colors will gradually transform, becoming less reminiscent of a child's bewildered expression in an art shop left unattended.* 
 
-- [**The Book**](https://amirography.github.io/soapberry/): Currently there is a very pretty online book that is
-  there to document the development and over-arching
-  decisions related to all the projects under soapberry.
-  Though it is bare right now, it should get pretty thick in time.
-  - it currently contains the following informations:
-    - Architectural Decision Records (ADRs).
-    - How an `mdBook` can *actually* become pretty.
+- [**The Book**](https://amirography.github.io/soapberry/): Presently, an exquisite online book exists to document the development progress and overarching decisions pertaining to all the projects housed under Soapberry. While the book may appear sparse at the moment, it will progressively flourish with substantial content over time. Currently, it encompasses the following information:
 
-- **API Documentation**: API documentations per crates are provided for libraries:
-  - [RedMaple's API Documentation](https://docs.rs/redmaple/latest/redmaple/) 
-  - [WhirlyBird's API Documentation](https://docs.rs/whirlybird/latest/whirlybird/) 
+  - Architectural Decision Records (ADRs) that capture crucial decisions made throughout the development process.
+  - Insights on how an `mdBook` can genuinely transform into a visually captivating masterpiece, ensuring an aesthetically pleasing reading experience.
+
+- **API Documentation**: Comprehensive API documentations are provided for each crate within their libraries:
+  - [RedMaple's API Documentation](https://docs.rs/redmaple/latest/redmaple/)
+  - [WhirlyBird's API Documentation](https://docs.rs/whirlybird/latest/whirlybird/)
  
   
 
