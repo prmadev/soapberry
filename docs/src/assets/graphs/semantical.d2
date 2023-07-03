@@ -56,7 +56,7 @@ pdomain: Persistence Domain {
 	style.fill: honeydew
 }
 
-pdomain.structsy: Structsy-Friendly Event {
+pdomain.filedb: FileDB-Friendly Event {
 	style.multiple: true
 
 	content: Content {
@@ -67,12 +67,12 @@ pdomain.structsy: Structsy-Friendly Event {
 
 }
 
-pdomain.structsy -> mdomain.msg.event {
+pdomain.filedb -> mdomain.msg.event {
 	style.animated: true
 	style.stroke-width: 5
 }
 
-pdomain.structsy <- mdomain.msg.event {
+pdomain.filedb <- mdomain.msg.event {
 	style.animated: true
 	style.stroke: orange 
 	style.stroke-width: 5
@@ -83,13 +83,13 @@ idomain: Interface Domain {
 	style.fill: honeydew
 
 	command: Command {
-		protoreq: Proto Request {
+		req: Request {
 			content: Content {
 				shape: class
 			}
 		}		
 
-		protores: Proto Response {
+		res: Response {
 			content: Content {
 				shape: class
 			}
@@ -97,12 +97,12 @@ idomain: Interface Domain {
 	} 
 
 	query: Query {
-		protoreq: Proto Request {
+		req:  Request {
 			content: Content {
 				shape: class
 			}
 		}		
-		protores: Proto Response {
+		res: Response {
 			content: Content {
 				shape: class
 			}
@@ -111,13 +111,13 @@ idomain: Interface Domain {
 	}
 }
 
-mdomain.msg.command <- idomain.command.protoreq {
+mdomain.msg.command <- idomain.command.req {
 	style.animated: true
 	style.stroke: orange
 	style.stroke-width: 5
 }
 
-mdomain.msg.query <- idomain.query.protoreq {
+mdomain.msg.query <- idomain.query.req {
 	style.animated: true
 	style.stroke: orange
 	style.stroke-width: 5
@@ -130,31 +130,31 @@ user: User {
 	style.font-size: 35
 } 
 
-user -> idomain.query.protoreq {
+user -> idomain.query.req {
 	style.animated: true
 	style.stroke: orange
 	style.stroke-width: 5
 }
 
-user -> idomain.command.protoreq {
+user -> idomain.command.req {
 	style.animated: true
 	style.stroke: orange
 	style.stroke-width: 5
 }
 
-user <- idomain.query.protores {
+user <- idomain.query.res {
 	style.animated: true
 	style.stroke-width: 5
 }
 
 
-mdomain.msg.projector -> idomain.query.protores {
+mdomain.msg.projector -> idomain.query.res {
 	style.animated: true
 	style.stroke-width: 5
 }
 
 
-user <- idomain.command.protores {
+user <- idomain.command.res {
 	style.animated: true
 	style.stroke-width: 5
 }

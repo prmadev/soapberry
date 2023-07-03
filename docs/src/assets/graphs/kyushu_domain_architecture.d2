@@ -7,11 +7,11 @@ repos: Repositories {
 		shape: package
 		style.font-size: 50
 
-		store: Structsy {
+		store: FileDB {
 			shape: cylinder 
 			style.font-size: 50
 
-			EntryCreated: {
+			MapleCreated: {
 				shape: class
 				style.font-size: 50
 
@@ -56,7 +56,7 @@ logic: Logic  {
 			shape: stored_data 
 			style.font-size: 50
 
-			EntryCreated: {
+			MapleCreated: {
 				shape: class
 				style.font-size: 50
 
@@ -64,12 +64,12 @@ logic: Logic  {
 			}
 		}
 
-		memory.EntryCreated <- ACL : retrieve {
+		memory.MapleCreated <- ACL : retrieve {
 			style.font-size: 50
 			style.stroke-width: 6
 			style.animated : true
 		}
-		memory.EntryCreated -> ACL : store {
+		memory.MapleCreated -> ACL : store {
 			style.font-size: 50
 			style.stroke-width: 6
 			style.animated : true
@@ -90,12 +90,12 @@ logic.domain.ACL <-  repos.persistence.ACL: retrieve{
 }
 
 
-logic.domain.ACl -> Projectors.entry_list{
+logic.domain.ACl -> Projectors.Maple_list{
 	style.font-size: 50
 	style.stroke-width: 6
 	style.animated : true
 }
-logic.domain.ACl -> Projectors.journey_list{
+logic.domain.ACl -> Projectors.redmaple_list{
 	style.font-size: 50
 	style.stroke-width: 6
 	style.animated : true
@@ -104,7 +104,7 @@ logic.domain.ACl -> Projectors.journey_list{
 projectors: Projectors {
 	style.font-size: 50
 
-	entry_list: Entry List {
+	Maple_list: Maple List {
 		shape: document
 		style.font-size: 50
 
@@ -113,21 +113,21 @@ projectors: Projectors {
 			style.multiple: true
 			style.font-size: 50
 
-			entry1: Entry 1 {
+			Maple1: Maple 1 {
 				shape: class 
 				style.font-size: 50
 
-				entry_id: ID
+				Maple_id: ID
 				created_at: Time
 				updated_at: Time 
 				jouneys: '[]ValidID'
-				contents: EntryContent
+				contents: MapleContent
 			}
 		}
 
 	}
 
-	journey_list: Journey List {
+	redmaple_list: redmaple List {
 		shape: document
 		style.font-size: 50
 
@@ -136,15 +136,15 @@ projectors: Projectors {
 			style.multiple: true
 			style.font-size: 50
 
-			journey1: Journey 1 {
+			redmaple1: redmaple 1 {
 				shape:class 
 				style.multiple: true
 				style.font-size: 50
 
-				journey_id: ID
+				redmaple_id: ID
 				created_at: Time
 				updated_at: Time 
-				entries: '[]ValidID'
+				maples: '[]ValidID'
 			}
 		}
 	}
@@ -154,20 +154,20 @@ projectors: Projectors {
 commander: Command Handlers {
 	shape: package
 	style.font-size: 50
-	create_entry_command {
+	create_Maple_command {
 		shape: class	
 		style.font-size: 50
 
-		content: EntryContent
+		content: MapleContent
 	}
 }
 
-commander.create_entry_command -> logic.domain.ACL: request for change{
+commander.create_Maple_command -> logic.domain.ACL: request for change{
 	style.font-size: 50
 	style.stroke-width: 6
 	style.animated : true
 } 
-commander.create_entry_command <- logic.domain.ACL: status of message{
+commander.create_Maple_command <- logic.domain.ACL: status of message{
 	style.font-size: 50
 	style.stroke-width: 6
 	style.animated : true
@@ -177,29 +177,29 @@ querier: Query Handlers {
 	shape: package
 	style.font-size: 50
 
-	get_entries {
+	get_maples {
 		shape: class
 		style.font-size: 50
 
 		content: '[]Event'
 	}
 
-	get_journeys {
+	get_redmaples {
 		shape: class
 		style.font-size: 50
 
-		content: '[]Journey'
+		content: '[]redmaple'
 	}
 
 	
 }
 
-querier.get_entries <- projectors.entry_list {
+querier.get_maples <- projectors.Maple_list {
 	style.font-size: 50
 	style.stroke-width: 6
 	style.animated : true
 } 
-querier.get_journeys <- projectors.journey_list {
+querier.get_redmaples <- projectors.redmaple_list {
 	style.font-size: 50
 	style.stroke-width: 6
 	style.animated : true
@@ -212,24 +212,24 @@ UI: User Interface {
 	
 }
 
-UI ->  commander.create_entry_command : Requests a new_entry {
+UI ->  commander.create_Maple_command : Requests a new_Maple {
 	style.font-size: 50
 	style.stroke-width: 6
 	style.animated : true
 } 
 
-UI <-  commander.create_entry_command : Gets Status of Delivery of Request  {
+UI <-  commander.create_Maple_command : Gets Status of Delivery of Request  {
 	style.font-size: 50
 	style.stroke-width: 6
 	style.animated : true
 } 
 
-UI ->  querier.get_entries : Request Information {
+UI ->  querier.get_maples : Request Information {
 	style.font-size: 50
 	style.stroke-width: 6
 	style.animated : true
 } 
-UI <-  querier.get_entries : Respond Information {
+UI <-  querier.get_maples : Respond Information {
 	style.font-size: 50
 	style.stroke-width: 6
 	style.animated : true

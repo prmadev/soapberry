@@ -1,13 +1,7 @@
 # Type Semantics
 
-I extensively use Type-Driven Development (TyDD).
+Type-Driven Development (TyDe) plays a fundamental role in my development approach, where program logic predominantly relies on type transformations. However, there are instances where broader type changes go beyond business logic, aiming to comply with implementation limitations.
 
-This means that of the time the logic of the programs happens trough type transformations.
-
-However there are broader type changes where we are not just checking for business logic but we are trying to adhere to implementation limitations.
-
-An example of that is converting types from enums into more protobuffer friendly types.
-
-This means that there are architectural patterns in type conversions that I will outline using the bellow diagram:
+Consequently, architectural patterns emerge in the realm of type conversions. To provide a visual representation of these patterns, please refer to the diagram below:
 
 <figure ><img src="../../assets/type_semantics.svg"> </img> <figcaption > </figcaption> </figure>
