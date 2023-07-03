@@ -88,38 +88,38 @@ Whirlybird provides a few different ones, but you can just take them to be an ex
 
 ## Kyushu
 
-Kyushu just follows a simple server-client architecture.
+Kyushu just follows a simple local-first architecture.
 
 
 ```                                                                                         
- +---------------------------------------+         +-------------+
- |            Kyushu Server              |         |             |
- | +-----------------------------------+ |-------->|             |
- | |                                   | |         |             |
- | |                                   | |         |             |
- | |                                   | |         |             |
- | |   Journal (One Giant RedMaple)    | |         |Kyushu Client|
- | |                                   | |         |             |
- | |                                   | |         |             |
- | |                                   | |         |             |
- | +-----------------------------------+ |         |             |
- |                                       |<--------|             |
- +---------------------------------------+         +-------------+
-                                                      |      ^    
-                                                      |      |    
-                                                      |      |    
-                                                      |      |    
-                                                      |      |    
-                                                      v      |    
-                                               +-----------------+
-                                               |                 |
-                                               |                 |
-                                               |                 |
-                                               |      User       |
-                                               |                 |
-                                               |                 |
-                                               |                 |
-                                               +-----------------+
+ +----------------------------------------------------+
+ |            Kyushu                                  |
+ | +---------------------------+                      |
+ | |                           |                      |
+ | |                           |                      |
+ | |                           |                      |
+ | | A lot of  small RedMaples |                      |
+ | |                           |                      |
+ | |                           |                      |
+ | |                           |                      |
+ | +---------------------------+                      |
+ |                                                    |
+ +----------------------------------------------------+
+      |       ^                            |      ^    
+      |       |                            |      |    
+      |       |                            |      |    
+      |       |                            |      |    
+      |       |                            |      |    
+      v       |                            v      |    
+  +--------------+                   +-----------------+
+  |              |                   |                 |
+  |              |                   |                 |
+  |              |                   |                 |
+  |    FileDB    |                   |      User       |
+  |              |                   |                 |
+  |              |                   |                 |
+  |              |                   |                 |
+  +--------------+                   +-----------------+
 ```
 
 The key here is that kyushu client is responsible for a implementing the projector of events. 
