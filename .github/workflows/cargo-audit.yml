@@ -33,10 +33,6 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock')}}
           restore-keys: ${{ runner.os }}-cargo-
 
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: "Install cargo-udeps"
         run: |
           cargo install --locked cargo-audit || true
