@@ -517,6 +517,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0](https://github.com/amirography/soapberry/compare/kyushu-v0.13.0...kyushu-v0.14.0) - 2023-07-03
+
+### Other
+- update book
+
 ## [0.13.0](https://github.com/amirography/soapberry/compare/kyushu-v0.12.0...kyushu-v0.13.0) - 2023-07-02
 
 ### Added
