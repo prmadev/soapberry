@@ -8,12 +8,12 @@ use crate::{
 };
 
 /// defines the bare minimum implementation for storing events
-pub trait EventRepo: Clone {
+pub trait FrostElf: Clone + Send + Sync {
     /// Item should be able to return ID
     type Item: EventKind + Unique + Clone + Eq + PartialOrd + Ord;
 
     /// Errors that may happen in these functions
-    type EventError: Display + error::Error;
+    type EventError: Display + error::Error + Send + Sync;
 
     /// Returns events by finding the first one that matches the item
     ///

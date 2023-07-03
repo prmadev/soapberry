@@ -36,12 +36,12 @@ use kyushu::{
     cli::{Args, MaplePrinter},
     config::{Config, InputInfo},
     domain::requests::{Change, Request},
-    persistence::{self, EventRepoError},
+    persistence::{self, FileDB, FrostElfError},
 };
 use redmaple::{
     event_group::EventKind,
     id::{Unique, ValidID, ID},
-    EventRepo, RedMaple,
+    FrostElf, RedMaple,
 };
 use thiserror::Error;
 use time::format_description;
@@ -86,7 +86,7 @@ fn main() -> color_eyre::Result<()> {
     let req = cli_arguments.to_request()?;
 
     // creating persistence
-    let repo = persistence::FileDB::try_from(
+    let frost_elf = persistence::FileDB::try_from(
         configurations
             .file_store
             .ok_or(MainError::FileStoreCannotBeEmpty)?,
@@ -95,30 +95,35 @@ fn main() -> color_eyre::Result<()> {
     // matching requests to the appropiate functions
     match req {
         Request::Change(chng) => match chng {
-            Change::CreateNewMaple(mpl) => create_maple(&repo, mpl)?,
+            Change::CreateNewMaple(mpl) => create_maple(&frost_elf, mpl)?,
             Change::UpdateMapleBody(maple_id, new_body) => {
-                update_maple(&repo, &maple_id, new_body)?;
+                update_maple(&frost_elf, &maple_id, new_body)?;
             }
-            Change::AddLinkToMaple { from, to, why } => add_link(&repo, &from, &to, why)?,
+            Change::AddLinkToMaple { from, to, why } => add_link(&frost_elf, &from, &to, why)?,
         },
 
         Request::Information(i) => match i {
-            kyushu::domain::requests::Information::ListEntries => list_entries(&repo)?,
+            kyushu::domain::requests::Information::ListEntries => list_entries(&frost_elf)?,
         },
     };
     Ok(())
 }
 
 fn add_link(
-    repo: &persistence::FileDB,
+    frost_elf: &persistence::FileDB,
     from: &ID,
     to: &ID,
     why: String,
 ) -> Result<(), color_eyre::Report> {
-    let des = ValidMapleID::try_from(repo.redmaple_similar_id(to)?)?;
+    let des = ValidMapleID::try_from(frost_elf.redmaple_similar_id(to)?)?;
     let time_now = time::OffsetDateTime::now_utc();
     let ev = EventWrapper::new(time_now.into(), time_now, Event::LinkAdded((des, why)));
-    repo.save(repo.redmaple_similar_id(from)?.clone().into_appended(ev))?;
+    frost_elf.save(
+        frost_elf
+            .redmaple_similar_id(from)?
+            .clone()
+            .into_appended(ev),
+    )?;
     Ok(())
 }
 
@@ -128,8 +133,8 @@ fn add_link(
 ///
 /// # Arguments
 ///
-/// * `repo` - A reference to a `persistence::FileDB` object representing the repository
-///            from which the events are retrieved.
+/// * `frost_elf` - A reference to a `persistence::FileDB` object representing the repository
+///                 from which the events are retrieved.
 ///
 /// # Returns
 ///
@@ -138,8 +143,8 @@ fn add_link(
 /// - If an error occurs during the retrieval, sorting, or printing process, an `Err` variant
 ///   containing a `color_eyre::Report` is returned.
 ///
-fn list_entries(repo: &persistence::FileDB) -> Result<(), color_eyre::Report> {
-    let mut redmaples = repo.all_events()?.values().collect::<Vec<_>>();
+fn list_entries(frost_elf: &FileDB) -> Result<(), color_eyre::Report> {
+    let mut redmaples = frost_elf.all_events()?.values().collect::<Vec<_>>();
 
     redmaples.sort_by(|a, b| {
         let at = a
@@ -179,9 +184,12 @@ fn list_entries(repo: &persistence::FileDB) -> Result<(), color_eyre::Report> {
     Ok(())
 }
 
-fn create_maple(repo: &persistence::FileDB, mpl: journey::Maple) -> Result<(), color_eyre::Report> {
+fn create_maple(
+    frost_elf: &persistence::FileDB,
+    mpl: journey::Maple,
+) -> Result<(), color_eyre::Report> {
     let created_time = time::OffsetDateTime::now_utc();
-    repo.save(RedMaple::new(vec![EventWrapper::new(
+    frost_elf.save(RedMaple::new(vec![EventWrapper::new(
         mpl.id().inner().clone(),
         created_time,
         Event::MapleCreated(mpl),
@@ -190,25 +198,25 @@ fn create_maple(repo: &persistence::FileDB, mpl: journey::Maple) -> Result<(), c
 }
 
 fn update_maple(
-    repo: &persistence::FileDB,
+    frost_elf: &persistence::FileDB,
     maple_id: &ID,
     new_body: Body,
 ) -> Result<(), color_eyre::Report> {
-    let rdmpl = match repo.redmaple_matching_id(maple_id) {
+    let rdmpl = match frost_elf.redmaple_matching_id(maple_id) {
         Ok(o) => o.clone(),
         Err(e) => match e {
-            EventRepoError::FailedToFindTheEventWithThatID => {
-                match repo.redmaple_similar_id(maple_id) {
+            FrostElfError::FailedToFindTheEventWithThatID => {
+                match frost_elf.redmaple_similar_id(maple_id) {
                     Ok(o) => o.clone(),
                     Err(er) => return Err(er)?,
                 }
             }
-            EventRepoError::FailedToSerialize(e) => return Err(e)?,
-            EventRepoError::FailedToCreateNewFile(e) | EventRepoError::FailedToWriteIntoFile(e) => {
+            FrostElfError::FailedToSerialize(e) => return Err(e)?,
+            FrostElfError::FailedToCreateNewFile(e) | FrostElfError::FailedToWriteIntoFile(e) => {
                 return Err(e)?
             }
-            EventRepoError::FailedToGetID(e) => return Err(e)?,
-            EventRepoError::FailedToFindASingleMatchingItem(e) => {
+            FrostElfError::FailedToGetID(e) => return Err(e)?,
+            FrostElfError::FailedToFindASingleMatchingItem(e) => {
                 return Err(color_eyre::Report::msg(format!("{e:#?}")))?
             }
         },
@@ -221,7 +229,7 @@ fn update_maple(
     );
 
     let rdmpl = rdmpl.into_appended(event);
-    repo.save(rdmpl)?;
+    frost_elf.save(rdmpl)?;
     Ok(())
 }
 

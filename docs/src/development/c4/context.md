@@ -2,62 +2,30 @@
 
 ## RedMaple 
 
-A Redmaple is just a data-structure with a set of methods.
-The implementaition of a RedMaple will contain the business logic. 
-Any redmaple can be hosted inside a (not yet created) ForestElf,
-Which is a wrapper and manager for  one or more RedMaples.
-Each ForestElf implement a set of server-application protocols and is a distinct service application.
-When a user wants to interact with the Redmaple Cluster,
-they would need to find specific Redmaples.
-An ElfGuide keeps a live database of different redmaples and in which ForestElf they are located. 
-As such a client application would have to first contact an ElfGuide. 
+A RedMaple, if you will, can be conceived as a wrapper encompassing a veritable array of events.
+These events, residing within the library, demonstrate their versatility through the employment of generics, thereby allowing for a multitude of implementations to coexist harmoniously.
 
-Each redmaple is commanded by ForestElf synchronously, but the ForestElfs contact each other asynchronously.
+Now, let us delve into the crux of RedMaple's design, wherein lies the implementation of each event, serving as the vessel for essential business logic.
+To fulfill this crucial role, I have opted for the utilization of Whirlybird, a tool specifically tailored to facilitate the seamless execution of said logic.
 
-```ascii
+It is worth noting that the RedMaple's domain extends further, enabling its integration within the overarching framework of a ForestElf.
+Functioning as both a wrapper and a diligent manager, the ForestElf takes charge of one or more RedMaples, ensuring their smooth operation within the system.
 
-            +------+ +------+ +------+ +------+          
-            | user | | user | | user | | user |          
-            +------+ +------+ +------+ +------+          
-               | ^     ^ |      ^ \       ^ |            
-               | |     | |       \ \      | |            
-               v |     | v        \ v     | v            
-            +---------------+    +---------------+       
-            |   ElfGuide    |    |   ElfGuide    |       
-            +---------------+    +---------------+       
-                    ^    ^                 ^             
-+------------------/------\----------------|------------+
-| RedMaple Cluster/        v               |            |
-|                /    +--- --------+       |            |
-|               v     |  ForestElf |       v            |
-|  +--- --------+     |+----------+|     +--- --------+ |
-|  | ForestElf  |     || RedMaple ||     |  ForstElf  | |
-|  |+----------+|     |+----------+|     |+----------+| |
-|  || RedMaple ||<--->|+----------+|<--->|| RedMaple || |
-|  |+----------+|     || RedMaple ||     |+----------+| |
-|  |+----------+|     |+----------+|     |+----------+| |
-|  || RedMaple ||     |+----------+|     || RedMaple || |
-|  |+----------+|     || RedMaple ||     |+----------+| |
-|  |+----------+|     |+----------+|     |+----------+| |
-|  || RedMaple ||     +------------+     || RedMaple || |
-|  |+----------+|<---------------------->|+----------+| |
-|  +------------+                        +------------+ |
-+-------------------------------------------------------+ 
+For individuals seeking to engage with the Redmaple Cluster, a meticulous search for specific RedMaples becomes imperative.
+By identifying and locating the desired RedMaples, users gain the means to interact fruitfully with this interconnected network.
 
-```
-
-Now, this is just how I imagine an architecture based on RedMaples may look-like.
-This is not prescriptive.
+Let us bear in mind, however, that the depiction I have presented here reflects a hypothetical architecture based on RedMaples, devoid of any prescriptive directives.
 
 <figure ><img src="../../assets/2021.jpg"> </img> <figcaption > Randal Munroe, Attribution-NonCommercial 2.5 Generic (CC BY-NC 2.5)</figcaption> </figure>
 
 
 ## WhirlyBird
 
-WhirlyBird is just a  crate full of different implementations of Redmaple.
-Each redmaple is Generic over DomainEvents logic and its ViewModes.
-Both of which are and should be defind by the domain events and their projectors.
-Whirlybird provides a few different ones, but you can just take them to be an example of how you could define your own.
+WhirlyBird can be aptly likened to a treasure trove—a crate teeming with a diverse array of event implementations and their corresponding projectors tailored explicitly for Redmaple.
+The essence of Redmaple lies in its inherent generality, as it gracefully embraces the events and their projectors in a generic fashion.
+
+These events and projectors hold paramount importance, as they are not only pivotal components of Redmaple but should also be thoughtfully crafted within the framework of the domain itself.
+WhirlyBird generously offers a selection of distinct event implementations and projectors, serving as valuable exemplars for inspiration in devising one's own bespoke solutions.
 
 ```
 +-------------------------------------------------------+
@@ -88,8 +56,7 @@ Whirlybird provides a few different ones, but you can just take them to be an ex
 
 ## Kyushu
 
-Kyushu just follows a simple local-first architecture.
-
+Kyushu adheres to a straightforward and pragmatic local-first architecture.
 
 ```                                                                                         
  +----------------------------------------------------+
@@ -122,5 +89,3 @@ Kyushu just follows a simple local-first architecture.
   +--------------+                   +-----------------+
 ```
 
-The key here is that kyushu client is responsible for a implementing the projector of events. 
-In the kyushu server, For each journal, we only use one Redmaple.

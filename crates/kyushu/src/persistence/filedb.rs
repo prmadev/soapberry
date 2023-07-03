@@ -3,7 +3,7 @@ use std::{collections::HashMap, path::PathBuf};
 
 use redmaple::{
     id::{ValidID, ID},
-    EventRepo, RedMaple,
+    FrostElf, RedMaple,
 };
 use whirlybird::journey::{EventWrapper, IDGetterError, ValidMapleID};
 
@@ -84,15 +84,15 @@ pub enum RebuildError {
     CouldNotReadDirectory(std::io::Error),
 }
 
-impl EventRepo for FileDB {
+impl FrostElf for FileDB {
     type Item = EventWrapper;
 
-    type EventError = EventRepoError;
+    type EventError = FrostElfError;
 
     fn redmaple_matching_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
         self.events
             .get(id)
-            .ok_or(EventRepoError::FailedToFindTheEventWithThatID)
+            .ok_or(FrostElfError::FailedToFindTheEventWithThatID)
     }
 
     fn redmaple_similar_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
@@ -104,17 +104,17 @@ impl EventRepo for FileDB {
             .collect();
 
         if finding.len() != 1 {
-            return Err(EventRepoError::FailedToFindASingleMatchingItem(
+            return Err(FrostElfError::FailedToFindASingleMatchingItem(
                 finding.into_iter().map(std::clone::Clone::clone).collect(),
             ));
         }
         let idfounded = finding
             .first()
-            .ok_or(EventRepoError::FailedToFindTheEventWithThatID)?;
+            .ok_or(FrostElfError::FailedToFindTheEventWithThatID)?;
 
         self.events
             .get(idfounded)
-            .ok_or(EventRepoError::FailedToFindTheEventWithThatID)
+            .ok_or(FrostElfError::FailedToFindTheEventWithThatID)
     }
 
     fn all_events(&self) -> Result<&HashMap<ID, RedMaple<Self::Item>>, Self::EventError> {
@@ -127,16 +127,16 @@ impl EventRepo for FileDB {
             .join(format!("{}.json", ValidMapleID::try_from(&item)?.inner()));
 
         let s = serde_json::to_string_pretty(&item)
-            .map_err(EventRepoError::FailedToSerialize)?
+            .map_err(FrostElfError::FailedToSerialize)?
             .into_bytes();
 
-        std::fs::write(file_path, s).map_err(EventRepoError::FailedToWriteIntoFile)
+        std::fs::write(file_path, s).map_err(FrostElfError::FailedToWriteIntoFile)
     }
 }
 
 /// Errors related to the implementation of [`EventRepo`] trait for the [`FileDB`]
 #[derive(thiserror::Error, Debug)]
-pub enum EventRepoError {
+pub enum FrostElfError {
     /// Failed to find the requested item.
     #[error("could not find item")]
     FailedToFindTheEventWithThatID,
