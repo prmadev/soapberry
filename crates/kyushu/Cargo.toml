@@ -30,9 +30,9 @@ clap = { version = "4.3.10", features = ["derive"] }
 color-eyre = "0.6.2"
 owo-colors = "3.5.0"
 redmaple = { version = "0.16.0", path = "../redmaple" }
-serde = { version = "1.0.164", features = ["derive"] }
-serde_json = "1.0.99"
-thiserror = "1.0.40"
+serde = { version = "1.0.166", features = ["derive"] }
+serde_json = "1.0.100"
+thiserror = "1.0.41"
 time = { version = "0.3.22", features = ["serde", "formatting", "local-offset", "serde-human-readable"] }
 whirlybird = { version = "0.12.1", path = "../whirlybird", features = [
   "journey",

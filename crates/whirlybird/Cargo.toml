@@ -24,7 +24,7 @@ filter_unconventional = true
 
 [dependencies]
 redmaple = { version = "0.16.0", path = "../redmaple"}
-serde = { version = "1.0.164", features = ["derive"] }
-thiserror = {version="1.0.40"}
+serde = { version = "1.0.166", features = ["derive"] }
+thiserror = {version="1.0.41"}
 time = { version = "0.3.22", features = ["serde"] }
 
