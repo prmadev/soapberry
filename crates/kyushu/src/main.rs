@@ -219,6 +219,7 @@ fn update_maple(
             FrostElfError::FailedToFindASingleMatchingItem(e) => {
                 return Err(color_eyre::Report::msg(format!("{e:#?}")))?
             }
+            FrostElfError::EventBuilderFailed(e) => return Err(e)?,
         },
     };
     let time_now = time::OffsetDateTime::now_utc();

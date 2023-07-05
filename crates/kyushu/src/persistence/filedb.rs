@@ -1,6 +1,7 @@
 //! This module provides the `FileDB` implementation, which serves as a plaintext persistence layer for redmaple.
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, fs::read_dir, path::PathBuf};
 
+use once_cell::sync::OnceCell;
 use redmaple::{
     id::{ValidID, ID},
     FrostElf, RedMaple,
@@ -10,7 +11,7 @@ use whirlybird::journey::{EventWrapper, IDGetterError, ValidMapleID};
 /// Represents the `FileDB` implementation, which is a file-based local `RedMaple` repository.
 #[derive(Debug, Clone)]
 pub struct FileDB {
-    events: std::collections::HashMap<ID, RedMaple<EventWrapper>>,
+    events: OnceCell<HashMap<ID, RedMaple<EventWrapper>>>,
     path: PathBuf,
 }
 
@@ -23,35 +24,7 @@ impl TryFrom<PathBuf> for FileDB {
         }
 
         // Read the directory for files
-        let events = std::fs::read_dir(&path_to_rep) // create a directory reader
-            //then mapping the error of directory reading
-            .map_err(RebuildError::CouldNotReadTheDirectory)?
-            // filtering all the items that are not ok
-            .filter_map(Result::ok) // filter those that are ok
-            // creating a redmaple from each file
-            .map(redmaple_from_file)
-            // then filtering all those that are not redmaples
-            .filter_map(|x| match x {
-                Ok(o) => match o {
-                    Some(rm) => match ValidMapleID::try_from(&rm) {
-                        Ok(i) => Some(Ok((i.inner().clone(), rm))),
-                        // then for invalid redmaples
-                        Err(ers) => Some(Err(RebuildError::CouldNotGetTheIDRedmaple(ers))),
-                    },
-                    None => None,
-                },
-                Err(e) => Some(Err(RebuildError::CouldNotProcessesAFile(e))),
-            })
-            .fold(
-                Ok(HashMap::<ID, RedMaple<EventWrapper>>::new()),
-                |acc: Result<_, Self::Error>, item| {
-                    let i = item?;
-                    let mut res = acc?;
-                    _ = res.insert(i.0, i.1);
-                    Ok(res)
-                },
-            )?;
-
+        let events = OnceCell::new();
         Ok(Self {
             events,
             path: path_to_rep,
@@ -90,7 +63,7 @@ impl FrostElf for FileDB {
     type EventError = FrostElfError;
 
     fn redmaple_matching_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
-        self.events
+        self.all_events()?
             .get(id)
             .ok_or(FrostElfError::FailedToFindTheEventWithThatID)
     }
@@ -98,7 +71,7 @@ impl FrostElf for FileDB {
     fn redmaple_similar_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
         let sid = id.to_string();
         let finding: Vec<_> = self
-            .events
+            .all_events()?
             .keys()
             .filter(|x| x.to_string().contains(&sid))
             .collect();
@@ -112,13 +85,42 @@ impl FrostElf for FileDB {
             .first()
             .ok_or(FrostElfError::FailedToFindTheEventWithThatID)?;
 
-        self.events
+        self.all_events()?
             .get(idfounded)
             .ok_or(FrostElfError::FailedToFindTheEventWithThatID)
     }
 
     fn all_events(&self) -> Result<&HashMap<ID, RedMaple<Self::Item>>, Self::EventError> {
-        Ok(&self.events)
+        self.events.get_or_try_init(|| {
+            Ok(read_dir(&self.path) // create a directory reader
+                //then mapping the error of directory reading
+                .map_err(RebuildError::CouldNotReadTheDirectory)?
+                // filtering all the items that are not ok
+                .filter_map(Result::ok) // filter those that are ok
+                // creating a redmaple from each file
+                .map(redmaple_from_file)
+                // then filtering all those that are not redmaples
+                .filter_map(|x| match x {
+                    Ok(o) => match o {
+                        Some(rm) => match ValidMapleID::try_from(&rm) {
+                            Ok(i) => Some(Ok((i.inner().clone(), rm))),
+                            // then for invalid redmaples
+                            Err(ers) => Some(Err(RebuildError::CouldNotGetTheIDRedmaple(ers))),
+                        },
+                        None => None,
+                    },
+                    Err(e) => Some(Err(RebuildError::CouldNotProcessesAFile(e))),
+                })
+                .fold(
+                    Ok(HashMap::<ID, RedMaple<EventWrapper>>::new()),
+                    |acc: Result<_, RebuildError>, item| {
+                        let i = item?;
+                        let mut res = acc?;
+                        _ = res.insert(i.0, i.1);
+                        Ok(res)
+                    },
+                )?)
+        })
     }
 
     fn save(&self, item: RedMaple<Self::Item>) -> Result<(), Self::EventError> {
@@ -160,6 +162,10 @@ pub enum FrostElfError {
     /// Multiple items with the same ID were found.
     #[error("multiple items found: {0:?}")]
     FailedToFindASingleMatchingItem(Vec<ID>),
+
+    /// Multiple items with the same ID were found.
+    #[error("events failed to build: {0:?}")]
+    EventBuilderFailed(#[from] RebuildError),
 }
 
 #[allow(clippy::needless_pass_by_value)] // the value is not being used any further in the original function

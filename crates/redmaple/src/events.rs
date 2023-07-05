@@ -8,7 +8,7 @@ use crate::{
 };
 
 /// defines the bare minimum implementation for storing events
-pub trait FrostElf: Clone + Send + Sync {
+pub trait FrostElf: Send + Sync {
     /// Item should be able to return ID
     type Item: EventKind + Unique + Clone + Eq + PartialOrd + Ord;
 
