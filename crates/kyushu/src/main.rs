@@ -117,7 +117,11 @@ fn add_link(
 ) -> Result<(), color_eyre::Report> {
     let des = ValidMapleID::try_from(frost_elf.redmaple_similar_id(to)?)?;
     let time_now = time::OffsetDateTime::now_utc();
-    let ev = EventWrapper::new(time_now.into(), time_now, Event::LinkAdded((des, why)));
+    let ev = EventWrapper::new(
+        time_now.into(),
+        time_now,
+        Event::LinkAdded((des, why, ID::from(time_now))),
+    );
     frost_elf.save(
         frost_elf
             .redmaple_similar_id(from)?

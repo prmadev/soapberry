@@ -2,13 +2,18 @@
 
 use std::fmt::Display;
 
-use redmaple::RedMaple;
+use redmaple::{
+    id::{ValidID, ID},
+    RedMaple,
+};
 
 use crate::journey::{Event, EventWrapper, ValidMapleID};
 
 /// [`Link`] is the holder of information between two valid objects
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Link {
+    /// identifier
+    id: ValidLinkID,
     /// To which maple are we gazing at?
     to: ValidMapleID,
     /// tell me, what is this thing that we are looking at?
@@ -17,7 +22,29 @@ pub struct Link {
 
 impl Display for Link {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}: {}", self.to, self.explanation)
+        write!(
+            f,
+            "LINK ID:\t{}\tNOTE ID:\t{}\tREASON:\t{}",
+            self.id.inner(),
+            self.to,
+            self.explanation
+        )
+    }
+}
+
+/// a valid for of ID of a link
+#[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
+pub struct ValidLinkID(pub(super) ID);
+
+impl ValidID for ValidLinkID {
+    #[must_use]
+    fn inner(&self) -> &ID {
+        &self.0
+    }
+
+    #[must_use]
+    fn into_inner(self) -> ID {
+        self.0
     }
 }
 
@@ -35,6 +62,7 @@ impl From<&RedMaple<EventWrapper>> for Links {
                     accu.push(Link {
                         to: l.0.clone(),
                         explanation: l.1.clone(),
+                        id: ValidLinkID(l.2.clone()),
                     });
                     accu
                 }

@@ -54,7 +54,7 @@ pub enum NewPrinterError {
 impl Display for MaplePrinter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let line = format!(
-            "{} {}\n{}",
+            "{}\t{}\n{}",
             self.time_string.bold().reversed(),
             self.id.italic().reversed(),
             self.body,
