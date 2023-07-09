@@ -102,7 +102,7 @@ fn main() -> color_eyre::Result<()> {
             Change::AddLinkToMaple { from, to, why } => add_link(&frost_elf, &from, &to, why)?,
             Change::Dislink { link_id } => {
                 let time_now = time::OffsetDateTime::now_utc();
-                dislink(&frost_elf, link_id, ID::from(time_now), time_now)?;
+                dislink(&frost_elf, &link_id, ID::from(time_now), time_now)?;
             }
         },
 
@@ -115,7 +115,7 @@ fn main() -> color_eyre::Result<()> {
 
 fn dislink(
     frost_elf: &persistence::FileDB,
-    link_id: ID,
+    link_id: &ID,
     new_event_id: ID,
     time_of_the_new_event: time::OffsetDateTime,
 ) -> Result<(), color_eyre::Report> {
@@ -128,7 +128,7 @@ fn dislink(
     // try to find the exact match on the item
     let the_exact = suspect_maples.clone().find_map(|(x, l)| {
         l.into_iter()
-            .find(|li| li.id().inner() == &link_id)
+            .find(|li| li.id().inner() == link_id)
             .map(|li| Some((li, x)))?
     });
 
@@ -136,7 +136,7 @@ fn dislink(
         Ok(l)
     } else {
         let matches: Vec<(Link, &RedMaple<EventWrapper>)> = suspect_maples
-            .map(|(the_redmaple_in_question, suspect_links)| {
+            .flat_map(|(the_redmaple_in_question, suspect_links)| {
                 {
                     suspect_links
                         .into_iter()
@@ -152,7 +152,6 @@ fn dislink(
                         .collect::<Vec<(Link, &RedMaple<EventWrapper>)>>()
                 }
             })
-            .flatten()
             .collect();
 
         if matches.len() > 1 {
