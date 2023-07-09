@@ -29,12 +29,12 @@ pub trait FrostElf: Send + Sync {
     /// if it cannot find any item or could not convert any of the types it will return an error.
     fn redmaple_similar_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError>;
 
-    /// Returns all the events
+    /// Returns all the redmaples as a map
     ///
     /// # Errors
     ///
     /// if at any point it could not convert any item it will return error
-    fn all_events(&self) -> Result<&HashMap<ID, RedMaple<Self::Item>>, Self::EventError>;
+    fn all_redmaples_as_map(&self) -> Result<&HashMap<ID, RedMaple<Self::Item>>, Self::EventError>;
 
     /// Appends an item to the database
     ///

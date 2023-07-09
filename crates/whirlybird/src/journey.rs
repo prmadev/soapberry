@@ -29,7 +29,7 @@ use redmaple::{
     RedMaple,
 };
 
-/// [`JournelaEvent`] holds the meta data for [`Journal`] event
+/// [`EventWrapper`] holds the meta data for [`Journal`] event
 #[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct EventWrapper {
     event_id: ValidEventID,
@@ -46,7 +46,7 @@ impl TryFrom<&RedMaple<EventWrapper>> for ValidMapleID {
             .iter()
             .fold(Option::None, |ac, m| match m.data() {
                 Event::MapleCreated(mp) => Some(mp.id().clone()),
-                Event::MapleBodyUpdated(_, _) | Event::LinkAdded(_) => ac,
+                Event::MapleBodyUpdated(_, _) | Event::LinkAdded(_) | Event::Dislinked(_) => ac,
             })
             .ok_or(IDGetterError::NoEventsFound)
     }
@@ -131,6 +131,9 @@ pub enum Event {
 
     /// Event: Represents the addition of a link between multiple [`Maple`]s.
     LinkAdded((ValidMapleID, String, ID)),
+
+    /// Event: Represents the removal of a link from [`Maple`]
+    Dislinked(ValidLinkID),
 }
 
 /// A thin wrapper around [`ID`] that validates that the [`ID`] is coming from an [`Journey`]

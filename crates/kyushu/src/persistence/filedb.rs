@@ -63,7 +63,7 @@ impl FrostElf for FileDB {
     type EventError = FrostElfError;
 
     fn redmaple_matching_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
-        self.all_events()?
+        self.all_redmaples_as_map()?
             .get(id)
             .ok_or(FrostElfError::FailedToFindTheEventWithThatID)
     }
@@ -71,7 +71,7 @@ impl FrostElf for FileDB {
     fn redmaple_similar_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
         let sid = id.to_string();
         let finding: Vec<_> = self
-            .all_events()?
+            .all_redmaples_as_map()?
             .keys()
             .filter(|x| x.to_string().contains(&sid))
             .collect();
@@ -85,12 +85,12 @@ impl FrostElf for FileDB {
             .first()
             .ok_or(FrostElfError::FailedToFindTheEventWithThatID)?;
 
-        self.all_events()?
+        self.all_redmaples_as_map()?
             .get(idfounded)
             .ok_or(FrostElfError::FailedToFindTheEventWithThatID)
     }
 
-    fn all_events(&self) -> Result<&HashMap<ID, RedMaple<Self::Item>>, Self::EventError> {
+    fn all_redmaples_as_map(&self) -> Result<&HashMap<ID, RedMaple<Self::Item>>, Self::EventError> {
         self.events.get_or_try_init(|| {
             Ok(read_dir(&self.path) // create a directory reader
                 //then mapping the error of directory reading

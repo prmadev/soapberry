@@ -21,4 +21,10 @@ pub enum Change {
         /// the explanantion of linking
         why: String,
     },
+
+    /// Link to remove
+    Dislink {
+        /// ID of the link to remove
+        link_id: ID,
+    },
 }

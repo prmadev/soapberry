@@ -3,7 +3,7 @@
 use std::fmt::Display;
 
 use redmaple::{
-    id::{ValidID, ID},
+    id::{Unique, ValidID, ID},
     RedMaple,
 };
 
@@ -29,6 +29,17 @@ impl Display for Link {
             self.to,
             self.explanation
         )
+    }
+}
+impl Unique for Link {
+    type Valid = ValidLinkID;
+
+    fn id(&self) -> &Self::Valid {
+        &self.id
+    }
+
+    fn into_id(self) -> Self::Valid {
+        self.id
     }
 }
 
@@ -65,6 +76,9 @@ impl From<&RedMaple<EventWrapper>> for Links {
                         id: ValidLinkID(l.2.clone()),
                     });
                     accu
+                }
+                Event::Dislinked(link_id) => {
+                    accu.into_iter().filter(|l| !(l.id() == link_id)).collect()
                 }
             },
         );

@@ -45,7 +45,7 @@ use redmaple::{
 };
 use thiserror::Error;
 use time::format_description;
-use whirlybird::journey::{self, Body, Event, EventWrapper, Links, ValidMapleID};
+use whirlybird::journey::{self, Body, Event, EventWrapper, Link, Links, ValidMapleID};
 
 fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
@@ -100,12 +100,79 @@ fn main() -> color_eyre::Result<()> {
                 update_maple(&frost_elf, &maple_id, new_body)?;
             }
             Change::AddLinkToMaple { from, to, why } => add_link(&frost_elf, &from, &to, why)?,
+            Change::Dislink { link_id } => {
+                let time_now = time::OffsetDateTime::now_utc();
+                dislink(&frost_elf, link_id, ID::from(time_now), time_now)?
+            }
         },
 
         Request::Information(i) => match i {
             kyushu::domain::requests::Information::ListEntries => list_entries(&frost_elf)?,
         },
     };
+    Ok(())
+}
+
+fn dislink(
+    frost_elf: &persistence::FileDB,
+    link_id: ID,
+    new_event_id: ID,
+    time_of_the_new_event: time::OffsetDateTime,
+) -> Result<(), color_eyre::Report> {
+    // creating links of all maples
+    let suspect_maples = frost_elf
+        .all_redmaples_as_map()?
+        .values()
+        .map(|x| (x, Links::from(x).0));
+
+    // try to find the exact match on the item
+    let the_exact = suspect_maples.clone().find_map(|(x, l)| {
+        l.into_iter()
+            .find(|li| li.id().inner() == &link_id)
+            .map(|li| Some((li, x)))?
+    });
+
+    let (link_in_question, harboring_redmaple) = match the_exact {
+        Some(l) => Ok(l), // if it's ok, we don't need a similarity search
+        None => {
+            let matches: Vec<(Link, &RedMaple<EventWrapper>)> = suspect_maples
+                .map(|(the_redmaple_in_question, suspect_links)| {
+                    {
+                        suspect_links
+                            .into_iter()
+                            .filter(|one_link| {
+                                one_link
+                                    .id()
+                                    .inner()
+                                    .inner()
+                                    .to_string()
+                                    .contains(&link_id.inner().to_string())
+                            })
+                            .map(|li| (li, the_redmaple_in_question))
+                            .collect::<Vec<(Link, &RedMaple<EventWrapper>)>>()
+                    }
+                })
+                .flatten()
+                .collect();
+
+            if matches.len() > 1 {
+                Err::<(Link, &RedMaple<EventWrapper>), MainError>(MainError::TooManyLinksMatched)
+            } else {
+                matches
+                    .first()
+                    .ok_or(MainError::LinkCouldNotBeFound)
+                    .map(core::clone::Clone::clone)
+            }
+        }
+    }?;
+
+    let event_at_the_bay = EventWrapper::new(
+        new_event_id,
+        time_of_the_new_event,
+        Event::Dislinked(link_in_question.into_id()),
+    );
+
+    frost_elf.save(harboring_redmaple.clone().into_appended(event_at_the_bay))?;
     Ok(())
 }
 
@@ -148,7 +215,10 @@ fn add_link(
 ///   containing a `color_eyre::Report` is returned.
 ///
 fn list_entries(frost_elf: &FileDB) -> Result<(), color_eyre::Report> {
-    let mut redmaples = frost_elf.all_events()?.values().collect::<Vec<_>>();
+    let mut redmaples = frost_elf
+        .all_redmaples_as_map()?
+        .values()
+        .collect::<Vec<_>>();
 
     redmaples.sort_by(|a, b| {
         let at = a
@@ -242,4 +312,10 @@ fn update_maple(
 enum MainError {
     #[error("file store must be given")]
     FileStoreCannotBeEmpty,
+
+    #[error("Could not find the link")]
+    LinkCouldNotBeFound,
+
+    #[error("Matched too many links")]
+    TooManyLinksMatched,
 }

@@ -82,6 +82,9 @@ impl Args {
                     to: maple_to.into(),
                     why: explanation,
                 })),
+                MapleCommands::Dislink { link_to_remove } => Ok(Request::Change(Change::Dislink {
+                    link_id: ID::from(link_to_remove),
+                })),
             },
         }
     }
@@ -145,6 +148,13 @@ pub enum MapleCommands {
         /// Why the link?
         #[arg(value_name = "Why are you linking?")]
         explanation: String,
+    },
+
+    /// Dislink the id
+    Dislink {
+        /// ID of the Link which we are removing the link.
+        #[arg(value_name = "Link ID to remove")]
+        link_to_remove: i128,
     },
 }
 
