@@ -102,7 +102,7 @@ fn main() -> color_eyre::Result<()> {
             Change::AddLinkToMaple { from, to, why } => add_link(&frost_elf, &from, &to, why)?,
             Change::Dislink { link_id } => {
                 let time_now = time::OffsetDateTime::now_utc();
-                dislink(&frost_elf, link_id, ID::from(time_now), time_now)?
+                dislink(&frost_elf, link_id, ID::from(time_now), time_now)?;
             }
         },
 
@@ -132,36 +132,36 @@ fn dislink(
             .map(|li| Some((li, x)))?
     });
 
-    let (link_in_question, harboring_redmaple) = match the_exact {
-        Some(l) => Ok(l), // if it's ok, we don't need a similarity search
-        None => {
-            let matches: Vec<(Link, &RedMaple<EventWrapper>)> = suspect_maples
-                .flat_map(|(the_redmaple_in_question, suspect_links)| {
-                    {
-                        suspect_links
-                            .into_iter()
-                            .filter(|one_link| {
-                                one_link
-                                    .id()
-                                    .inner()
-                                    .inner()
-                                    .to_string()
-                                    .contains(&link_id.inner().to_string())
-                            })
-                            .map(|li| (li, the_redmaple_in_question))
-                            .collect::<Vec<(Link, &RedMaple<EventWrapper>)>>()
-                    }
-                })
-                .collect();
+    let (link_in_question, harboring_redmaple) = if let Some(l) = the_exact {
+        Ok(l)
+    } else {
+        let matches: Vec<(Link, &RedMaple<EventWrapper>)> = suspect_maples
+            .map(|(the_redmaple_in_question, suspect_links)| {
+                {
+                    suspect_links
+                        .into_iter()
+                        .filter(|one_link| {
+                            one_link
+                                .id()
+                                .inner()
+                                .inner()
+                                .to_string()
+                                .contains(&link_id.inner().to_string())
+                        })
+                        .map(|li| (li, the_redmaple_in_question))
+                        .collect::<Vec<(Link, &RedMaple<EventWrapper>)>>()
+                }
+            })
+            .flatten()
+            .collect();
 
-            if matches.len() > 1 {
-                Err::<(Link, &RedMaple<EventWrapper>), MainError>(MainError::TooManyLinksMatched)
-            } else {
-                matches
-                    .first()
-                    .ok_or(MainError::LinkCouldNotBeFound)
-                    .map(core::clone::Clone::clone)
-            }
+        if matches.len() > 1 {
+            Err::<(Link, &RedMaple<EventWrapper>), MainError>(MainError::TooManyLinksMatched)
+        } else {
+            matches
+                .first()
+                .ok_or(MainError::LinkCouldNotBeFound)
+                .map(core::clone::Clone::clone)
         }
     }?;
 
