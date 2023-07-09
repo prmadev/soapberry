@@ -25,7 +25,11 @@
     clippy::use_self,
     clippy::missing_const_for_fn,
     clippy::cognitive_complexity,
-    clippy::self_named_constructors
+    clippy::self_named_constructors,
+    clippy::cloned_instead_of_copied,
+    clippy::iter_cloned_collect,
+    clippy::implicit_clone,
+    clippy::map_clone
 )]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
@@ -122,7 +126,7 @@ fn main() -> color_eyre::Result<()> {
 }
 
 fn dislink(
-    frost_elf: &persistence::FileDB,
+    frost_elf: &impl FrostElf<Item = EventWrapper, EventError = FrostElfError>,
     link_id: &ID,
     new_event_id: ID,
     time_of_the_new_event: time::OffsetDateTime,
@@ -185,7 +189,7 @@ fn dislink(
 }
 
 fn add_link(
-    frost_elf: &persistence::FileDB,
+    frost_elf: &impl FrostElf<Item = EventWrapper, EventError = FrostElfError>,
     from: &ID,
     time_of_the_new_event: OffsetDateTime,
     to: &ID,
@@ -268,7 +272,7 @@ fn list_entries(frost_elf: &FileDB) -> Result<(), color_eyre::Report> {
 }
 
 fn create_maple(
-    frost_elf: &persistence::FileDB,
+    frost_elf: &impl FrostElf<Item = EventWrapper, EventError = FrostElfError>,
     mpl: journey::Maple,
     time_of_the_new_event: OffsetDateTime,
 ) -> Result<(), color_eyre::Report> {
@@ -281,7 +285,7 @@ fn create_maple(
 }
 
 fn update_maple(
-    frost_elf: &persistence::FileDB,
+    frost_elf: &impl FrostElf<Item = EventWrapper, EventError = FrostElfError>,
     maple_id: &ID,
     new_body: Body,
     time_now: OffsetDateTime,

@@ -26,7 +26,11 @@
     clippy::use_self,
     clippy::missing_const_for_fn,
     clippy::cognitive_complexity,
-    clippy::self_named_constructors
+    clippy::self_named_constructors,
+    clippy::cloned_instead_of_copied,
+    clippy::iter_cloned_collect,
+    clippy::implicit_clone,
+    clippy::map_clone
 )]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
