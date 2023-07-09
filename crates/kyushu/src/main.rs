@@ -210,18 +210,46 @@ fn linkup(
     why: String,
     new_event_id: ID,
 ) -> Result<(), color_eyre::Report> {
-    let des = ValidMapleID::try_from(frost_elf.redmaple_similar_id(to)?)?;
+    let dest = match frost_elf.redmaple_matching_id(to) {
+        Ok(o) => Ok(ValidMapleID::try_from(o)),
+        Err(e) => match e {
+            FrostElfError::FailedToFindTheEventWithThatID => {
+                Ok(ValidMapleID::try_from(frost_elf.redmaple_similar_id(to)?))
+            }
+            FrostElfError::FailedToSerialize(e) => Err(FrostElfError::FailedToSerialize(e)),
+            FrostElfError::FailedToCreateNewFile(e) => Err(FrostElfError::FailedToCreateNewFile(e)),
+            FrostElfError::FailedToWriteIntoFile(e) => Err(FrostElfError::FailedToWriteIntoFile(e)),
+            FrostElfError::FailedToGetID(e) => Err(FrostElfError::FailedToGetID(e)),
+            FrostElfError::FailedToFindASingleMatchingItem(e) => {
+                Err(FrostElfError::FailedToFindASingleMatchingItem(e))
+            }
+            FrostElfError::EventBuilderFailed(e) => Err(FrostElfError::EventBuilderFailed(e)),
+        },
+    }??;
+
+    let frm = match frost_elf.redmaple_matching_id(from) {
+        Ok(o) => Ok(o),
+        Err(e) => match e {
+            FrostElfError::FailedToFindTheEventWithThatID => {
+                Ok(frost_elf.redmaple_similar_id(from)?)
+            }
+            FrostElfError::FailedToSerialize(e) => Err(FrostElfError::FailedToSerialize(e)),
+            FrostElfError::FailedToCreateNewFile(e) => Err(FrostElfError::FailedToCreateNewFile(e)),
+            FrostElfError::FailedToWriteIntoFile(e) => Err(FrostElfError::FailedToWriteIntoFile(e)),
+            FrostElfError::FailedToGetID(e) => Err(FrostElfError::FailedToGetID(e)),
+            FrostElfError::FailedToFindASingleMatchingItem(e) => {
+                Err(FrostElfError::FailedToFindASingleMatchingItem(e))
+            }
+            FrostElfError::EventBuilderFailed(e) => Err(FrostElfError::EventBuilderFailed(e)),
+        },
+    }?;
+
     let ev = EventWrapper::new(
         time_of_the_new_event.into(),
         time_of_the_new_event,
-        Event::LinkAdded((des, why, new_event_id)),
+        Event::LinkAdded((dest, why, new_event_id)),
     );
-    frost_elf.save(
-        frost_elf
-            .redmaple_similar_id(from)?
-            .clone()
-            .into_appended(ev),
-    )?;
+    frost_elf.save(frm.clone().into_appended(ev))?;
     Ok(())
 }
 
