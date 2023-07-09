@@ -155,11 +155,14 @@ fn dislink(
             .collect();
 
         if matches.len() > 1 {
+            // too many matches
             Err::<(Link, &RedMaple<EventWrapper>), MainError>(MainError::TooManyLinksMatched)
         } else {
             matches
                 .first()
+                // not enough matches
                 .ok_or(MainError::LinkCouldNotBeFound)
+                // somehow self reflective:
                 .map(core::clone::Clone::clone)
         }
     }?;
