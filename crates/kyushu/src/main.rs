@@ -227,7 +227,7 @@ fn linkup(
         },
     }??;
 
-    let frm = match frost_elf.redmaple_matching_id(from) {
+    let origin_maple = match frost_elf.redmaple_matching_id(from) {
         Ok(o) => Ok(o),
         Err(e) => match e {
             FrostElfError::FailedToFindTheEventWithThatID => {
@@ -249,7 +249,7 @@ fn linkup(
         time_of_the_new_event,
         Event::LinkAdded((dest, why, new_event_id)),
     );
-    frost_elf.save(frm.clone().into_appended(ev))?;
+    frost_elf.save(origin_maple.clone().into_appended(ev))?;
     Ok(())
 }
 
