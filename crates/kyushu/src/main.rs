@@ -44,7 +44,7 @@ use redmaple::{
     FrostElf, RedMaple,
 };
 use thiserror::Error;
-use time::format_description;
+use time::{format_description, OffsetDateTime};
 use whirlybird::journey::{self, Body, Event, EventWrapper, Link, Links, ValidMapleID};
 
 fn main() -> color_eyre::Result<()> {
@@ -82,9 +82,6 @@ fn main() -> color_eyre::Result<()> {
         config_file_output,
     ));
 
-    // forming a request
-    let req = cli_arguments.to_request()?;
-
     // creating persistence
     let frost_elf = persistence::FileDB::try_from(
         configurations
@@ -92,16 +89,27 @@ fn main() -> color_eyre::Result<()> {
             .ok_or(MainError::FileStoreCannotBeEmpty)?,
     )?;
 
+    let time_now = time::OffsetDateTime::now_utc();
+
     // matching requests to the appropiate functions
-    match req {
-        Request::Change(chng) => match chng {
-            Change::CreateNewMaple(mpl) => create_maple(&frost_elf, mpl)?,
-            Change::UpdateMapleBody(maple_id, new_body) => {
-                update_maple(&frost_elf, &maple_id, new_body)?;
+    match cli_arguments.to_request()? {
+        Request::Change(the_change) => match the_change {
+            Change::CreateNewMaple(the_new_maple) => {
+                create_maple(&frost_elf, the_new_maple, time_now)?;
             }
-            Change::AddLinkToMaple { from, to, why } => add_link(&frost_elf, &from, &to, why)?,
+            Change::UpdateMapleBody(maple_id, the_new_body) => {
+                update_maple(
+                    &frost_elf,
+                    &maple_id,
+                    the_new_body,
+                    time_now,
+                    ID::from(time_now),
+                )?;
+            }
+            Change::AddLinkToMaple { from, to, why } => {
+                add_link(&frost_elf, &from, time_now, &to, why, ID::from(time_now))?;
+            }
             Change::Dislink { link_id } => {
-                let time_now = time::OffsetDateTime::now_utc();
                 dislink(&frost_elf, &link_id, ID::from(time_now), time_now)?;
             }
         },
@@ -162,8 +170,7 @@ fn dislink(
                 .first()
                 // not enough matches
                 .ok_or(MainError::LinkCouldNotBeFound)
-                // somehow self reflective:
-                .map(core::clone::Clone::clone)
+                .cloned()
         }
     }?;
 
@@ -180,15 +187,16 @@ fn dislink(
 fn add_link(
     frost_elf: &persistence::FileDB,
     from: &ID,
+    time_of_the_new_event: OffsetDateTime,
     to: &ID,
     why: String,
+    new_event_id: ID,
 ) -> Result<(), color_eyre::Report> {
     let des = ValidMapleID::try_from(frost_elf.redmaple_similar_id(to)?)?;
-    let time_now = time::OffsetDateTime::now_utc();
     let ev = EventWrapper::new(
-        time_now.into(),
-        time_now,
-        Event::LinkAdded((des, why, ID::from(time_now))),
+        time_of_the_new_event.into(),
+        time_of_the_new_event,
+        Event::LinkAdded((des, why, new_event_id)),
     );
     frost_elf.save(
         frost_elf
@@ -262,11 +270,11 @@ fn list_entries(frost_elf: &FileDB) -> Result<(), color_eyre::Report> {
 fn create_maple(
     frost_elf: &persistence::FileDB,
     mpl: journey::Maple,
+    time_of_the_new_event: OffsetDateTime,
 ) -> Result<(), color_eyre::Report> {
-    let created_time = time::OffsetDateTime::now_utc();
     frost_elf.save(RedMaple::new(vec![EventWrapper::new(
         mpl.id().inner().clone(),
-        created_time,
+        time_of_the_new_event,
         Event::MapleCreated(mpl),
     )]))?;
     Ok(())
@@ -276,36 +284,36 @@ fn update_maple(
     frost_elf: &persistence::FileDB,
     maple_id: &ID,
     new_body: Body,
+    time_now: OffsetDateTime,
+    new_event_id: ID,
 ) -> Result<(), color_eyre::Report> {
-    let rdmpl = match frost_elf.redmaple_matching_id(maple_id) {
+    let young_redmaple = match frost_elf.redmaple_matching_id(maple_id) {
         Ok(o) => o.clone(),
         Err(e) => match e {
             FrostElfError::FailedToFindTheEventWithThatID => {
                 match frost_elf.redmaple_similar_id(maple_id) {
-                    Ok(o) => o.clone(),
-                    Err(er) => return Err(er)?,
+                    Ok(the_maple) => the_maple.clone(),
+                    Err(err) => return Err(err)?,
                 }
             }
-            FrostElfError::FailedToSerialize(e) => return Err(e)?,
-            FrostElfError::FailedToCreateNewFile(e) | FrostElfError::FailedToWriteIntoFile(e) => {
-                return Err(e)?
+            FrostElfError::FailedToSerialize(err) => return Err(err)?,
+            FrostElfError::FailedToCreateNewFile(err)
+            | FrostElfError::FailedToWriteIntoFile(err) => return Err(err)?,
+            FrostElfError::FailedToGetID(err) => return Err(err)?,
+            FrostElfError::FailedToFindASingleMatchingItem(err) => {
+                return Err(color_eyre::Report::msg(format!("{err:#?}")))?
             }
-            FrostElfError::FailedToGetID(e) => return Err(e)?,
-            FrostElfError::FailedToFindASingleMatchingItem(e) => {
-                return Err(color_eyre::Report::msg(format!("{e:#?}")))?
-            }
-            FrostElfError::EventBuilderFailed(e) => return Err(e)?,
+            FrostElfError::EventBuilderFailed(err) => return Err(err)?,
         },
     };
-    let time_now = time::OffsetDateTime::now_utc();
-    let event = EventWrapper::new(
-        ID::from(time_now),
+    let new_event = EventWrapper::new(
+        new_event_id,
         time_now,
-        Event::MapleBodyUpdated(ValidMapleID::try_from(&rdmpl)?, new_body),
+        Event::MapleBodyUpdated(ValidMapleID::try_from(&young_redmaple)?, new_body),
     );
 
-    let rdmpl = rdmpl.into_appended(event);
-    frost_elf.save(rdmpl)?;
+    let more_sophisticated_redmaple = young_redmaple.into_appended(new_event);
+    frost_elf.save(more_sophisticated_redmaple)?;
     Ok(())
 }
 
