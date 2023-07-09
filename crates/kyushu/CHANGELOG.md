@@ -517,6 +517,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.0](https://github.com/amirography/soapberry/compare/kyushu-v0.15.0...kyushu-v0.16.0) - 2023-07-09
+
+### Added
+- now can use an optional time input
+- add similarity dislink
+- add id for links
+
+### Fixed
+- fix the problem with similarity getting applied prematurely
+- fix the problem with similarity getting applied prematurely
+
+### Other
+- improve files
+- more genericacity
+- even more refactoring
+- a few linting imrpovements
+- a few linting imrpovements
+- a few linting imrpovements
+- a few linting imrpovements
+
 ## [0.15.0](https://github.com/amirography/soapberry/compare/kyushu-v0.14.0...kyushu-v0.15.0) - 2023-07-05
 
 ### Other
