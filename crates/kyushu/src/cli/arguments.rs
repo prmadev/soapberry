@@ -3,7 +3,7 @@
 use redmaple::id::ID;
 use std::{env::ArgsOs, path::PathBuf};
 
-use clap::Parser;
+use clap::{arg, Parser};
 use whirlybird::journey::{Body, Maple};
 
 use crate::domain::requests::{Change, Information, Request};
@@ -11,7 +11,7 @@ use crate::domain::requests::{Change, Information, Request};
 /// interpretations of valid arguments given to the program
 #[derive(clap::Parser, Debug, Clone, PartialEq, Eq)]
 #[command(author)]
-#[command(about = "local first, event driven-journaling in one line or less")]
+#[command(about = "Local-First, Event-Driven Journaling")]
 #[command(version)]
 #[command(bin_name = "kyushu")]
 #[command(name = "kyushu")]

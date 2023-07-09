@@ -1,6 +1,6 @@
 [package]
 name = "kyushu"
-description = "kyushu is a journaling application which let you deliberate on events and your journey through them"
+description = "kyushu is a local-first, event-based journaling application."
 version = "0.15.0"
 edition = "2021"
 authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
@@ -26,7 +26,7 @@ split_commits = true
 filter_unconventional = true
 
 [dependencies]
-clap = { version = "4.3.10", features = ["derive"] }
+clap = { version = "4.3.10", features = ["derive", "cargo"] }
 color-eyre = "0.6.2"
 once_cell = "1.18.0"
 owo-colors = "3.5.0"

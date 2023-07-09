@@ -51,8 +51,9 @@ use thiserror::Error;
 use time::{format_description, OffsetDateTime};
 use whirlybird::journey::{self, Body, Event, EventWrapper, Link, Links, ValidMapleID};
 
+#[allow(unreachable_code)]
 fn main() -> color_eyre::Result<()> {
-    color_eyre::install()?;
+    // color_eyre::install()?;
 
     // checking for config file
     let mut config_file_output: Option<Config> = Option::default();
@@ -99,10 +100,10 @@ fn main() -> color_eyre::Result<()> {
     match cli_arguments.to_request()? {
         Request::Change(the_change) => match the_change {
             Change::CreateNewMaple(the_new_maple) => {
-                create_maple(&frost_elf, the_new_maple, time_now)?;
+                plant_maple(&frost_elf, the_new_maple, time_now)?;
             }
             Change::UpdateMapleBody(maple_id, the_new_body) => {
-                update_maple(
+                water_maple(
                     &frost_elf,
                     &maple_id,
                     the_new_body,
@@ -111,7 +112,7 @@ fn main() -> color_eyre::Result<()> {
                 )?;
             }
             Change::AddLinkToMaple { from, to, why } => {
-                add_link(&frost_elf, &from, time_now, &to, why, ID::from(time_now))?;
+                linkup(&frost_elf, &from, time_now, &to, why, ID::from(time_now))?;
             }
             Change::Dislink { link_id } => {
                 dislink(&frost_elf, &link_id, ID::from(time_now), time_now)?;
@@ -119,7 +120,7 @@ fn main() -> color_eyre::Result<()> {
         },
 
         Request::Information(i) => match i {
-            kyushu::domain::requests::Information::ListEntries => list_entries(&frost_elf)?,
+            kyushu::domain::requests::Information::ListEntries => show_forest(&frost_elf)?,
         },
     };
     Ok(())
@@ -188,7 +189,7 @@ fn dislink(
     Ok(())
 }
 
-fn add_link(
+fn linkup(
     frost_elf: &impl FrostElf<Item = EventWrapper, EventError = FrostElfError>,
     from: &ID,
     time_of_the_new_event: OffsetDateTime,
@@ -227,7 +228,7 @@ fn add_link(
 /// - If an error occurs during the retrieval, sorting, or printing process, an `Err` variant
 ///   containing a `color_eyre::Report` is returned.
 ///
-fn list_entries(frost_elf: &FileDB) -> Result<(), color_eyre::Report> {
+fn show_forest(frost_elf: &FileDB) -> Result<(), color_eyre::Report> {
     let mut redmaples = frost_elf
         .all_redmaples_as_map()?
         .values()
@@ -271,20 +272,20 @@ fn list_entries(frost_elf: &FileDB) -> Result<(), color_eyre::Report> {
     Ok(())
 }
 
-fn create_maple(
+fn plant_maple(
     frost_elf: &impl FrostElf<Item = EventWrapper, EventError = FrostElfError>,
-    mpl: journey::Maple,
+    the_new_maple: journey::Maple,
     time_of_the_new_event: OffsetDateTime,
 ) -> Result<(), color_eyre::Report> {
     frost_elf.save(RedMaple::new(vec![EventWrapper::new(
-        mpl.id().inner().clone(),
+        the_new_maple.id().inner().clone(),
         time_of_the_new_event,
-        Event::MapleCreated(mpl),
+        Event::MapleCreated(the_new_maple),
     )]))?;
     Ok(())
 }
 
-fn update_maple(
+fn water_maple(
     frost_elf: &impl FrostElf<Item = EventWrapper, EventError = FrostElfError>,
     maple_id: &ID,
     new_body: Body,
