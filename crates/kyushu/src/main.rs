@@ -136,7 +136,7 @@ fn dislink(
         Some(l) => Ok(l), // if it's ok, we don't need a similarity search
         None => {
             let matches: Vec<(Link, &RedMaple<EventWrapper>)> = suspect_maples
-                .map(|(the_redmaple_in_question, suspect_links)| {
+                .flat_map(|(the_redmaple_in_question, suspect_links)| {
                     {
                         suspect_links
                             .into_iter()
@@ -152,7 +152,6 @@ fn dislink(
                             .collect::<Vec<(Link, &RedMaple<EventWrapper>)>>()
                     }
                 })
-                .flatten()
                 .collect();
 
             if matches.len() > 1 {
