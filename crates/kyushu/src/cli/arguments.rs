@@ -2,6 +2,7 @@
 
 use redmaple::id::ID;
 use std::{env::ArgsOs, path::PathBuf};
+use time::OffsetDateTime;
 
 use clap::{arg, Parser};
 use whirlybird::journey::{Body, Maple};
@@ -48,43 +49,91 @@ impl Args {
     ///
     /// if there are inconsistencies and domain problems, this conversion will return an error
     #[allow(clippy::cast_sign_loss)] // timestamp is given in i64, but it can only be positive
-    pub fn to_request(self) -> Result<crate::domain::requests::Request, ArgToDomainRequestError> {
+    pub fn to_request(
+        self,
+        time_now: OffsetDateTime,
+    ) -> Result<crate::domain::requests::Request, ArgToDomainRequestError> {
         match self.command {
             Commands::Maple(maple_command) => match maple_command {
                 // request the creation of a brand new [`Maple`]
-                MapleCommands::New { content } => {
+                MapleCommands::New {
+                    content,
+                    time_given,
+                } => {
                     let new_maple = Maple::new(
-                        ID::from(
-                            time::OffsetDateTime::now_local()
-                                .map_err(ArgToDomainRequestError::TimeOffsetCouldNotBeGet)?,
-                        ),
+                        ID::from(time_given.unwrap_or(time_now.unix_timestamp_nanos())),
                         Body::try_from(content)?,
                     );
+
                     let ch = Change::CreateNewMaple(new_maple);
 
-                    Ok(Request::Change(ch))
+                    let time_of_change = time_given
+                        .map(OffsetDateTime::from_unix_timestamp_nanos)
+                        .transpose()
+                        .map_err(ArgToDomainRequestError::FailedToParseTime)?
+                        .unwrap_or(time_now);
+
+                    Ok(Request::Change((time_of_change, ch)))
                 }
 
                 // Request for listing of all maple
                 MapleCommands::List => Ok(Request::Information(Information::ListEntries)),
 
                 // Request a updating of body
-                MapleCommands::Update { content, maple_id } => Ok(Request::Change(
-                    Change::UpdateMapleBody(ID::from(maple_id), Body::try_from(content)?),
-                )),
+                MapleCommands::Water {
+                    content,
+                    maple_id,
+                    time_given,
+                } => {
+                    let time_of_change = time_given
+                        .map(OffsetDateTime::from_unix_timestamp_nanos)
+                        .transpose()
+                        .map_err(ArgToDomainRequestError::FailedToParseTime)?
+                        .unwrap_or(time_now);
+
+                    Ok(Request::Change((
+                        time_of_change,
+                        Change::UpdateMapleBody(ID::from(maple_id), Body::try_from(content)?),
+                    )))
+                }
 
                 MapleCommands::Link {
                     maple_from,
                     maple_to,
-                    explanation,
-                } => Ok(Request::Change(Change::AddLinkToMaple {
-                    from: maple_from.into(),
-                    to: maple_to.into(),
-                    why: explanation,
-                })),
-                MapleCommands::Dislink { link_to_remove } => Ok(Request::Change(Change::Dislink {
-                    link_id: ID::from(link_to_remove),
-                })),
+                    why,
+                    time_given,
+                } => {
+                    let time_of_change = time_given
+                        .map(OffsetDateTime::from_unix_timestamp_nanos)
+                        .transpose()
+                        .map_err(ArgToDomainRequestError::FailedToParseTime)?
+                        .unwrap_or(time_now);
+
+                    Ok(Request::Change((
+                        time_of_change,
+                        Change::AddLinkToMaple {
+                            from: maple_from.into(),
+                            to: maple_to.into(),
+                            why,
+                        },
+                    )))
+                }
+                MapleCommands::Dislink {
+                    link_to_remove,
+                    time_given,
+                } => {
+                    let time_of_change = time_given
+                        .map(OffsetDateTime::from_unix_timestamp_nanos)
+                        .transpose()
+                        .map_err(ArgToDomainRequestError::FailedToParseTime)?
+                        .unwrap_or(time_now);
+                    Ok(Request::Change((
+                        time_of_change,
+                        Change::Dislink {
+                            link_id: ID::from(link_to_remove),
+                        },
+                    )))
+                }
             },
         }
     }
@@ -94,12 +143,16 @@ impl Args {
 #[derive(thiserror::Error, Debug, Clone)]
 pub enum ArgToDomainRequestError {
     /// Body Could not be built!
-    #[error("body could not be built {0}")]
+    #[error("body could not be built: {0}")]
     BodyBuildingFailed(#[from] whirlybird::journey::BuildingError),
 
     /// Could not get the time!
-    #[error("failed to get the time {0}")]
+    #[error("failed to get the time: {0}")]
     TimeOffsetCouldNotBeGet(time::error::IndeterminateOffset),
+
+    /// Could Not Parse Time
+    #[error("failed to parse time: {0}")]
+    FailedToParseTime(time::error::ComponentRange),
 }
 
 /// Program arguments for issuing commands.
@@ -116,25 +169,34 @@ pub enum Commands {
 #[derive(clap::Subcommand, Debug, Clone, PartialEq, Eq)]
 pub enum MapleCommands {
     /// Creates a new maple.
-    #[command(arg_required_else_help = true)]
+    #[command()]
     New {
         #[arg(value_name = "CONTENT")]
-        /// Content of the body of the maple's Body
+        /// Content of the body of the maple's Body.
         content: String,
+
+        /// Time of the creation of the new event. This is used for IDs as well.
+        #[arg(value_name = "TIME")]
+        time_given: Option<i128>,
     },
 
     /// Lists all the maples.
     List,
 
     /// Updates the Body of a maple.
-    #[command(arg_required_else_help = true)]
-    Update {
+    #[command()]
+    Water {
         /// ID of the maple for which the body is being updated.
-        #[arg(value_name = "Maple ID")]
+        #[arg(value_name = "MAPLEID")]
         maple_id: i128,
-        #[arg(value_name = "Body")]
+
+        #[arg(value_name = "BODY")]
         /// Content of the body of the maple's Body.
         content: String,
+
+        /// Time of the updating of maple. This is used for IDs as well.
+        #[arg(value_name = "TIME")]
+        time_given: Option<i128>,
     },
 
     /// links a maple to another
@@ -147,7 +209,11 @@ pub enum MapleCommands {
         maple_to: i128,
         /// Why the link?
         #[arg(value_name = "Why are you linking?")]
-        explanation: String,
+        why: String,
+
+        /// Time of the linking. This is used for IDs as well.
+        #[arg(value_name = "TIME")]
+        time_given: Option<i128>,
     },
 
     /// Dislink the id
@@ -155,6 +221,10 @@ pub enum MapleCommands {
         /// ID of the Link which we are removing the link.
         #[arg(value_name = "Link ID to remove")]
         link_to_remove: i128,
+
+        /// Time of the linking. This is used for IDs as well.
+        #[arg(value_name = "TIME")]
+        time_given: Option<i128>,
     },
 }
 
@@ -162,6 +232,6 @@ pub enum MapleCommands {
 #[derive(clap::Subcommand, Debug, Clone, PartialEq, Eq)]
 pub enum HouseCommands {
     /// Creates a new house.
-    #[command(arg_required_else_help = true)]
+    #[command()]
     New {},
 }

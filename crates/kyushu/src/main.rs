@@ -35,6 +35,7 @@
 
 use std::path::PathBuf;
 
+use clap::Parser;
 use kyushu::{
     self,
     cli::{Args, MaplePrinter},
@@ -79,7 +80,7 @@ fn main() -> color_eyre::Result<()> {
     };
 
     // getting arguments
-    let cli_arguments = Args::try_from(std::env::args_os())?;
+    let cli_arguments = Args::try_parse_from(std::env::args_os())?;
 
     // getting configurations from cli_arguments
     let configurations = Config::from(InputInfo::new(
@@ -97,25 +98,37 @@ fn main() -> color_eyre::Result<()> {
     let time_now = time::OffsetDateTime::now_utc();
 
     // matching requests to the appropiate functions
-    match cli_arguments.to_request()? {
-        Request::Change(the_change) => match the_change {
+    match cli_arguments.to_request(time_now)? {
+        Request::Change((time_of_change, the_change)) => match the_change {
             Change::CreateNewMaple(the_new_maple) => {
-                plant_maple(&frost_elf, the_new_maple, time_now)?;
+                plant_maple(&frost_elf, the_new_maple, time_of_change)?;
             }
             Change::UpdateMapleBody(maple_id, the_new_body) => {
                 water_maple(
                     &frost_elf,
                     &maple_id,
                     the_new_body,
-                    time_now,
-                    ID::from(time_now),
+                    time_of_change,
+                    ID::from(time_of_change),
                 )?;
             }
             Change::AddLinkToMaple { from, to, why } => {
-                linkup(&frost_elf, &from, time_now, &to, why, ID::from(time_now))?;
+                linkup(
+                    &frost_elf,
+                    &from,
+                    time_of_change,
+                    &to,
+                    why,
+                    ID::from(time_of_change),
+                )?;
             }
             Change::Dislink { link_id } => {
-                dislink(&frost_elf, &link_id, ID::from(time_now), time_now)?;
+                dislink(
+                    &frost_elf,
+                    &link_id,
+                    ID::from(time_of_change),
+                    time_of_change,
+                )?;
             }
         },
 
