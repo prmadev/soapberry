@@ -41,12 +41,12 @@ use kyushu::{
     cli::{Args, MaplePrinter},
     config::{Config, InputInfo},
     domain::requests::{Change, Request},
-    persistence::{self, FileDB, FrostElfError},
+    persistence::{self, FrostElfError},
 };
 use redmaple::{
     event_group::EventKind,
     id::{Unique, ValidID, ID},
-    FrostElf, RedMaple,
+    BeeElf, CartographerElf, GardnerElf, RedMaple, SeekingElf,
 };
 use thiserror::Error;
 use time::{format_description, OffsetDateTime};
@@ -106,6 +106,7 @@ fn main() -> color_eyre::Result<()> {
             Change::UpdateMapleBody(maple_id, the_new_body) => {
                 water_maple(
                     &frost_elf,
+                    &frost_elf,
                     &maple_id,
                     the_new_body,
                     time_of_change,
@@ -114,6 +115,7 @@ fn main() -> color_eyre::Result<()> {
             }
             Change::AddLinkToMaple { from, to, why } => {
                 linkup(
+                    &frost_elf,
                     &frost_elf,
                     &from,
                     time_of_change,
@@ -124,6 +126,7 @@ fn main() -> color_eyre::Result<()> {
             }
             Change::Dislink { link_id } => {
                 dislink(
+                    &frost_elf,
                     &frost_elf,
                     &link_id,
                     ID::from(time_of_change),
@@ -140,13 +143,14 @@ fn main() -> color_eyre::Result<()> {
 }
 
 fn dislink(
-    frost_elf: &impl FrostElf<Item = EventWrapper, EventError = FrostElfError>,
+    gardner_elf: &impl GardnerElf<Item = EventWrapper, EventError = FrostElfError>,
+    cartographer_elf: &impl CartographerElf<Item = EventWrapper, EventError = FrostElfError>,
     link_id: &ID,
     new_event_id: ID,
     time_of_the_new_event: time::OffsetDateTime,
 ) -> Result<(), color_eyre::Report> {
     // creating links of all maples
-    let suspect_maples = frost_elf
+    let suspect_maples = cartographer_elf
         .all_redmaples_as_map()?
         .values()
         .map(|x| (x, Links::from(x).0));
@@ -198,26 +202,24 @@ fn dislink(
         Event::Dislinked(link_in_question.into_id()),
     );
 
-    frost_elf.save(
-        harboring_redmaple.clone().into_appended(event_at_the_bay),
-        true,
-    )?;
+    gardner_elf.tend(harboring_redmaple.clone().into_appended(event_at_the_bay))?;
     Ok(())
 }
 
 fn linkup(
-    frost_elf: &impl FrostElf<Item = EventWrapper, EventError = FrostElfError>,
+    gardner_elf: &impl GardnerElf<Item = EventWrapper, EventError = FrostElfError>,
+    seeking_elf: &impl SeekingElf<Item = EventWrapper, EventError = FrostElfError>,
     from: &ID,
     time_of_the_new_event: OffsetDateTime,
     to: &ID,
     why: String,
     new_event_id: ID,
 ) -> Result<(), color_eyre::Report> {
-    let dest = match frost_elf.redmaple_matching_id(to) {
+    let dest = match seeking_elf.redmaple_matching_id(to) {
         Ok(o) => Ok(ValidMapleID::try_from(o)),
         Err(e) => match e {
             FrostElfError::FailedToFindTheEventWithThatID => {
-                Ok(ValidMapleID::try_from(frost_elf.redmaple_similar_id(to)?))
+                Ok(ValidMapleID::try_from(seeking_elf.redmaple_similar_id(to)?))
             }
             FrostElfError::FailedToSerialize(e) => Err(FrostElfError::FailedToSerialize(e)),
             FrostElfError::FailedToCreateNewFile(e) => Err(FrostElfError::FailedToCreateNewFile(e)),
@@ -232,14 +234,15 @@ fn linkup(
             FrostElfError::CouldNotReadTheDirectory(e) => {
                 Err(FrostElfError::CouldNotReadTheDirectory(e))
             }
+            FrostElfError::FileDoesNotExists(e) => Err(FrostElfError::FileDoesNotExists(e)),
         },
     }??;
 
-    let origin_maple = match frost_elf.redmaple_matching_id(from) {
+    let origin_maple = match seeking_elf.redmaple_matching_id(from) {
         Ok(o) => Ok(o),
         Err(e) => match e {
             FrostElfError::FailedToFindTheEventWithThatID => {
-                Ok(frost_elf.redmaple_similar_id(from)?)
+                Ok(seeking_elf.redmaple_similar_id(from)?)
             }
             FrostElfError::FailedToSerialize(e) => Err(FrostElfError::FailedToSerialize(e)),
             FrostElfError::FailedToCreateNewFile(e) => Err(FrostElfError::FailedToCreateNewFile(e)),
@@ -254,6 +257,7 @@ fn linkup(
             FrostElfError::CouldNotReadTheDirectory(e) => {
                 Err(FrostElfError::CouldNotReadTheDirectory(e))
             }
+            FrostElfError::FileDoesNotExists(e) => Err(FrostElfError::FileDoesNotExists(e)),
         },
     }?;
 
@@ -262,7 +266,7 @@ fn linkup(
         time_of_the_new_event,
         Event::LinkAdded((dest, why, new_event_id)),
     );
-    frost_elf.save(origin_maple.clone().into_appended(ev), true)?;
+    gardner_elf.tend(origin_maple.clone().into_appended(ev))?;
     Ok(())
 }
 
@@ -282,8 +286,10 @@ fn linkup(
 /// - If an error occurs during the retrieval, sorting, or printing process, an `Err` variant
 ///   containing a `color_eyre::Report` is returned.
 ///
-fn show_forest(frost_elf: &FileDB) -> Result<(), color_eyre::Report> {
-    let mut redmaples = frost_elf
+fn show_forest(
+    cartographer_elf: &impl CartographerElf<Item = EventWrapper, EventError = FrostElfError>,
+) -> Result<(), color_eyre::Report> {
+    let mut redmaples = cartographer_elf
         .all_redmaples_as_map()?
         .values()
         .collect::<Vec<_>>();
@@ -327,33 +333,31 @@ fn show_forest(frost_elf: &FileDB) -> Result<(), color_eyre::Report> {
 }
 
 fn plant_maple(
-    frost_elf: &impl FrostElf<Item = EventWrapper, EventError = FrostElfError>,
+    frost_elf: &impl BeeElf<Item = EventWrapper, EventError = FrostElfError>,
     the_new_maple: journey::Maple,
     time_of_the_new_event: OffsetDateTime,
 ) -> Result<(), color_eyre::Report> {
-    frost_elf.save(
-        RedMaple::new(vec![EventWrapper::new(
-            the_new_maple.id().inner().clone(),
-            time_of_the_new_event,
-            Event::MapleCreated(the_new_maple),
-        )]),
-        false,
-    )?;
+    frost_elf.plant(RedMaple::new(vec![EventWrapper::new(
+        the_new_maple.id().inner().clone(),
+        time_of_the_new_event,
+        Event::MapleCreated(the_new_maple),
+    )]))?;
     Ok(())
 }
 
 fn water_maple(
-    frost_elf: &impl FrostElf<Item = EventWrapper, EventError = FrostElfError>,
+    gardner_elf: &impl GardnerElf<Item = EventWrapper, EventError = FrostElfError>,
+    seeking_elf: &impl SeekingElf<Item = EventWrapper, EventError = FrostElfError>,
     maple_id: &ID,
     new_body: Body,
     time_now: OffsetDateTime,
     new_event_id: ID,
 ) -> Result<(), color_eyre::Report> {
-    let young_redmaple = match frost_elf.redmaple_matching_id(maple_id) {
+    let young_redmaple = match seeking_elf.redmaple_matching_id(maple_id) {
         Ok(o) => o.clone(),
         Err(e) => match e {
             FrostElfError::FailedToFindTheEventWithThatID => {
-                match frost_elf.redmaple_similar_id(maple_id) {
+                match seeking_elf.redmaple_similar_id(maple_id) {
                     Ok(the_maple) => the_maple.clone(),
                     Err(err) => return Err(err)?,
                 }
@@ -365,7 +369,9 @@ fn water_maple(
             FrostElfError::FailedToFindASingleMatchingItem(err) => {
                 return Err(color_eyre::Report::msg(format!("{err:#?}")))?
             }
-            FrostElfError::FileExists(err) => Err(color_eyre::Report::msg(format!("{err:#?}")))?,
+            FrostElfError::FileExists(err) | FrostElfError::FileDoesNotExists(err) => {
+                Err(color_eyre::Report::msg(format!("{err:#?}")))?
+            }
             FrostElfError::FileReadFailed(err) => return Err(err)?,
             FrostElfError::GivenPathDoesNotExist => {
                 return Err(FrostElfError::GivenPathDoesNotExist)?
@@ -373,6 +379,7 @@ fn water_maple(
             FrostElfError::CouldNotReadTheDirectory(err) => return Err(err)?,
         },
     };
+
     let new_event = EventWrapper::new(
         new_event_id,
         time_now,
@@ -380,7 +387,7 @@ fn water_maple(
     );
 
     let more_sophisticated_redmaple = young_redmaple.into_appended(new_event);
-    frost_elf.save(more_sophisticated_redmaple, true)?;
+    gardner_elf.tend(more_sophisticated_redmaple)?;
     Ok(())
 }
 

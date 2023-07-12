@@ -3,7 +3,7 @@
 use once_cell::sync::OnceCell;
 use redmaple::{
     id::{ValidID, ID},
-    FrostElf, RedMaple,
+    BeeElf, CartographerElf, FrostElf, GardnerElf, RedMaple, SeekingElf,
 };
 use std::{collections::HashMap, fs::read_dir, path::PathBuf};
 use whirlybird::journey::{EventWrapper, IDGetterError, ValidMapleID};
@@ -14,6 +14,10 @@ pub struct FileDB {
     events: OnceCell<HashMap<ID, RedMaple<EventWrapper>>>,
     path_to_repo: PathBuf,
 }
+
+// pub struct AnaTheWise()
+
+// pub struct PegahTheFun();
 
 impl TryFrom<PathBuf> for FileDB {
     type Error = FrostElfError;
@@ -30,10 +34,8 @@ impl TryFrom<PathBuf> for FileDB {
         })
     }
 }
-
-impl FrostElf for FileDB {
+impl SeekingElf for FileDB {
     type Item = EventWrapper;
-
     type EventError = FrostElfError;
 
     fn redmaple_matching_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
@@ -66,6 +68,11 @@ impl FrostElf for FileDB {
             .get(founded_id)
             .ok_or(FrostElfError::FailedToFindTheEventWithThatID)
     }
+}
+
+impl CartographerElf for FileDB {
+    type Item = EventWrapper;
+    type EventError = FrostElfError;
 
     fn all_redmaples_as_map(&self) -> Result<&HashMap<ID, RedMaple<Self::Item>>, Self::EventError> {
         self.events.get_or_try_init(|| {
@@ -106,18 +113,19 @@ impl FrostElf for FileDB {
                 )?)
         })
     }
+}
 
-    fn save(
-        &self,
-        item: RedMaple<Self::Item>,
-        should_overwrite: bool,
-    ) -> Result<(), Self::EventError> {
+impl BeeElf for FileDB {
+    type Item = EventWrapper;
+    type EventError = FrostElfError;
+
+    fn plant(&self, item: RedMaple<Self::Item>) -> Result<(), Self::EventError> {
         let file_path = self
             .path_to_repo
             .join(format!("{}.json", ValidMapleID::try_from(&item)?.inner()));
 
         // IO impurity
-        if file_path.exists() && !should_overwrite {
+        if !file_path.exists() {
             return Err(FrostElfError::FileExists(file_path));
         }
 
@@ -129,6 +137,30 @@ impl FrostElf for FileDB {
         std::fs::write(file_path, s).map_err(FrostElfError::FailedToWriteIntoFile)
     }
 }
+
+impl GardnerElf for FileDB {
+    type Item = EventWrapper;
+    type EventError = FrostElfError;
+    fn tend(&self, item: RedMaple<Self::Item>) -> Result<(), Self::EventError> {
+        let file_path = self
+            .path_to_repo
+            .join(format!("{}.json", ValidMapleID::try_from(&item)?.inner()));
+
+        // IO impurity
+        if file_path.exists() {
+            return Err(FrostElfError::FileDoesNotExists(file_path));
+        }
+
+        let s = serde_json::to_string_pretty(&item)
+            .map_err(FrostElfError::FailedToSerialize)?
+            .into_bytes();
+
+        // IO impurity
+        std::fs::write(file_path, s).map_err(FrostElfError::FailedToWriteIntoFile)
+    }
+}
+
+impl FrostElf for FileDB {}
 
 /// Errors related to the implementation of [`EventRepo`] trait for the [`FileDB`]
 #[derive(thiserror::Error, Debug)]
@@ -157,9 +189,13 @@ pub enum FrostElfError {
     #[error("multiple items found: {0:?}")]
     FailedToFindASingleMatchingItem(Vec<ID>),
 
-    /// Multiple given file already exists.
+    /// File exists.
     #[error("redmaple file already exists {0}")]
     FileExists(PathBuf),
+
+    /// Multiple given file already exists.
+    #[error("redmaple file does not exists {0}")]
+    FileDoesNotExists(PathBuf),
 
     /// The file content could not be read.
     #[error("failed to read the content of the file: {0}")]
