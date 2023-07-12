@@ -226,8 +226,12 @@ fn linkup(
             FrostElfError::FailedToFindASingleMatchingItem(e) => {
                 Err(FrostElfError::FailedToFindASingleMatchingItem(e))
             }
-            FrostElfError::EventBuilderFailed(e) => Err(FrostElfError::EventBuilderFailed(e)),
             FrostElfError::FileExists(e) => Err(FrostElfError::FileExists(e)),
+            FrostElfError::FileReadFailed(e) => Err(FrostElfError::FileReadFailed(e)),
+            FrostElfError::GivenPathDoesNotExist => Err(FrostElfError::GivenPathDoesNotExist),
+            FrostElfError::CouldNotReadTheDirectory(e) => {
+                Err(FrostElfError::CouldNotReadTheDirectory(e))
+            }
         },
     }??;
 
@@ -244,8 +248,12 @@ fn linkup(
             FrostElfError::FailedToFindASingleMatchingItem(e) => {
                 Err(FrostElfError::FailedToFindASingleMatchingItem(e))
             }
-            FrostElfError::EventBuilderFailed(e) => Err(FrostElfError::EventBuilderFailed(e)),
             FrostElfError::FileExists(e) => Err(FrostElfError::FileExists(e)),
+            FrostElfError::FileReadFailed(e) => Err(FrostElfError::FileReadFailed(e)),
+            FrostElfError::GivenPathDoesNotExist => Err(FrostElfError::GivenPathDoesNotExist),
+            FrostElfError::CouldNotReadTheDirectory(e) => {
+                Err(FrostElfError::CouldNotReadTheDirectory(e))
+            }
         },
     }?;
 
@@ -357,8 +365,12 @@ fn water_maple(
             FrostElfError::FailedToFindASingleMatchingItem(err) => {
                 return Err(color_eyre::Report::msg(format!("{err:#?}")))?
             }
-            FrostElfError::EventBuilderFailed(err) => return Err(err)?,
             FrostElfError::FileExists(err) => Err(color_eyre::Report::msg(format!("{err:#?}")))?,
+            FrostElfError::FileReadFailed(err) => return Err(err)?,
+            FrostElfError::GivenPathDoesNotExist => {
+                return Err(FrostElfError::GivenPathDoesNotExist)?
+            }
+            FrostElfError::CouldNotReadTheDirectory(err) => return Err(err)?,
         },
     };
     let new_event = EventWrapper::new(
