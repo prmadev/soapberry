@@ -42,5 +42,9 @@ pub trait FrostElf: Send + Sync {
     ///
     /// if it cannot convert types correctly, or it fails at any of the steps of adding item to the database,
     /// it will return an error
-    fn save(&self, item: RedMaple<Self::Item>) -> Result<(), Self::EventError>;
+    fn save(
+        &self,
+        item: RedMaple<Self::Item>,
+        should_overright: bool,
+    ) -> Result<(), Self::EventError>;
 }

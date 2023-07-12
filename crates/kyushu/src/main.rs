@@ -198,7 +198,10 @@ fn dislink(
         Event::Dislinked(link_in_question.into_id()),
     );
 
-    frost_elf.save(harboring_redmaple.clone().into_appended(event_at_the_bay))?;
+    frost_elf.save(
+        harboring_redmaple.clone().into_appended(event_at_the_bay),
+        true,
+    )?;
     Ok(())
 }
 
@@ -224,6 +227,7 @@ fn linkup(
                 Err(FrostElfError::FailedToFindASingleMatchingItem(e))
             }
             FrostElfError::EventBuilderFailed(e) => Err(FrostElfError::EventBuilderFailed(e)),
+            FrostElfError::FileExists(e) => Err(FrostElfError::FileExists(e)),
         },
     }??;
 
@@ -241,6 +245,7 @@ fn linkup(
                 Err(FrostElfError::FailedToFindASingleMatchingItem(e))
             }
             FrostElfError::EventBuilderFailed(e) => Err(FrostElfError::EventBuilderFailed(e)),
+            FrostElfError::FileExists(e) => Err(FrostElfError::FileExists(e)),
         },
     }?;
 
@@ -249,7 +254,7 @@ fn linkup(
         time_of_the_new_event,
         Event::LinkAdded((dest, why, new_event_id)),
     );
-    frost_elf.save(origin_maple.clone().into_appended(ev))?;
+    frost_elf.save(origin_maple.clone().into_appended(ev), true)?;
     Ok(())
 }
 
@@ -318,11 +323,14 @@ fn plant_maple(
     the_new_maple: journey::Maple,
     time_of_the_new_event: OffsetDateTime,
 ) -> Result<(), color_eyre::Report> {
-    frost_elf.save(RedMaple::new(vec![EventWrapper::new(
-        the_new_maple.id().inner().clone(),
-        time_of_the_new_event,
-        Event::MapleCreated(the_new_maple),
-    )]))?;
+    frost_elf.save(
+        RedMaple::new(vec![EventWrapper::new(
+            the_new_maple.id().inner().clone(),
+            time_of_the_new_event,
+            Event::MapleCreated(the_new_maple),
+        )]),
+        false,
+    )?;
     Ok(())
 }
 
@@ -350,6 +358,7 @@ fn water_maple(
                 return Err(color_eyre::Report::msg(format!("{err:#?}")))?
             }
             FrostElfError::EventBuilderFailed(err) => return Err(err)?,
+            FrostElfError::FileExists(err) => Err(color_eyre::Report::msg(format!("{err:#?}")))?,
         },
     };
     let new_event = EventWrapper::new(
@@ -359,7 +368,7 @@ fn water_maple(
     );
 
     let more_sophisticated_redmaple = young_redmaple.into_appended(new_event);
-    frost_elf.save(more_sophisticated_redmaple)?;
+    frost_elf.save(more_sophisticated_redmaple, true)?;
     Ok(())
 }
 

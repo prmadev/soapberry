@@ -123,10 +123,18 @@ impl FrostElf for FileDB {
         })
     }
 
-    fn save(&self, item: RedMaple<Self::Item>) -> Result<(), Self::EventError> {
+    fn save(
+        &self,
+        item: RedMaple<Self::Item>,
+        should_overwrite: bool,
+    ) -> Result<(), Self::EventError> {
         let file_path = self
             .path
             .join(format!("{}.json", ValidMapleID::try_from(&item)?.inner()));
+
+        if file_path.exists() && !should_overwrite {
+            return Err(FrostElfError::FileExists(file_path));
+        }
 
         let s = serde_json::to_string_pretty(&item)
             .map_err(FrostElfError::FailedToSerialize)?
@@ -166,6 +174,10 @@ pub enum FrostElfError {
     /// Multiple items with the same ID were found.
     #[error("events failed to build: {0:?}")]
     EventBuilderFailed(#[from] RebuildError),
+
+    /// Multiple given file already exists.
+    #[error("redmaple file already exists {0}")]
+    FileExists(PathBuf),
 }
 
 #[allow(clippy::needless_pass_by_value)] // the value is not being used any further in the original function
