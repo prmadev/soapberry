@@ -143,7 +143,7 @@ fn main() -> color_eyre::Result<()> {
         Request::Information(i) => match i {
             kyushu::domain::requests::Information::ListEntries => {
                 let parastoo = ParastooTheKeeper::try_from(selda)?;
-                show_forest(&parastoo)?
+                show_forest(&parastoo)?;
             }
         },
     };
@@ -376,11 +376,12 @@ fn water_maple(
             FrostElfError::FileExists(err) | FrostElfError::FileDoesNotExists(err) => {
                 Err(color_eyre::Report::msg(format!("{err:#?}")))?
             }
-            FrostElfError::FileReadFailed(err) => return Err(err)?,
+            FrostElfError::FileReadFailed(err) | FrostElfError::CouldNotReadTheDirectory(err) => {
+                return Err(err)?
+            }
             FrostElfError::GivenPathDoesNotExist => {
                 return Err(FrostElfError::GivenPathDoesNotExist)?
             }
-            FrostElfError::CouldNotReadTheDirectory(err) => return Err(err)?,
         },
     };
 
