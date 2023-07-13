@@ -24,7 +24,7 @@ impl TryFrom<PathBuf> for SeldaTheListner {
     fn try_from(path_to_forest: PathBuf) -> Result<Self, Self::Error> {
         // IO impurity
         if !path_to_forest.exists() {
-            return Err(FrostElfError::GivenPathDoesNotExist);
+            return Err(FrostElfError::GivenPathDoesNotExist(path_to_forest));
         }
 
         Ok(Self(path_to_forest))
@@ -279,8 +279,8 @@ pub enum FrostElfError {
     FileReadFailed(std::io::Error),
 
     /// if a path is not given
-    #[error("the given path does not exist")]
-    GivenPathDoesNotExist,
+    #[error("the given path does not exist {0}")]
+    GivenPathDoesNotExist(PathBuf),
 
     /// indicates that the file at the given address does not exist.
     /// this should not happen.

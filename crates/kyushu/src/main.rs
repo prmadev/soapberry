@@ -223,24 +223,30 @@ fn linkup(
 ) -> Result<(), color_eyre::Report> {
     let dest = match seeking_elf.redmaple_matching_id(to) {
         Ok(o) => Ok(ValidMapleID::try_from(o)),
-        Err(e) => match e {
+        Err(err) => match err {
             FrostElfError::FailedToFindTheEventWithThatID => {
                 Ok(ValidMapleID::try_from(seeking_elf.redmaple_similar_id(to)?))
             }
-            FrostElfError::FailedToSerialize(e) => Err(FrostElfError::FailedToSerialize(e)),
-            FrostElfError::FailedToCreateNewFile(e) => Err(FrostElfError::FailedToCreateNewFile(e)),
-            FrostElfError::FailedToWriteIntoFile(e) => Err(FrostElfError::FailedToWriteIntoFile(e)),
-            FrostElfError::FailedToGetID(e) => Err(FrostElfError::FailedToGetID(e)),
-            FrostElfError::FailedToFindASingleMatchingItem(e) => {
-                Err(FrostElfError::FailedToFindASingleMatchingItem(e))
+            FrostElfError::FailedToSerialize(err) => Err(FrostElfError::FailedToSerialize(err)),
+            FrostElfError::FailedToCreateNewFile(err) => {
+                Err(FrostElfError::FailedToCreateNewFile(err))
             }
-            FrostElfError::FileExists(e) => Err(FrostElfError::FileExists(e)),
-            FrostElfError::FileReadFailed(e) => Err(FrostElfError::FileReadFailed(e)),
-            FrostElfError::GivenPathDoesNotExist => Err(FrostElfError::GivenPathDoesNotExist),
-            FrostElfError::CouldNotReadTheDirectory(e) => {
-                Err(FrostElfError::CouldNotReadTheDirectory(e))
+            FrostElfError::FailedToWriteIntoFile(err) => {
+                Err(FrostElfError::FailedToWriteIntoFile(err))
             }
-            FrostElfError::FileDoesNotExists(e) => Err(FrostElfError::FileDoesNotExists(e)),
+            FrostElfError::FailedToGetID(err) => Err(FrostElfError::FailedToGetID(err)),
+            FrostElfError::FailedToFindASingleMatchingItem(err) => {
+                Err(FrostElfError::FailedToFindASingleMatchingItem(err))
+            }
+            FrostElfError::FileExists(err) => Err(FrostElfError::FileExists(err)),
+            FrostElfError::FileReadFailed(err) => Err(FrostElfError::FileReadFailed(err)),
+            FrostElfError::GivenPathDoesNotExist(err) => {
+                Err(FrostElfError::GivenPathDoesNotExist(err))
+            }
+            FrostElfError::CouldNotReadTheDirectory(err) => {
+                Err(FrostElfError::CouldNotReadTheDirectory(err))
+            }
+            FrostElfError::FileDoesNotExists(err) => Err(FrostElfError::FileDoesNotExists(err)),
         },
     }??;
 
@@ -250,20 +256,26 @@ fn linkup(
             FrostElfError::FailedToFindTheEventWithThatID => {
                 Ok(seeking_elf.redmaple_similar_id(from)?)
             }
-            FrostElfError::FailedToSerialize(e) => Err(FrostElfError::FailedToSerialize(e)),
-            FrostElfError::FailedToCreateNewFile(e) => Err(FrostElfError::FailedToCreateNewFile(e)),
-            FrostElfError::FailedToWriteIntoFile(e) => Err(FrostElfError::FailedToWriteIntoFile(e)),
-            FrostElfError::FailedToGetID(e) => Err(FrostElfError::FailedToGetID(e)),
-            FrostElfError::FailedToFindASingleMatchingItem(e) => {
-                Err(FrostElfError::FailedToFindASingleMatchingItem(e))
+            FrostElfError::FailedToSerialize(err) => Err(FrostElfError::FailedToSerialize(err)),
+            FrostElfError::FailedToCreateNewFile(err) => {
+                Err(FrostElfError::FailedToCreateNewFile(err))
             }
-            FrostElfError::FileExists(e) => Err(FrostElfError::FileExists(e)),
-            FrostElfError::FileReadFailed(e) => Err(FrostElfError::FileReadFailed(e)),
-            FrostElfError::GivenPathDoesNotExist => Err(FrostElfError::GivenPathDoesNotExist),
-            FrostElfError::CouldNotReadTheDirectory(e) => {
-                Err(FrostElfError::CouldNotReadTheDirectory(e))
+            FrostElfError::FailedToWriteIntoFile(err) => {
+                Err(FrostElfError::FailedToWriteIntoFile(err))
             }
-            FrostElfError::FileDoesNotExists(e) => Err(FrostElfError::FileDoesNotExists(e)),
+            FrostElfError::FailedToGetID(err) => Err(FrostElfError::FailedToGetID(err)),
+            FrostElfError::FailedToFindASingleMatchingItem(err) => {
+                Err(FrostElfError::FailedToFindASingleMatchingItem(err))
+            }
+            FrostElfError::FileExists(err) => Err(FrostElfError::FileExists(err)),
+            FrostElfError::FileReadFailed(err) => Err(FrostElfError::FileReadFailed(err)),
+            FrostElfError::GivenPathDoesNotExist(err) => {
+                Err(FrostElfError::GivenPathDoesNotExist(err))
+            }
+            FrostElfError::CouldNotReadTheDirectory(err) => {
+                Err(FrostElfError::CouldNotReadTheDirectory(err))
+            }
+            FrostElfError::FileDoesNotExists(err) => Err(FrostElfError::FileDoesNotExists(err)),
         },
     }?;
 
@@ -272,7 +284,9 @@ fn linkup(
         time_of_the_new_event,
         Event::LinkAdded((dest, why, new_event_id)),
     );
+
     gardner_elf.tend(origin_maple.clone().into_appended(ev))?;
+
     Ok(())
 }
 
@@ -373,14 +387,13 @@ fn water_maple(
             FrostElfError::FailedToFindASingleMatchingItem(err) => {
                 return Err(color_eyre::Report::msg(format!("{err:#?}")))?
             }
-            FrostElfError::FileExists(err) | FrostElfError::FileDoesNotExists(err) => {
+            FrostElfError::FileExists(err)
+            | FrostElfError::FileDoesNotExists(err)
+            | FrostElfError::GivenPathDoesNotExist(err) => {
                 Err(color_eyre::Report::msg(format!("{err:#?}")))?
             }
             FrostElfError::FileReadFailed(err) | FrostElfError::CouldNotReadTheDirectory(err) => {
                 return Err(err)?
-            }
-            FrostElfError::GivenPathDoesNotExist => {
-                return Err(FrostElfError::GivenPathDoesNotExist)?
             }
         },
     };
