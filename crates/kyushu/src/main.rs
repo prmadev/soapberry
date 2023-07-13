@@ -41,7 +41,7 @@ use kyushu::{
     cli::{Args, MaplePrinter},
     config::{Config, InputInfo},
     domain::requests::{Change, Request},
-    persistence::{self, FrostElfError},
+    persistence::{self, AminTheSinger, FrostElfError, ParastooTheKeeper},
 };
 use redmaple::{
     event_group::EventKind,
@@ -89,7 +89,7 @@ fn main() -> color_eyre::Result<()> {
     ));
 
     // creating persistence
-    let frost_elf = persistence::FileDB::try_from(
+    let selda = persistence::SeldaTheListner::try_from(
         configurations
             .file_store
             .ok_or(MainError::FileStoreCannotBeEmpty)?,
@@ -101,12 +101,15 @@ fn main() -> color_eyre::Result<()> {
     match cli_arguments.to_request(time_now)? {
         Request::Change((time_of_change, the_change)) => match the_change {
             Change::CreateNewMaple(the_new_maple) => {
-                plant_maple(&frost_elf, the_new_maple, time_of_change)?;
+                let amin = AminTheSinger::from(selda);
+                plant_maple(&amin, the_new_maple, time_of_change)?;
             }
+
             Change::UpdateMapleBody(maple_id, the_new_body) => {
+                let parastoo = ParastooTheKeeper::try_from(selda)?;
                 water_maple(
-                    &frost_elf,
-                    &frost_elf,
+                    &parastoo,
+                    &parastoo,
                     &maple_id,
                     the_new_body,
                     time_of_change,
@@ -114,9 +117,10 @@ fn main() -> color_eyre::Result<()> {
                 )?;
             }
             Change::AddLinkToMaple { from, to, why } => {
+                let parastoo = ParastooTheKeeper::try_from(selda)?;
                 linkup(
-                    &frost_elf,
-                    &frost_elf,
+                    &parastoo,
+                    &parastoo,
                     &from,
                     time_of_change,
                     &to,
@@ -125,9 +129,10 @@ fn main() -> color_eyre::Result<()> {
                 )?;
             }
             Change::Dislink { link_id } => {
+                let parastoo = ParastooTheKeeper::try_from(selda)?;
                 dislink(
-                    &frost_elf,
-                    &frost_elf,
+                    &parastoo,
+                    &parastoo,
                     &link_id,
                     ID::from(time_of_change),
                     time_of_change,
@@ -136,7 +141,10 @@ fn main() -> color_eyre::Result<()> {
         },
 
         Request::Information(i) => match i {
-            kyushu::domain::requests::Information::ListEntries => show_forest(&frost_elf)?,
+            kyushu::domain::requests::Information::ListEntries => {
+                let parastoo = ParastooTheKeeper::try_from(selda)?;
+                show_forest(&parastoo)?
+            }
         },
     };
     Ok(())
@@ -150,16 +158,14 @@ fn dislink(
     time_of_the_new_event: time::OffsetDateTime,
 ) -> Result<(), color_eyre::Report> {
     // creating links of all maples
-    let suspect_maples = cartographer_elf
-        .all_redmaples_as_map()?
-        .values()
-        .map(|x| (x, Links::from(x).0));
+    let binding = cartographer_elf.all_redmaples_as_map()?;
+    let suspect_maples = binding.values().map(|x| (x, Links::from(*x).0));
 
     // try to find the exact match on the item
     let the_exact = suspect_maples.clone().find_map(|(x, l)| {
         l.into_iter()
             .find(|li| li.id().inner() == link_id)
-            .map(|li| Some((li, x)))?
+            .map(|li| Some((li, *x)))?
     });
 
     let (link_in_question, harboring_redmaple) = if let Some(l) = the_exact {
@@ -178,7 +184,7 @@ fn dislink(
                                 .to_string()
                                 .contains(&link_id.inner().to_string())
                         })
-                        .map(|li| (li, the_redmaple_in_question))
+                        .map(|li| (li, *the_redmaple_in_question))
                         .collect::<Vec<(Link, &RedMaple<EventWrapper>)>>()
                 }
             })
@@ -289,10 +295,8 @@ fn linkup(
 fn show_forest(
     cartographer_elf: &impl CartographerElf<Item = EventWrapper, EventError = FrostElfError>,
 ) -> Result<(), color_eyre::Report> {
-    let mut redmaples = cartographer_elf
-        .all_redmaples_as_map()?
-        .values()
-        .collect::<Vec<_>>();
+    let binding = cartographer_elf.all_redmaples_as_map()?;
+    let redmaples = &mut binding.values().collect::<Vec<_>>();
 
     redmaples.sort_by(|a, b| {
         let at = a
@@ -312,14 +316,14 @@ fn show_forest(
         .into_iter()
         .map(|rm| -> Result<MaplePrinter, String> {
             MaplePrinter::new_with_local_offset(
-                ValidMapleID::try_from(rm)
+                ValidMapleID::try_from(**rm)
                     .map_err(|er| format!("could nto create id for map{er}"))?,
-                Body::from(rm),
+                Body::from(**rm),
                 *rm.time_created()
                     .ok_or("Could not find the time created".to_owned())?,
                 &format_description::parse("[year]-[month]-[day]:[hour]-[minute]-[second]")
                     .unwrap_or_default(),
-                Links::from(rm).0,
+                Links::from(**rm).0,
             )
             .map_err(|er| format!("could not create printer: {er}"))
         })

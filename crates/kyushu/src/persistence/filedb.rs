@@ -3,125 +3,46 @@
 use once_cell::sync::OnceCell;
 use redmaple::{
     id::{ValidID, ID},
-    BeeElf, CartographerElf, FrostElf, GardnerElf, RedMaple, SeekingElf,
+    BeeElf, CartographerElf, GardnerElf, RedMaple, SeekingElf, TrackerElf,
 };
 use std::{collections::HashMap, fs::read_dir, path::PathBuf};
 use whirlybird::journey::{EventWrapper, IDGetterError, ValidMapleID};
 
-/// Represents the `FileDB` implementation, which is a file-based local `RedMaple` repository.
-#[derive(Debug, Clone)]
-pub struct FileDB {
-    events: OnceCell<HashMap<ID, RedMaple<EventWrapper>>>,
-    path_to_repo: PathBuf,
-}
+// pub struct AnaTheWise() -> seek
+// pub struct KamandTheWeird; -> gardner
+// pub struct PegahTheCute(); -> cartograph
+// pub struct ParastooThePassionate(); -> keeper
+// pub struct IliyaTheKachal();
+// pub struct AhmadTheFriend();
 
-// pub struct AnaTheWise()
+/// Selda holds a valid path for our forest
+pub struct SeldaTheListner(PathBuf);
 
-// pub struct PegahTheFun();
-
-impl TryFrom<PathBuf> for FileDB {
+impl TryFrom<PathBuf> for SeldaTheListner {
     type Error = FrostElfError;
 
-    fn try_from(path_to_repo: PathBuf) -> Result<Self, Self::Error> {
+    fn try_from(path_to_forest: PathBuf) -> Result<Self, Self::Error> {
         // IO impurity
-        if !path_to_repo.exists() {
+        if !path_to_forest.exists() {
             return Err(FrostElfError::GivenPathDoesNotExist);
         }
 
-        Ok(Self {
-            events: OnceCell::new(),
-            path_to_repo,
-        })
-    }
-}
-impl SeekingElf for FileDB {
-    type Item = EventWrapper;
-    type EventError = FrostElfError;
-
-    fn redmaple_matching_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
-        self.all_redmaples_as_map()?
-            .get(id)
-            .ok_or(FrostElfError::FailedToFindTheEventWithThatID)
-    }
-
-    fn redmaple_similar_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
-        let founded_ids: Vec<_> = self
-            .all_redmaples_as_map()?
-            .keys()
-            .filter(|x| x.to_string().contains(&id.to_string()))
-            .collect();
-
-        if founded_ids.len() != 1 {
-            return Err(FrostElfError::FailedToFindASingleMatchingItem(
-                founded_ids
-                    .into_iter()
-                    .map(std::clone::Clone::clone)
-                    .collect(),
-            ));
-        }
-
-        let founded_id = founded_ids
-            .first()
-            .ok_or(FrostElfError::FailedToFindTheEventWithThatID)?;
-
-        self.all_redmaples_as_map()?
-            .get(founded_id)
-            .ok_or(FrostElfError::FailedToFindTheEventWithThatID)
+        Ok(Self(path_to_forest))
     }
 }
 
-impl CartographerElf for FileDB {
-    type Item = EventWrapper;
-    type EventError = FrostElfError;
+/// Amin plants new maples
+pub struct AminTheSinger(SeldaTheListner);
 
-    fn all_redmaples_as_map(&self) -> Result<&HashMap<ID, RedMaple<Self::Item>>, Self::EventError> {
-        self.events.get_or_try_init(|| {
-            // IO impurity
-            Ok(read_dir(&self.path_to_repo) // create a directory reader
-                //then mapping the error of directory reading
-                .map_err(FrostElfError::CouldNotReadTheDirectory)?
-                // filtering all the items that are not ok
-                .filter_map(Result::ok) // filter those that are ok
-                // we only use json files
-                .filter(|direntry| direntry.path().extension().map_or(false, |e| e == "json"))
-                // creating a redmaple from each file
-                // IO impurity
-                .map(|value| {
-                    std::fs::read(value.path())
-                        .map_err(FrostElfError::FileReadFailed)
-                        .map(|raw| {
-                            let the_redmaple =
-                                serde_json::from_slice::<RedMaple<EventWrapper>>(&raw)
-                                    .map_err(FrostElfError::FailedToSerialize)?;
-                            Ok((
-                                ValidMapleID::try_from(&the_redmaple)
-                                    .map_err(FrostElfError::FailedToGetID)?
-                                    .inner().clone(),
-                                the_redmaple,
-                            ))
-                        })?
-                })
-                // then filtering all those that are not redmaples
-                .fold(
-                    Ok(HashMap::<ID, RedMaple<EventWrapper>>::new()),
-                    |acc: Result<_, FrostElfError>, item: Result<(ID, RedMaple<EventWrapper>), FrostElfError>| {
-                        let the_item = item?;
-                        let mut maple_map = acc?;
-                        _ = maple_map.insert(the_item.0, the_item.1);
-                        Ok(maple_map)
-                    },
-                )?)
-        })
-    }
-}
-
-impl BeeElf for FileDB {
+impl BeeElf for AminTheSinger {
     type Item = EventWrapper;
+
     type EventError = FrostElfError;
 
     fn plant(&self, item: RedMaple<Self::Item>) -> Result<(), Self::EventError> {
         let file_path = self
-            .path_to_repo
+            .0
+             .0
             .join(format!("{}.json", ValidMapleID::try_from(&item)?.inner()));
 
         // IO impurity
@@ -129,38 +50,195 @@ impl BeeElf for FileDB {
             return Err(FrostElfError::FileExists(file_path));
         }
 
-        let s = serde_json::to_string_pretty(&item)
+        let the_song = serde_json::to_string_pretty(&item)
             .map_err(FrostElfError::FailedToSerialize)?
             .into_bytes();
 
         // IO impurity
-        std::fs::write(file_path, s).map_err(FrostElfError::FailedToWriteIntoFile)
+        std::fs::write(file_path, the_song).map_err(FrostElfError::FailedToWriteIntoFile)
     }
 }
 
-impl GardnerElf for FileDB {
+impl From<SeldaTheListner> for AminTheSinger {
+    fn from(selda: SeldaTheListner) -> Self {
+        Self(selda)
+    }
+}
+
+/// parastoo keeps a list of all Maples
+pub struct ParastooTheKeeper {
+    vines: Vec<(PathBuf, OnceCell<RedMaple<EventWrapper>>)>,
+    the_path: SeldaTheListner,
+}
+
+impl TrackerElf for ParastooTheKeeper {
     type Item = EventWrapper;
+
     type EventError = FrostElfError;
+
+    fn maples(&self) -> Result<Vec<&RedMaple<EventWrapper>>, FrostElfError> {
+        Ok(self
+            .vines
+            .iter()
+            .map(|(the_maples_path, maple)| {
+                maple.get_or_try_init(|| {
+                    std::fs::read(the_maples_path)
+                        .map_err(FrostElfError::FileReadFailed)
+                        .map(|raw| {
+                            Ok(serde_json::from_slice::<RedMaple<EventWrapper>>(&raw)
+                                .map_err(FrostElfError::FailedToSerialize)?)
+                        })?
+                })
+            })
+            .fold(
+                Ok(vec![]),
+                |acc: Result<Vec<&RedMaple<EventWrapper>>, FrostElfError>,
+                 item: Result<&RedMaple<EventWrapper>, FrostElfError>| {
+                    let the_item = item?;
+                    let mut forest: Vec<&RedMaple<EventWrapper>> = acc?;
+                    forest.push(the_item);
+                    Ok(forest)
+                },
+            )?)
+    }
+}
+impl CartographerElf for ParastooTheKeeper {
+    type Item = EventWrapper;
+
+    type EventError = FrostElfError;
+
+    fn all_redmaples_as_map(&self) -> Result<HashMap<ID, &RedMaple<Self::Item>>, Self::EventError> {
+        self.vines
+            .iter()
+            .map(|(the_maple_path, the_maple)| {
+                the_maple.get_or_try_init(|| -> Result<RedMaple<EventWrapper>, FrostElfError> {
+                    std::fs::read(the_maple_path)
+                        .map_err(FrostElfError::FileReadFailed)
+                        .map(|raw| {
+                            serde_json::from_slice::<RedMaple<EventWrapper>>(&raw)
+                                .map_err(FrostElfError::FailedToSerialize)
+                        })?
+                })
+            })
+            .fold(
+                Ok(HashMap::new()),
+                |acc: Result<HashMap<ID, &RedMaple<EventWrapper>>, FrostElfError>, item| {
+                    let the_maple = item?;
+                    let the_id = ValidMapleID::try_from(the_maple)?;
+                    acc.map(|mut the_map| {
+                        _ = the_map.insert(the_id.into_inner(), the_maple);
+                        the_map
+                    })
+                },
+            )
+    }
+}
+impl SeekingElf for ParastooTheKeeper {
+    type Item = EventWrapper;
+
+    type EventError = FrostElfError;
+
+    fn redmaple_matching_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
+        self.vines
+            .iter()
+            .map(|(the_maple_path, a_maple)| {
+                let the_maple = a_maple.get_or_try_init(
+                    || -> Result<RedMaple<EventWrapper>, FrostElfError> {
+                        std::fs::read(the_maple_path)
+                            .map_err(FrostElfError::FileReadFailed)
+                            .map(|raw| {
+                                serde_json::from_slice::<RedMaple<EventWrapper>>(&raw)
+                                    .map_err(FrostElfError::FailedToSerialize)
+                            })?
+                    },
+                )?;
+                let the_maple_id =
+                    ValidMapleID::try_from(the_maple).map_err(FrostElfError::FailedToGetID)?;
+                Ok((the_maple_id, the_maple))
+            })
+            .find(|x| match x {
+                Ok(maple_under_question) => maple_under_question.0.inner() == id,
+                Err(_) => true, // in case of first error come back to me
+            })
+            .ok_or(FrostElfError::FailedToFindTheEventWithThatID)?
+            .map(|x| x.1)
+    }
+
+    fn redmaple_similar_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError> {
+        self.vines
+            .iter()
+            .map(|(the_maple_path, a_maple)| {
+                let the_maple = a_maple.get_or_try_init(
+                    || -> Result<RedMaple<EventWrapper>, FrostElfError> {
+                        std::fs::read(the_maple_path)
+                            .map_err(FrostElfError::FileReadFailed)
+                            .map(|raw| {
+                                serde_json::from_slice::<RedMaple<EventWrapper>>(&raw)
+                                    .map_err(FrostElfError::FailedToSerialize)
+                            })?
+                    },
+                )?;
+                let the_maple_id =
+                    ValidMapleID::try_from(the_maple).map_err(FrostElfError::FailedToGetID)?;
+                Ok((the_maple_id, the_maple))
+            })
+            .find(|x| match x {
+                Ok(maple_under_question) => maple_under_question
+                    .0
+                    .inner()
+                    .inner()
+                    .to_string()
+                    .contains(&id.inner().to_string()),
+                Err(_) => true, // in case of first error come back to me
+            })
+            .ok_or(FrostElfError::FailedToFindTheEventWithThatID)?
+            .map(|x| x.1)
+    }
+}
+impl GardnerElf for ParastooTheKeeper {
+    type Item = EventWrapper;
+
+    type EventError = FrostElfError;
+
     fn tend(&self, item: RedMaple<Self::Item>) -> Result<(), Self::EventError> {
         let file_path = self
-            .path_to_repo
+            .the_path
+            .0
             .join(format!("{}.json", ValidMapleID::try_from(&item)?.inner()));
 
         // IO impurity
-        if file_path.exists() {
+        if !file_path.exists() {
             return Err(FrostElfError::FileDoesNotExists(file_path));
         }
 
-        let s = serde_json::to_string_pretty(&item)
+        let song = serde_json::to_string_pretty(&item)
             .map_err(FrostElfError::FailedToSerialize)?
             .into_bytes();
 
         // IO impurity
-        std::fs::write(file_path, s).map_err(FrostElfError::FailedToWriteIntoFile)
+        std::fs::write(file_path, song).map_err(FrostElfError::FailedToWriteIntoFile)
     }
 }
 
-impl FrostElf for FileDB {}
+impl TryFrom<SeldaTheListner> for ParastooTheKeeper {
+    type Error = FrostElfError;
+
+    fn try_from(selda: SeldaTheListner) -> Result<Self, Self::Error> {
+        Ok(ParastooTheKeeper {
+            // IO impurity
+            vines: read_dir(&selda.0) // create a directory reader
+                //then mapping the error of directory reading
+                .map_err(FrostElfError::CouldNotReadTheDirectory)?
+                // filtering all the items that are not ok
+                .filter_map(Result::ok) // filter those that are ok
+                // we only use json files
+                .filter(|direntry| direntry.path().extension().map_or(false, |e| e == "json"))
+                .map(|i| (i.path(), OnceCell::new()))
+                .collect(),
+            the_path: selda,
+        })
+    }
+}
 
 /// Errors related to the implementation of [`EventRepo`] trait for the [`FileDB`]
 #[derive(thiserror::Error, Debug)]

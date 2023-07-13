@@ -30,6 +30,22 @@ pub trait SeekingElf: Send + Sync {
     fn redmaple_similar_id(&self, id: &ID) -> Result<&RedMaple<Self::Item>, Self::EventError>;
 }
 
+/// Tracker elf maps every maple tree  
+pub trait TrackerElf: Send + Sync {
+    /// Item should be able to return ID
+    type Item: EventKind + Unique + Clone + Eq + PartialOrd + Ord;
+
+    /// Errors that may happen in these functions
+    type EventError: Display + error::Error + Send + Sync;
+
+    /// Returns all the redmaples as a map
+    ///
+    /// # Errors
+    ///
+    /// if at any point it could not convert any item it will return error
+    fn maples(&self) -> Result<Vec<&RedMaple<Self::Item>>, Self::EventError>;
+}
+
 /// Cartographer elf maps every maple tree  
 pub trait CartographerElf: Send + Sync {
     /// Item should be able to return ID
@@ -43,7 +59,7 @@ pub trait CartographerElf: Send + Sync {
     /// # Errors
     ///
     /// if at any point it could not convert any item it will return error
-    fn all_redmaples_as_map(&self) -> Result<&HashMap<ID, RedMaple<Self::Item>>, Self::EventError>;
+    fn all_redmaples_as_map(&self) -> Result<HashMap<ID, &RedMaple<Self::Item>>, Self::EventError>;
 }
 
 /// BeeElf plants new maple tree  
