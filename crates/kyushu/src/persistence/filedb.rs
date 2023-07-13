@@ -46,7 +46,7 @@ impl BeeElf for AminTheSinger {
             .join(format!("{}.json", ValidMapleID::try_from(&item)?.inner()));
 
         // IO impurity
-        if !file_path.exists() {
+        if file_path.exists() {
             return Err(FrostElfError::FileExists(file_path));
         }
 
@@ -77,8 +77,7 @@ impl TrackerElf for ParastooTheKeeper {
     type EventError = FrostElfError;
 
     fn maples(&self) -> Result<Vec<&RedMaple<EventWrapper>>, FrostElfError> {
-        self
-            .vines
+        self.vines
             .iter()
             .map(|(the_maples_path, maple)| {
                 maple.get_or_try_init(|| {

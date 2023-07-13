@@ -337,11 +337,11 @@ fn show_forest(
 }
 
 fn plant_maple(
-    frost_elf: &impl BeeElf<Item = EventWrapper, EventError = FrostElfError>,
+    bee_elf: &impl BeeElf<Item = EventWrapper, EventError = FrostElfError>,
     the_new_maple: journey::Maple,
     time_of_the_new_event: OffsetDateTime,
 ) -> Result<(), color_eyre::Report> {
-    frost_elf.plant(RedMaple::new(vec![EventWrapper::new(
+    bee_elf.plant(RedMaple::new(vec![EventWrapper::new(
         the_new_maple.id().inner().clone(),
         time_of_the_new_event,
         Event::MapleCreated(the_new_maple),
