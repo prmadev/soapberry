@@ -17,8 +17,8 @@ split_commits = true
 filter_unconventional = true
 
 [dependencies]
-serde = { version = "1.0.166", features = ["derive"] }
-time = { version = "0.3.22" }
+serde = { version = "1.0.171", features = ["derive"] }
+time = { version = "0.3.23" }
 
 [dev-dependencies]
-thiserror = "1.0.41"
+thiserror = "1.0.43"
