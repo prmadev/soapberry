@@ -77,7 +77,7 @@ impl TrackerElf for ParastooTheKeeper {
     type EventError = FrostElfError;
 
     fn maples(&self) -> Result<Vec<&RedMaple<EventWrapper>>, FrostElfError> {
-        Ok(self
+        self
             .vines
             .iter()
             .map(|(the_maples_path, maple)| {
@@ -85,8 +85,8 @@ impl TrackerElf for ParastooTheKeeper {
                     std::fs::read(the_maples_path)
                         .map_err(FrostElfError::FileReadFailed)
                         .map(|raw| {
-                            Ok(serde_json::from_slice::<RedMaple<EventWrapper>>(&raw)
-                                .map_err(FrostElfError::FailedToSerialize)?)
+                            serde_json::from_slice::<RedMaple<EventWrapper>>(&raw)
+                                .map_err(FrostElfError::FailedToSerialize)
                         })?
                 })
             })
@@ -99,7 +99,7 @@ impl TrackerElf for ParastooTheKeeper {
                     forest.push(the_item);
                     Ok(forest)
                 },
-            )?)
+            )
     }
 }
 impl CartographerElf for ParastooTheKeeper {
@@ -224,7 +224,7 @@ impl TryFrom<SeldaTheListner> for ParastooTheKeeper {
     type Error = FrostElfError;
 
     fn try_from(selda: SeldaTheListner) -> Result<Self, Self::Error> {
-        Ok(ParastooTheKeeper {
+        Ok(Self {
             // IO impurity
             vines: read_dir(&selda.0) // create a directory reader
                 //then mapping the error of directory reading

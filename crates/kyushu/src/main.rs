@@ -313,7 +313,7 @@ fn show_forest(
     });
 
     redmaples
-        .into_iter()
+        .iter_mut()
         .map(|rm| -> Result<MaplePrinter, String> {
             MaplePrinter::new_with_local_offset(
                 ValidMapleID::try_from(**rm)
