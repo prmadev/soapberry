@@ -120,6 +120,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.1](https://github.com/amirography/soapberry/compare/whirlybird-v0.13.0...whirlybird-v0.13.1) - 2023-07-15
+
+### Other
+- *(whirlybird)* adding tests for body
+- update dependencies
+
 ## [0.13.0](https://github.com/amirography/soapberry/compare/whirlybird-v0.12.2...whirlybird-v0.13.0) - 2023-07-09
 
 ### Added
