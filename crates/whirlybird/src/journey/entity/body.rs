@@ -264,7 +264,12 @@ mod tests {
             )),
         }?;
 
-        assert_eq!(format!("{the_body}"), VALID_BODY_TEXT);
+        if format!("{the_body}") != VALID_BODY_TEXT {
+            return Err(format!(
+                "wanted this '{the_body}' instead got this: '{VALID_BODY_TEXT}'"
+            ));
+        }
+
         Ok(())
     }
 }
