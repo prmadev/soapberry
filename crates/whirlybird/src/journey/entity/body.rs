@@ -230,7 +230,7 @@ mod tests {
             EventWrapper::new(
                 this_event_time.into(),
                 this_event_time,
-                Event::Dislinked(l.id().to_owned()),
+                Event::Dislinked(l.id().clone()),
             )
         };
 
