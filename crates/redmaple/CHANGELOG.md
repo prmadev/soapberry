@@ -127,6 +127,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.0](https://github.com/amirography/soapberry/compare/redmaple-v0.17.0...redmaple-v0.18.0) - 2023-07-15
+
+### Added
+- new implementation of frost elfs
+- add flake
+
+### Other
+- update dependencies
+- fix a few linting problems
+- separate responsibilities of elfs
+
 ## [0.17.0](https://github.com/amirography/soapberry/compare/redmaple-v0.16.1...redmaple-v0.17.0) - 2023-07-09
 
 ### Added

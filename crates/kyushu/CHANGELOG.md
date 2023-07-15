@@ -517,6 +517,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.0](https://github.com/amirography/soapberry/compare/kyushu-v0.16.0...kyushu-v0.17.0) - 2023-07-15
+
+### Added
+- add path information to error
+- new implementation of frost elfs
+- add flake
+
+### Fixed
+- fix a logic mistake when doing a boolean comparison
+
+### Other
+- update dependencies
+- fix a few linting problems
+- fix a few linting problems
+- separate responsibilities of elfs
+- simplified filedb
+
 ## [0.16.0](https://github.com/amirography/soapberry/compare/kyushu-v0.15.0...kyushu-v0.16.0) - 2023-07-09
 
 ### Added
