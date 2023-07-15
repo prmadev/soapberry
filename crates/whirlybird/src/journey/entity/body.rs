@@ -66,9 +66,11 @@ impl From<&RedMaple<EventWrapper>> for Body {
 
 #[cfg(test)]
 mod tests {
+
+    use redmaple::id::{Unique, ID};
     use time::OffsetDateTime;
 
-    use crate::journey::{Maple, ValidMapleID};
+    use crate::journey::{Links, Maple, ValidMapleID};
 
     use super::*;
 
@@ -132,7 +134,7 @@ mod tests {
             )),
         }?;
 
-        let second_event = {
+        let body_updated_event = {
             let this_event_time = OffsetDateTime::now_utc();
             let valid_maple_id = ValidMapleID::try_from(&the_redmaple).map_err(|err| format!("I redmaple with events should be able to give out valid maple ids but it could not. instead got: {err}"))?;
 
@@ -148,8 +150,9 @@ mod tests {
             )
         };
 
-        let redmaple_v2 = the_redmaple.into_appended(second_event);
-        match Body::try_from(&redmaple_v2) {
+        let redmaple_after_body_updated = the_redmaple.into_appended(body_updated_event);
+
+        match Body::try_from(&redmaple_after_body_updated) {
             Ok(b) => match b {
                 Body::OneLineText(text) => {
                     if text == *VALID_BODY_TEXT_TWO {
@@ -166,6 +169,102 @@ mod tests {
             )),
         }?;
 
+        let another_redmaples_first_event = {
+            let this_event_time = OffsetDateTime::now_utc();
+            let new_maple = Maple::new(
+                this_event_time.into(),
+                Body::try_from(VALID_BODY_TEXT.to_owned()).map_err(|e| {
+                    format!("a valid body should not get error. but instead it got one: {e}")
+                })?,
+            );
+
+            EventWrapper::new(
+                this_event_time.into(),
+                this_event_time,
+                Event::MapleCreated(new_maple),
+            )
+        };
+
+        let another_redmaple = RedMaple::new(vec![another_redmaples_first_event]);
+
+        let linked_event = {
+            let this_event_time = OffsetDateTime::now_utc();
+            let valid_maple_id = ValidMapleID::try_from(&another_redmaple).map_err(|err| format!("I redmaple with events should be able to give out valid maple ids but it could not. instead got: {err}"))?;
+
+            EventWrapper::new(
+                this_event_time.into(),
+                this_event_time,
+                Event::LinkAdded((
+                    valid_maple_id,
+                    "some exaplanation".to_owned(),
+                    ID::from(this_event_time),
+                )),
+            )
+        };
+
+        let redmaple_after_linking = redmaple_after_body_updated.into_appended(linked_event);
+        match Body::try_from(&redmaple_after_linking) {
+            Ok(b) => match b {
+                Body::OneLineText(text) => {
+                    if text == *VALID_BODY_TEXT_TWO {
+                        Ok(())
+                    } else {
+                        Err(format!(
+                            "wanted '{VALID_BODY_TEXT_TWO}', instead got '{text}'"
+                        ))
+                    }
+                }
+            },
+            Err(e) => Err(format!(
+                "Should be able to get a body. but instead it got: {e}"
+            )),
+        }?;
+
+        let dislinked_event = {
+            let this_event_time = OffsetDateTime::now_utc();
+            let ls = Links::from(&redmaple_after_linking);
+            let l =
+                ls.0.first()
+                    .ok_or("could not find a link when I should have found one!")?;
+
+            EventWrapper::new(
+                this_event_time.into(),
+                this_event_time,
+                Event::Dislinked(l.id().to_owned()),
+            )
+        };
+
+        let redmaple_after_dislinking = redmaple_after_linking.into_appended(dislinked_event);
+        match Body::try_from(&redmaple_after_dislinking) {
+            Ok(b) => match b {
+                Body::OneLineText(text) => {
+                    if text == *VALID_BODY_TEXT_TWO {
+                        Ok(())
+                    } else {
+                        Err(format!(
+                            "wanted '{VALID_BODY_TEXT_TWO}', instead got '{text}'"
+                        ))
+                    }
+                }
+            },
+            Err(e) => Err(format!(
+                "Should be able to get a body. but instead it got: {e}"
+            )),
+        }?;
+
+        Ok(())
+    }
+    #[test]
+    fn test_body_print() -> Result<(), String> {
+        let valid_string = Body::try_from(VALID_BODY_TEXT.to_owned());
+        let the_body = match valid_string {
+            Ok(b) => Ok(b),
+            Err(err) => Err(format!(
+                "a valid body should not get error. but instead it got one: {err}"
+            )),
+        }?;
+
+        assert_eq!(format!("{the_body}"), VALID_BODY_TEXT);
         Ok(())
     }
 }
