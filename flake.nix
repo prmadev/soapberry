@@ -9,9 +9,17 @@
     nix2container.url = "github:nlewo/nix2container";
     nix2container.inputs.nixpkgs.follows = "nixpkgs";
     mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
+    flake-utils.url = "github:numtide/flake-utils";
+    crane.url = "github:ipetkov/crane";
+    crane.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs @ {flake-parts, ...}:
+  outputs = inputs @ {
+    crane,
+    flake-parts,
+    flake-utils,
+    ...
+  }:
     flake-parts.lib.mkFlake {inherit inputs;} {
       imports = [
         inputs.devenv.flakeModule
@@ -21,15 +29,35 @@
       perSystem = {
         # config,
         # self',
-        # inputs',
-        pkgs,
-        # system,
+        # inputs,
+        # pkgs,
+        system,
+        # crane,
         ...
-      }: {
+      }: let
+        craneLib = crane.lib.${system};
+      in let
+        kyushu_items = craneLib.crateNameFromCargoToml {cargoToml = ./crates/kyushu/Cargo.toml;};
+        kyushu = craneLib.buildPackage {
+          src = craneLib.cleanCargoSource (craneLib.path ./.);
+          # inherit kyushu_items;
+          name = kyushu_items.pname;
+          version = kyushu_items.version;
+          pname = kyushu_items.pname;
+
+          doCheck = true;
+        };
+      in {
         # Per-system attributes can be defined here. The self' and inputs'
         # module parameters provide easy access to attributes of the same
         # system.
 
+        packages.kyushu = kyushu;
+        packages.default = kyushu;
+
+        apps.default = flake-utils.lib.mkApp {
+          drv = kyushu;
+        };
         devenv.shells.default = let
           name = "Soapberry";
         in {
