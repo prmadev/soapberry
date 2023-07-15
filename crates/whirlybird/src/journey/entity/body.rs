@@ -117,7 +117,7 @@ mod tests {
         };
 
         let the_redmaple = RedMaple::new(vec![first_event]);
-        let _ = match Body::try_from(&the_redmaple) {
+        match Body::try_from(&the_redmaple) {
             Ok(b) => match b {
                 Body::OneLineText(text) => {
                     if text == VALID_BODY_TEXT {
@@ -143,17 +143,17 @@ mod tests {
                     valid_maple_id,
                     Body::try_from(VALID_BODY_TEXT_TWO.to_owned()).map_err(|err| {
                         format!("Should be able to get a body. but instead it got one: {err}")
-                            .to_owned()
+                            
                     })?,
                 ),
             )
         };
 
         let redmaple_v2 = the_redmaple.into_appended(second_event);
-        _ = match Body::try_from(&redmaple_v2) {
+        match Body::try_from(&redmaple_v2) {
             Ok(b) => match b {
                 Body::OneLineText(text) => {
-                    if text == VALID_BODY_TEXT_TWO.to_string() {
+                    if text == *VALID_BODY_TEXT_TWO {
                         Ok(())
                     } else {
                         Err(format!(
@@ -165,7 +165,7 @@ mod tests {
             Err(e) => Err(format!(
                 "Should be able to get a body. but instead it got: {e}"
             )),
-        }?;
+        }?;;
 
         Ok(())
     }
