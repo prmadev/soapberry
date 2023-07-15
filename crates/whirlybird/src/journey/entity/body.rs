@@ -100,8 +100,7 @@ mod tests {
         }
     }
 
-    #[test]
-    fn test_body_from_redmaple() -> Result<(), String> {
+    fn single_event_maple() -> Result<redmaple::RedMaple<EventWrapper>, String> {
         let first_event = {
             let this_event_time = OffsetDateTime::now_utc();
             let new_maple = Maple::new(
@@ -110,7 +109,47 @@ mod tests {
                     format!("a valid body should not get error. but instead it got one: {e}")
                 })?,
             );
+            EventWrapper::new(
+                this_event_time.into(),
+                this_event_time,
+                Event::MapleCreated(new_maple),
+            )
+        };
+        Ok(RedMaple::new(vec![first_event]))
+    }
 
+    fn updated_maple() -> Result<redmaple::RedMaple<EventWrapper>, String> {
+        let the_redmaple = single_event_maple()?;
+
+        let body_updated_event = {
+            let this_event_time = OffsetDateTime::now_utc();
+            let valid_maple_id = ValidMapleID::try_from(&the_redmaple).map_err(|err| format!("I redmaple with events should be able to give out valid maple ids but it could not. instead got: {err}"))?;
+            EventWrapper::new(
+                this_event_time.into(),
+                this_event_time,
+                Event::MapleBodyUpdated(
+                    valid_maple_id,
+                    Body::try_from(VALID_BODY_TEXT_TWO.to_owned()).map_err(|err| {
+                        format!("Should be able to get a body. but instead it got one: {err}")
+                    })?,
+                ),
+            )
+        };
+
+        Ok(the_redmaple.into_appended(body_updated_event))
+    }
+
+    fn linked_maple() -> Result<redmaple::RedMaple<EventWrapper>, String> {
+        let redmaple_after_body_updated = updated_maple()?;
+
+        let another_redmaples_first_event = {
+            let this_event_time = OffsetDateTime::now_utc();
+            let new_maple = Maple::new(
+                this_event_time.into(),
+                Body::try_from(VALID_BODY_TEXT.to_owned()).map_err(|e| {
+                    format!("a valid body should not get error. but instead it got one: {e}")
+                })?,
+            );
             EventWrapper::new(
                 this_event_time.into(),
                 this_event_time,
@@ -118,7 +157,47 @@ mod tests {
             )
         };
 
-        let the_redmaple = RedMaple::new(vec![first_event]);
+        let another_redmaple = RedMaple::new(vec![another_redmaples_first_event]);
+        let linked_event = {
+            let this_event_time = OffsetDateTime::now_utc();
+            let valid_maple_id = ValidMapleID::try_from(&another_redmaple).map_err(|err| format!("I redmaple with events should be able to give out valid maple ids but it could not. instead got: {err}"))?;
+            EventWrapper::new(
+                this_event_time.into(),
+                this_event_time,
+                Event::LinkAdded((
+                    valid_maple_id,
+                    "some exaplanation".to_owned(),
+                    ID::from(this_event_time),
+                )),
+            )
+        };
+
+        Ok(redmaple_after_body_updated.into_appended(linked_event))
+    }
+
+    fn dislinked_maple() -> Result<redmaple::RedMaple<EventWrapper>, String> {
+        let redmaple_after_linking = linked_maple()?;
+
+        let dislinked_event = {
+            let this_event_time = OffsetDateTime::now_utc();
+            let ls = Links::from(&redmaple_after_linking);
+            let l =
+                ls.0.first()
+                    .ok_or("could not find a link when I should have found one!")?;
+
+            EventWrapper::new(
+                this_event_time.into(),
+                this_event_time,
+                Event::Dislinked(l.id().clone()),
+            )
+        };
+
+        Ok(redmaple_after_linking.into_appended(dislinked_event))
+    }
+
+    #[test]
+    fn test_body_from_single_event_maple() -> Result<(), String> {
+        let the_redmaple = single_event_maple()?;
         match Body::try_from(&the_redmaple) {
             Ok(b) => match b {
                 Body::OneLineText(text) => {
@@ -132,25 +211,12 @@ mod tests {
             Err(e) => Err(format!(
                 "Should be able to get a body. but instead it got one: {e}"
             )),
-        }?;
+        }
+    }
 
-        let body_updated_event = {
-            let this_event_time = OffsetDateTime::now_utc();
-            let valid_maple_id = ValidMapleID::try_from(&the_redmaple).map_err(|err| format!("I redmaple with events should be able to give out valid maple ids but it could not. instead got: {err}"))?;
-
-            EventWrapper::new(
-                this_event_time.into(),
-                this_event_time,
-                Event::MapleBodyUpdated(
-                    valid_maple_id,
-                    Body::try_from(VALID_BODY_TEXT_TWO.to_owned()).map_err(|err| {
-                        format!("Should be able to get a body. but instead it got one: {err}")
-                    })?,
-                ),
-            )
-        };
-
-        let redmaple_after_body_updated = the_redmaple.into_appended(body_updated_event);
+    #[test]
+    fn test_body_from_updated_maple() -> Result<(), String> {
+        let redmaple_after_body_updated = updated_maple()?;
 
         match Body::try_from(&redmaple_after_body_updated) {
             Ok(b) => match b {
@@ -167,42 +233,12 @@ mod tests {
             Err(e) => Err(format!(
                 "Should be able to get a body. but instead it got: {e}"
             )),
-        }?;
+        }
+    }
 
-        let another_redmaples_first_event = {
-            let this_event_time = OffsetDateTime::now_utc();
-            let new_maple = Maple::new(
-                this_event_time.into(),
-                Body::try_from(VALID_BODY_TEXT.to_owned()).map_err(|e| {
-                    format!("a valid body should not get error. but instead it got one: {e}")
-                })?,
-            );
-
-            EventWrapper::new(
-                this_event_time.into(),
-                this_event_time,
-                Event::MapleCreated(new_maple),
-            )
-        };
-
-        let another_redmaple = RedMaple::new(vec![another_redmaples_first_event]);
-
-        let linked_event = {
-            let this_event_time = OffsetDateTime::now_utc();
-            let valid_maple_id = ValidMapleID::try_from(&another_redmaple).map_err(|err| format!("I redmaple with events should be able to give out valid maple ids but it could not. instead got: {err}"))?;
-
-            EventWrapper::new(
-                this_event_time.into(),
-                this_event_time,
-                Event::LinkAdded((
-                    valid_maple_id,
-                    "some exaplanation".to_owned(),
-                    ID::from(this_event_time),
-                )),
-            )
-        };
-
-        let redmaple_after_linking = redmaple_after_body_updated.into_appended(linked_event);
+    #[test]
+    fn test_body_from_linked_maple() -> Result<(), String> {
+        let redmaple_after_linking = linked_maple()?;
         match Body::try_from(&redmaple_after_linking) {
             Ok(b) => match b {
                 Body::OneLineText(text) => {
@@ -218,23 +254,12 @@ mod tests {
             Err(e) => Err(format!(
                 "Should be able to get a body. but instead it got: {e}"
             )),
-        }?;
+        }
+    }
 
-        let dislinked_event = {
-            let this_event_time = OffsetDateTime::now_utc();
-            let ls = Links::from(&redmaple_after_linking);
-            let l =
-                ls.0.first()
-                    .ok_or("could not find a link when I should have found one!")?;
-
-            EventWrapper::new(
-                this_event_time.into(),
-                this_event_time,
-                Event::Dislinked(l.id().clone()),
-            )
-        };
-
-        let redmaple_after_dislinking = redmaple_after_linking.into_appended(dislinked_event);
+    #[test]
+    fn test_body_from_dislinked_maple() -> Result<(), String> {
+        let redmaple_after_dislinking = dislinked_maple()?;
         match Body::try_from(&redmaple_after_dislinking) {
             Ok(b) => match b {
                 Body::OneLineText(text) => {
@@ -254,6 +279,7 @@ mod tests {
 
         Ok(())
     }
+
     #[test]
     fn test_body_print() -> Result<(), String> {
         let valid_string = Body::try_from(VALID_BODY_TEXT.to_owned());
