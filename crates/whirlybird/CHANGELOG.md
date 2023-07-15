@@ -120,6 +120,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.2](https://github.com/amirography/soapberry/compare/whirlybird-v0.13.1...whirlybird-v0.13.2) - 2023-07-15
+
+### Other
+- seperate tests into smaller parts
+- use clone instead of to_owned
+- use better handling of errors in tests
+- *(whirlybird)* complete tests for body
+- fix linting problem with regards to calling to_string on &str
+- auto linting fix
+
 ## [0.13.1](https://github.com/amirography/soapberry/compare/whirlybird-v0.13.0...whirlybird-v0.13.1) - 2023-07-15
 
 ### Other
