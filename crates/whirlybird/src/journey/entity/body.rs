@@ -78,7 +78,7 @@ mod tests {
 
     #[test]
     fn test_empty_body_from_string() -> Result<(), String> {
-        let empty_string = Body::try_from(EMPTY_BODY_TEXT.to_string());
+        let empty_string = Body::try_from(EMPTY_BODY_TEXT.to_owned());
         match empty_string {
             Ok(_) => Err("body should never be empty".to_owned()),
             Err(err) => match err {
@@ -89,7 +89,7 @@ mod tests {
 
     #[test]
     fn test_valid_body_from_string() -> Result<(), String> {
-        let valid_string = Body::try_from(VALID_BODY_TEXT.to_string());
+        let valid_string = Body::try_from(VALID_BODY_TEXT.to_owned());
         match valid_string {
             Ok(_) => Ok(()),
             Err(err) => Err(format!(
@@ -104,7 +104,7 @@ mod tests {
             let this_event_time = OffsetDateTime::now_utc();
             let new_maple = Maple::new(
                 this_event_time.into(),
-                Body::try_from(VALID_BODY_TEXT.to_string()).map_err(|e| {
+                Body::try_from(VALID_BODY_TEXT.to_owned()).map_err(|e| {
                     format!("a valid body should not get error. but instead it got one: {e}")
                 })?,
             );
@@ -143,7 +143,6 @@ mod tests {
                     valid_maple_id,
                     Body::try_from(VALID_BODY_TEXT_TWO.to_owned()).map_err(|err| {
                         format!("Should be able to get a body. but instead it got one: {err}")
-                            
                     })?,
                 ),
             )
@@ -165,7 +164,7 @@ mod tests {
             Err(e) => Err(format!(
                 "Should be able to get a body. but instead it got: {e}"
             )),
-        }?;;
+        }?;
 
         Ok(())
     }
