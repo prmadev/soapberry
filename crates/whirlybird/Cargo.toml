@@ -1,6 +1,6 @@
 [package]
 name = "whirlybird"
-version = "0.13.1"
+version = "0.13.2"
 edition = "2021"
 authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
 description = "whirlybird is a library of generic type implementations for RedMaple library, that offers workflows for different events compatible with common contents like todos, blogs and etc."
