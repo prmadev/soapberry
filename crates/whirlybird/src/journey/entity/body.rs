@@ -63,3 +63,110 @@ impl From<&RedMaple<EventWrapper>> for Body {
             })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use time::OffsetDateTime;
+
+    use crate::journey::{Maple, ValidMapleID};
+
+    use super::*;
+
+    const VALID_BODY_TEXT: &str = "Some Valid text";
+    const VALID_BODY_TEXT_TWO: &str = "Some Other Valid text";
+    const EMPTY_BODY_TEXT: &str = "";
+
+    #[test]
+    fn test_empty_body_from_string() -> Result<(), String> {
+        let empty_string = Body::try_from(EMPTY_BODY_TEXT.to_string());
+        match empty_string {
+            Ok(_) => Err("body should never be empty".to_owned()),
+            Err(err) => match err {
+                BuildingError::TextCannotBeEmpty => Ok(()),
+            },
+        }
+    }
+
+    #[test]
+    fn test_valid_body_from_string() -> Result<(), String> {
+        let valid_string = Body::try_from(VALID_BODY_TEXT.to_string());
+        match valid_string {
+            Ok(_) => Ok(()),
+            Err(err) => Err(format!(
+                "a valid body should not get error. but instead it got one: {err}"
+            )),
+        }
+    }
+
+    #[test]
+    fn test_body_from_redmaple() -> Result<(), String> {
+        let first_event = {
+            let this_event_time = OffsetDateTime::now_utc();
+            let new_maple = Maple::new(
+                this_event_time.into(),
+                Body::try_from(VALID_BODY_TEXT.to_string()).map_err(|e| {
+                    format!("a valid body should not get error. but instead it got one: {e}")
+                })?,
+            );
+
+            EventWrapper::new(
+                this_event_time.into(),
+                this_event_time,
+                Event::MapleCreated(new_maple),
+            )
+        };
+
+        let the_redmaple = RedMaple::new(vec![first_event]);
+        let _ = match Body::try_from(&the_redmaple) {
+            Ok(b) => match b {
+                Body::OneLineText(text) => {
+                    if text == VALID_BODY_TEXT {
+                        Ok(())
+                    } else {
+                        Err(format!("wanted '{VALID_BODY_TEXT}', instead go '{text}'"))
+                    }
+                }
+            },
+            Err(e) => Err(format!(
+                "Should be able to get a body. but instead it got one: {e}"
+            )),
+        }?;
+
+        let second_event = {
+            let this_event_time = OffsetDateTime::now_utc();
+            let valid_maple_id = ValidMapleID::try_from(&the_redmaple).map_err(|err| format!("I redmaple with events should be able to give out valid maple ids but it could not. instead got: {err}"))?;
+
+            EventWrapper::new(
+                this_event_time.into(),
+                this_event_time,
+                Event::MapleBodyUpdated(
+                    valid_maple_id,
+                    Body::try_from(VALID_BODY_TEXT_TWO.to_owned()).map_err(|err| {
+                        format!("Should be able to get a body. but instead it got one: {err}")
+                            .to_owned()
+                    })?,
+                ),
+            )
+        };
+
+        let redmaple_v2 = the_redmaple.into_appended(second_event);
+        _ = match Body::try_from(&redmaple_v2) {
+            Ok(b) => match b {
+                Body::OneLineText(text) => {
+                    if text == VALID_BODY_TEXT_TWO.to_string() {
+                        Ok(())
+                    } else {
+                        Err(format!(
+                            "wanted '{VALID_BODY_TEXT_TWO}', instead got '{text}'"
+                        ))
+                    }
+                }
+            },
+            Err(e) => Err(format!(
+                "Should be able to get a body. but instead it got: {e}"
+            )),
+        }?;
+
+        Ok(())
+    }
+}
