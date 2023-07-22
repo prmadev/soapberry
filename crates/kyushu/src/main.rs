@@ -75,7 +75,6 @@ use thiserror::Error;
 use time::{format_description, OffsetDateTime};
 use whirlybird::journey::{self, Body, Event, EventWrapper, Link, Links, ValidMapleID};
 
-#[allow(unreachable_code)]
 fn main() -> color_eyre::Result<()> {
     // color_eyre::install()?;
 
