@@ -88,7 +88,7 @@
     in {
       checks =
         {
-          # inherit kyushu;
+          inherit kyushu;
 
           the-clippy = craneLib.cargoClippy (commonArgs
             // {
@@ -136,21 +136,20 @@
       packages.default = kyushu;
 
       apps.default = flake-utils.lib.mkApp {
-        # inherit src advisory-db;
         drv = kyushu;
       };
 
-      # devShells.default = pkgs.mkShell {
-      #   inputsFrom = builtins.attrValues self.checks.${system};
+      devShells.default = pkgs.mkShell {
+        inputsFrom = builtins.attrValues self.checks.${system};
 
-      #   # Additional dev-shell environment variables can be set directly
-      #   # MY_CUSTOM_DEVELOPMENT_VAR = "something else";
+        # Additional dev-shell environment variables can be set directly
+        # MY_CUSTOM_DEVELOPMENT_VAR = "something else";
 
-      #   # Extra inputs can be added here
-      #   nativeBuildInputs = with pkgs; [
-      #     cargo
-      #     rustc
-      #   ];
-      # };
+        # Extra inputs can be added here
+        nativeBuildInputs = with pkgs; [
+          cargo
+          rustc
+        ];
+      };
     });
 }
