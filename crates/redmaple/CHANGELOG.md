@@ -127,6 +127,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.1](https://github.com/amirography/soapberry/compare/redmaple-v0.18.0...redmaple-v0.18.1) - 2023-07-22
+
+### Other
+- refactor main os derive
+
 ## [0.18.0](https://github.com/amirography/soapberry/compare/redmaple-v0.17.0...redmaple-v0.18.0) - 2023-07-15
 
 ### Added
