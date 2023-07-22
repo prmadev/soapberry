@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "advisory-db": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1689698236,
+        "narHash": "sha256-Qz9JxGKeA3jwuj1CdK9ejMJ7VsJRdiZniF8lx4mft9s=",
+        "owner": "rustsec",
+        "repo": "advisory-db",
+        "rev": "4aa517564d1d06f0e79784c8ad973a59d68aa9c8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rustsec",
+        "repo": "advisory-db",
+        "type": "github"
+      }
+    },
     "crane": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -20,6 +36,27 @@
       "original": {
         "owner": "ipetkov",
         "repo": "crane",
+        "type": "github"
+      }
+    },
+    "fenix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-analyzer-src": []
+      },
+      "locked": {
+        "lastModified": 1689920490,
+        "narHash": "sha256-u/mglflFeXa2bUlN6KJmSyKbibpIhTiPgyW1PJ1rC6E=",
+        "owner": "nix-community",
+        "repo": "fenix",
+        "rev": "efa52586ba0ba96e06de0c549ee2f614ac928be7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "fenix",
         "type": "github"
       }
     },
@@ -93,7 +130,9 @@
     },
     "root": {
       "inputs": {
+        "advisory-db": "advisory-db",
         "crane": "crane",
+        "fenix": "fenix",
         "flake-utils": "flake-utils_2",
         "nixpkgs": "nixpkgs",
         "rust-overlay": "rust-overlay_2"
