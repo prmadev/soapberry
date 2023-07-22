@@ -2,4 +2,5 @@ target/
 devenv/
 .devenv/
 .pre-commit-config.yaml
+result/
 

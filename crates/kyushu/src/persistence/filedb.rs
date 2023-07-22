@@ -16,9 +16,9 @@ use whirlybird::journey::{EventWrapper, IDGetterError, ValidMapleID};
 // pub struct AhmadTheFriend();
 
 /// Selda holds a valid path for our forest
-pub struct SeldaTheListner(PathBuf);
+pub struct SeldaTheListener(PathBuf);
 
-impl TryFrom<PathBuf> for SeldaTheListner {
+impl TryFrom<PathBuf> for SeldaTheListener {
     type Error = FrostElfError;
 
     fn try_from(path_to_forest: PathBuf) -> Result<Self, Self::Error> {
@@ -32,7 +32,7 @@ impl TryFrom<PathBuf> for SeldaTheListner {
 }
 
 /// Amin plants new maples
-pub struct AminTheSinger(SeldaTheListner);
+pub struct AminTheSinger(SeldaTheListener);
 
 impl BeeElf for AminTheSinger {
     type Item = EventWrapper;
@@ -59,8 +59,8 @@ impl BeeElf for AminTheSinger {
     }
 }
 
-impl From<SeldaTheListner> for AminTheSinger {
-    fn from(selda: SeldaTheListner) -> Self {
+impl From<SeldaTheListener> for AminTheSinger {
+    fn from(selda: SeldaTheListener) -> Self {
         Self(selda)
     }
 }
@@ -68,7 +68,7 @@ impl From<SeldaTheListner> for AminTheSinger {
 /// parastoo keeps a list of all Maples
 pub struct ParastooTheKeeper {
     vines: Vec<(PathBuf, OnceCell<RedMaple<EventWrapper>>)>,
-    the_path: SeldaTheListner,
+    the_path: SeldaTheListener,
 }
 
 impl TrackerElf for ParastooTheKeeper {
@@ -219,10 +219,10 @@ impl GardnerElf for ParastooTheKeeper {
     }
 }
 
-impl TryFrom<SeldaTheListner> for ParastooTheKeeper {
+impl TryFrom<SeldaTheListener> for ParastooTheKeeper {
     type Error = FrostElfError;
 
-    fn try_from(selda: SeldaTheListner) -> Result<Self, Self::Error> {
+    fn try_from(selda: SeldaTheListener) -> Result<Self, Self::Error> {
         Ok(Self {
             // IO impurity
             vines: read_dir(&selda.0) // create a directory reader

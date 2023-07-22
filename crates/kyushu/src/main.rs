@@ -1,4 +1,27 @@
-//! Kyushu is a local-first, plain-text, event-driven journaling tool for the modern age
+//! Kyushu is a local-first, plain-text,
+//! event-driven journaling tool for the modern age
+//
+//             ▄▓████▄  ▄██▄
+//         ▓▓ ████████████████▄
+//        ▓███████▓     █▓████████▄
+//       ▓█████████▄  ▜███████ ██████
+//         ▓████████▄    ▓██████▓ ▓███▄
+//            ██▀       ███ ██████████
+//             ▀▀█       █   ▄▄▄▄    ██
+//       ▓▓██▓    █      █  ▓████▓ ██ ██▓
+//      ▓███████   █    █   ▓███████████▀
+//    ▓████████▄▄▄ █▄█████▄▄▄████████▀
+//     ▓████████ ▀▀▀▀███▀▀████▀
+//      ▓████         ▀███
+//                   ▀███▀ ▄▀
+//                    ▓▓██▀
+//                    ▓▓██
+//                    ▓███
+//                    ▓███
+//                    ▓███
+//                   ▓████▄
+//                 ▄▄██████▄
+//  ▄▄▄▄▄▄▄▄▄▄▄ ▄▄████████████▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 
 #![deny(missing_docs)]
 #![deny(clippy::expect_used)]
@@ -33,7 +56,7 @@
 )]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-use std::path::PathBuf;
+use std::{ffi::OsString, fmt::Debug, path::PathBuf};
 
 use clap::Parser;
 use kyushu::{
@@ -60,17 +83,12 @@ fn main() -> color_eyre::Result<()> {
     let mut config_file_output: Option<Config> = Option::default();
 
     // finding the platform specific directory
-    let config_dir = match std::env::consts::OS {
-        "linux" | "openbsd" | "netbsd" | "freebsd" | "dragonfly" => {
-            std::env::var_os("XDG_CONFIG_HOME").map(PathBuf::from)
-        }
-        "macos" => std::env::var_os("HOME")
-            .map(|o| PathBuf::from(o).join("Library").join("Application Support")),
-        "solaris" => std::env::var_os("HOME").map(|o| PathBuf::from(o).join(".config")),
-        "windows" => std::env::var_os("USERPROFILE")
-            .map(|o| PathBuf::from(o).join("AppData").join("Roaming")),
-        _ => None,
-    };
+    let config_dir = config_dir_from_os(
+        std::env::consts::OS,
+        std::env::var_os("XDG_CONFIG_HOME"),
+        std::env::var_os("HOME"),
+        std::env::var_os("USERPROFILE"),
+    );
 
     if let Some(config) = config_dir {
         let config_file_path = config.join("kyushu").join("config.json");
@@ -89,7 +107,7 @@ fn main() -> color_eyre::Result<()> {
     ));
 
     // creating persistence
-    let selda = persistence::SeldaTheListner::try_from(
+    let selda = persistence::SeldaTheListener::try_from(
         configurations
             .file_store
             .ok_or(MainError::FileStoreCannotBeEmpty)?,
@@ -97,7 +115,7 @@ fn main() -> color_eyre::Result<()> {
 
     let time_now = time::OffsetDateTime::now_utc();
 
-    // matching requests to the appropiate functions
+    // matching requests to the appropriate functions
     match cli_arguments.to_request(time_now)? {
         Request::Change((time_of_change, the_change)) => match the_change {
             Change::CreateNewMaple(the_new_maple) => {
@@ -331,7 +349,7 @@ fn show_forest(
         .map(|rm| -> Result<MaplePrinter, String> {
             MaplePrinter::new_with_local_offset(
                 ValidMapleID::try_from(**rm)
-                    .map_err(|er| format!("could nto create id for map{er}"))?,
+                    .map_err(|er| format!("could not create id for map{er}"))?,
                 Body::from(**rm),
                 *rm.time_created()
                     .ok_or("Could not find the time created".to_owned())?,
@@ -384,14 +402,10 @@ fn water_maple(
             FrostElfError::FailedToCreateNewFile(err)
             | FrostElfError::FailedToWriteIntoFile(err) => return Err(err)?,
             FrostElfError::FailedToGetID(err) => return Err(err)?,
-            FrostElfError::FailedToFindASingleMatchingItem(err) => {
-                return Err(color_eyre::Report::msg(format!("{err:#?}")))?
-            }
+            FrostElfError::FailedToFindASingleMatchingItem(err) => return Err(to_ce_error(err))?,
             FrostElfError::FileExists(err)
             | FrostElfError::FileDoesNotExists(err)
-            | FrostElfError::GivenPathDoesNotExist(err) => {
-                Err(color_eyre::Report::msg(format!("{err:#?}")))?
-            }
+            | FrostElfError::GivenPathDoesNotExist(err) => Err(to_ce_error(err))?,
             FrostElfError::FileReadFailed(err) | FrostElfError::CouldNotReadTheDirectory(err) => {
                 return Err(err)?
             }
@@ -409,6 +423,10 @@ fn water_maple(
     Ok(())
 }
 
+fn to_ce_error(e: impl Debug) -> color_eyre::Report {
+    color_eyre::Report::msg(format!("{e:#?}"))
+}
+
 #[derive(Debug, Error)]
 enum MainError {
     #[error("file store must be given")]
@@ -419,4 +437,21 @@ enum MainError {
 
     #[error("Matched too many links")]
     TooManyLinksMatched,
+}
+
+fn config_dir_from_os(
+    os_name: &str,
+    xdg_config_home: Option<OsString>,
+    home: Option<OsString>,
+    userprofile: Option<OsString>,
+) -> Option<PathBuf> {
+    match os_name {
+        "linux" | "openbsd" | "netbsd" | "freebsd" | "dragonfly" => {
+            xdg_config_home.map(PathBuf::from)
+        }
+        "macos" => home.map(|o| PathBuf::from(o).join("Library").join("Application Support")),
+        "solaris" => home.map(|o| PathBuf::from(o).join(".config")),
+        "windows" => userprofile.map(|o| PathBuf::from(o).join("AppData").join("Roaming")),
+        _ => None,
+    }
 }
