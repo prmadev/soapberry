@@ -118,8 +118,7 @@ fn main() -> color_eyre::Result<()> {
     match cli_arguments.to_request(time_now)? {
         Request::Change((time_of_change, the_change)) => match the_change {
             Change::CreateNewMaple(the_new_maple) => {
-                let amin = AminTheSinger::from(selda);
-                plant_maple(&amin, the_new_maple, time_of_change)?;
+                plant_maple(&AminTheSinger::from(selda), the_new_maple, time_of_change)?
             }
 
             Change::UpdateMapleBody(maple_id, the_new_body) => {
@@ -159,8 +158,7 @@ fn main() -> color_eyre::Result<()> {
 
         Request::Information(i) => match i {
             kyushu::domain::requests::Information::ListEntries => {
-                let parastoo = ParastooTheKeeper::try_from(selda)?;
-                show_forest(&parastoo)?;
+                show_forest(&ParastooTheKeeper::try_from(selda)?)?;
             }
         },
     };
