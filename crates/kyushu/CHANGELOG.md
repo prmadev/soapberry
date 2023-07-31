@@ -517,6 +517,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.1](https://github.com/prmadev/soapberry/compare/kyushu-v0.18.0...kyushu-v0.18.1) - 2023-07-31
+
+### Added
+- update username
+
+### Fixed
+- fix a linting issue
+
+### Other
+- make things more simple
+- remove unused attribute
+
 ## [0.18.0](https://github.com/prmadev/soapberry/compare/kyushu-v0.17.1...kyushu-v0.18.0) - 2023-07-22
 
 ### Other
