@@ -23,7 +23,7 @@ Anyways. This Book contains two parts.
 
 ## Note on grammatical and spelling mistakes
 Please note that English is not my native language.
-So if you have seen any mistakes please [open an issue](https://github.com/amirography/soapberry/issues/new) or make a pull-request.
+So if you have seen any mistakes please [open an issue](https://github.com/prmadev/soapberry/issues/new) or make a pull-request.
 I will appreciate it! 
 
 <figure ><img src="./assets/thedoghousediaries-2009-04-08-433fddd4d4118d0e16456cac6db7eb70.jpg"> </img> <figcaption > TheDogHouseDiaries.com, Creative Commons Attribution-NonCommercial 4.0</figcaption> </figure>

@@ -36,6 +36,25 @@ impl TryFrom<PathBuf> for SeldaTheListener {
     }
 }
 
+/// This shall plant ta new tree
+pub fn planter<F>(i: PathBuf) -> impl Fn(RedMaple<EventWrapper>) -> Result<(), FrostElfError> {
+    move |item| {
+        let file_path = i.join(format!("{}.json", ValidMapleID::try_from(&item)?.inner()));
+
+        // IO impurity
+        if file_path.exists() {
+            return Err(FrostElfError::FileExists(file_path));
+        }
+
+        let the_song = serde_json::to_string_pretty(&item)
+            .map_err(FrostElfError::FailedToSerialize)?
+            .into_bytes();
+
+        // IO impurity
+        fs::write(file_path, the_song).map_err(FrostElfError::FailedToWriteIntoFile)
+    }
+}
+
 /// Amin plants new maples
 pub struct AminTheSinger(SeldaTheListener);
 

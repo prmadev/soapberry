@@ -4,10 +4,10 @@
 
 
 <p align="center">
-  <img alt="builds" src="https://img.shields.io/github/actions/workflow/status/amirography/soapberry/cargo-build.yml?color=%23eed49f&label=build&logo=Rust&logoColor=%23eed49f&style=for-the-badge">
-  <img alt="formaters" src="https://img.shields.io/github/actions/workflow/status/amirography/soapberry/cargo-fmt.yml?color=%23a6da95&label=formatted&logo=Rust&logoColor=%23a6da95&style=for-the-badge">
-  <img alt="lints" src="https://img.shields.io/github/actions/workflow/status/amirography/soapberry/cargo-clippy.yml?color=%23f5bde6&label=lints&logo=Rust&logoColor=%23f5bde6&style=for-the-badge">
-  <img alt="tests" src="https://img.shields.io/github/actions/workflow/status/amirography/soapberry/cargo-test.yml?color=%23f0c6c6&label=tests&logo=Rust&logoColor=%23f0c6c6&style=for-the-badge">
+  <img alt="builds" src="https://img.shields.io/github/actions/workflow/status/prmadev/soapberry/cargo-build.yml?color=%23eed49f&label=build&logo=Rust&logoColor=%23eed49f&style=for-the-badge">
+  <img alt="formaters" src="https://img.shields.io/github/actions/workflow/status/prmadev/soapberry/cargo-fmt.yml?color=%23a6da95&label=formatted&logo=Rust&logoColor=%23a6da95&style=for-the-badge">
+  <img alt="lints" src="https://img.shields.io/github/actions/workflow/status/prmadev/soapberry/cargo-clippy.yml?color=%23f5bde6&label=lints&logo=Rust&logoColor=%23f5bde6&style=for-the-badge">
+  <img alt="tests" src="https://img.shields.io/github/actions/workflow/status/prmadev/soapberry/cargo-test.yml?color=%23f0c6c6&label=tests&logo=Rust&logoColor=%23f0c6c6&style=for-the-badge">
 </p>
 
 <p align="center">
@@ -22,7 +22,7 @@ Event-sourced libraries and binary for aggregating, shaping, and journaling, as 
 
 ## Documentation
 <p align="center">
-  <a href="https://amirography.github.io/soapberry/">
+  <a href="https://prmadev.github.io/soapberry/">
     <img alt="tests" src="https://img.shields.io/static/v1?label=documentation&message=mdbook&color=c6a0f6&logo=Rust&logoColor=c6a0f6&style=for-the-badge">
   </a>
   <a href="https://docs.rs/redmaple/latest/redmaple/">
@@ -35,7 +35,7 @@ Event-sourced libraries and binary for aggregating, shaping, and journaling, as 
 
 > *Indeed, I am aware of the vibrant and seemingly chaotic appearance of this page, reminiscent of a unicorn's explosion within a candy factory. Please bear with me as I diligently work towards completing the documentation within the allotted time. Rest assured, the colors will gradually transform, becoming less reminiscent of a child's bewildered expression in an art shop left unattended.* 
 
-- [**The Book**](https://amirography.github.io/soapberry/): Presently, an exquisite online book exists to document the development progress and overarching decisions pertaining to all the projects housed under Soapberry. While the book may appear sparse at the moment, it will progressively flourish with substantial content over time. Currently, it encompasses the following information:
+- [**The Book**](https://prmadev.github.io/soapberry/): Presently, an exquisite online book exists to document the development progress and overarching decisions pertaining to all the projects housed under Soapberry. While the book may appear sparse at the moment, it will progressively flourish with substantial content over time. Currently, it encompasses the following information:
 
   - Architectural Decision Records (ADRs) that capture crucial decisions made throughout the development process.
   - Insights on how an `mdBook` can genuinely transform into a visually captivating masterpiece, ensuring an aesthetically pleasing reading experience.
@@ -87,7 +87,7 @@ I meticulously update project status, while automated badges dynamically reflect
 ### Development
 
 
-<img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/y/amirography/soapberry?color=%238bd5ca&logo=git&logoColor=%238bd5ca&style=for-the-badge">
+<img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/y/prmadev/soapberry?color=%238bd5ca&logo=git&logoColor=%238bd5ca&style=for-the-badge">
 
 Engaged in active development, I currently prioritize the project's overarching design.
 Beyond mere code, I delve into diverse forms, conducting research and experimentation.
@@ -99,9 +99,9 @@ Presently, consider the project to reside in the pre-alpha stage.
 ### Dependencies
 
 <p align="left">
-  <img alt="up to date" src="https://img.shields.io/github/actions/workflow/status/amirography/soapberry/cargo-outdated.yml?color=%237dc4e4&label=up-to-date&logo=Rust&logoColor=%237dc4e4&style=for-the-badge">
-  <img alt="no unused dependencies" src="https://img.shields.io/github/actions/workflow/status/amirography/soapberry/cargo-udep.yml?color=%23a6da95&label=no-unused&logo=Rust&logoColor=%23a6da95&style=for-the-badge">
-  <img alt="license consistency" src="https://img.shields.io/github/actions/workflow/status/amirography/soapberry/cargo-deny.yml?color=%238aadf4&label=licenses-compatible&logo=Rust&logoColor=%238aadf4&style=for-the-badge">
+  <img alt="up to date" src="https://img.shields.io/github/actions/workflow/status/prmadev/soapberry/cargo-outdated.yml?color=%237dc4e4&label=up-to-date&logo=Rust&logoColor=%237dc4e4&style=for-the-badge">
+  <img alt="no unused dependencies" src="https://img.shields.io/github/actions/workflow/status/prmadev/soapberry/cargo-udep.yml?color=%23a6da95&label=no-unused&logo=Rust&logoColor=%23a6da95&style=for-the-badge">
+  <img alt="license consistency" src="https://img.shields.io/github/actions/workflow/status/prmadev/soapberry/cargo-deny.yml?color=%238aadf4&label=licenses-compatible&logo=Rust&logoColor=%238aadf4&style=for-the-badge">
 </p>
 
 Inevitably reliant on libraries, I diligently undertake several measures:
@@ -112,8 +112,8 @@ Inevitably reliant on libraries, I diligently undertake several measures:
 ### Security
 
 <p align="left">
-  <img alt="advisory audit" src="https://img.shields.io/github/actions/workflow/status/amirography/soapberry/cargo-audit.yml?color=%23eed49f&label=audits&logo=Rust&logoColor=%23eed49f&style=for-the-badge">
-  <img alt="secure dependencies" src="https://img.shields.io/github/actions/workflow/status/amirography/soapberry/cargo-pants.yml?color=%23f0c6c6&label=secure-dependencies&logo=Rust&logoColor=%23f0c6c6&style=for-the-badge">
+  <img alt="advisory audit" src="https://img.shields.io/github/actions/workflow/status/prmadev/soapberry/cargo-audit.yml?color=%23eed49f&label=audits&logo=Rust&logoColor=%23eed49f&style=for-the-badge">
+  <img alt="secure dependencies" src="https://img.shields.io/github/actions/workflow/status/prmadev/soapberry/cargo-pants.yml?color=%23f0c6c6&label=secure-dependencies&logo=Rust&logoColor=%23f0c6c6&style=for-the-badge">
 </p>
 
 Imbued with a deep sense of responsibility towards security, I earnestly emphasize its significance.

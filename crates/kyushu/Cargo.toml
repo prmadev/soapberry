@@ -5,8 +5,8 @@ version = "0.18.0"
 edition = "2021"
 authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
 
-homepage = "https://github.com/amirography/soapberry/tree/main/crates/kyushu"
-repository = "https://github.com/amirography/soapberry/tree/main/crates/kyushu"
+homepage = "https://github.com/prmadev/soapberry/tree/main/crates/kyushu"
+repository = "https://github.com/prmadev/soapberry/tree/main/crates/kyushu"
 license = "MPL-2.0"
 readme = "README.md"
 categories = ["command-line-utilities"]

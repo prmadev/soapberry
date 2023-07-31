@@ -2,10 +2,10 @@
 name = "redmaple"
 version = "0.18.1"
 edition = "2021"
-authors = ["Amir Alesheikh <amirhossein.alehseikh@gmail.com>"]
+authors = ["Perma <prma.dev@protonmail.com>"]
 description = "RedMaple offers an oppinionated yet extremely flexible data modeling system based on events for backend applications"
-homepage = "https://github.com/amirography/soapberry/tree/main/crates/redmaple"
-repository = "https://github.com/amirography/soapberry/tree/main/crates/redmaple"
+homepage = "https://github.com/prmadev/soapberry/tree/main/crates/redmaple"
+repository = "https://github.com/prmadev/soapberry/tree/main/crates/redmaple"
 license = "MPL-2.0"
 categories = ["data-structures"]
 keywords = ["data_model", "event-sourcing", "events"]
