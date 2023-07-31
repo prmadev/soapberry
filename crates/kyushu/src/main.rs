@@ -118,7 +118,7 @@ fn main() -> color_eyre::Result<()> {
     match cli_arguments.to_request(time_now)? {
         Request::Change((time_of_change, the_change)) => match the_change {
             Change::CreateNewMaple(the_new_maple) => {
-                plant_maple(&AminTheSinger::from(selda), the_new_maple, time_of_change)?
+                plant_maple(&AminTheSinger::from(selda), the_new_maple, time_of_change)?;
             }
 
             Change::UpdateMapleBody(maple_id, the_new_body) => {
