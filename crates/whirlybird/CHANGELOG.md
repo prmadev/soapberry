@@ -120,6 +120,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.4](https://github.com/prmadev/soapberry/compare/whirlybird-v0.13.3...whirlybird-v0.13.4) - 2023-07-31
+
+### Added
+- update username
+
 ## [0.13.3](https://github.com/prmadev/soapberry/compare/whirlybird-v0.13.2...whirlybird-v0.13.3) - 2023-07-22
 
 ### Other
